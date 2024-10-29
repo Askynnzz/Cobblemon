@@ -97,19 +97,13 @@ import com.cobblemon.mod.common.pokemon.properties.BattleCloneProperty
 import com.cobblemon.mod.common.pokemon.properties.UncatchableProperty
 import com.cobblemon.mod.common.pokemon.status.PersistentStatus
 import com.cobblemon.mod.common.pokemon.status.PersistentStatusContainer
-import com.cobblemon.mod.common.util.DataKeys
-import com.cobblemon.mod.common.util.cobblemonResource
+import com.cobblemon.mod.common.util.*
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP1
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP2
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP3
 import com.cobblemon.mod.common.util.codec.internal.PokemonP1
 import com.cobblemon.mod.common.util.codec.internal.PokemonP2
 import com.cobblemon.mod.common.util.codec.internal.PokemonP3
-import com.cobblemon.mod.common.util.lang
-import com.cobblemon.mod.common.util.playSoundServer
-import com.cobblemon.mod.common.util.server
-import com.cobblemon.mod.common.util.setPositionSafely
-import com.cobblemon.mod.common.util.toBlockPos
 import com.google.gson.JsonObject
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
@@ -591,7 +585,19 @@ open class Pokemon : ShowdownIdentifiable {
         illusion: IllusionEffect? = null,
         mutation: (PokemonEntity) -> Unit = {},
     ): CompletableFuture<PokemonEntity> {
-
+        // send out raft if over water
+        if (position != null) {
+//            println("POSITION NOT NULL FOR ${this.species.name}")
+            // todo if send out position is over water then add a raft entity to stand on
+            if (level.isWaterAt(
+                    BlockPos(
+                        position.x.toInt(),
+                        position.y.toInt() - 1,
+                        position.z.toInt()
+                    )
+                ) && this.species.types.all { it != ElementalTypes.WATER && it != ElementalTypes.FLYING }) {
+            }
+        }
 
         // Handle special case of shouldered Cobblemon
         if (this.state is ShoulderedState) {
@@ -608,6 +614,7 @@ open class Pokemon : ShowdownIdentifiable {
 
         preamble.thenApply {
             sendOut(level, position, illusion) {
+                entityIds.add(it.uuid)
                 val owner = getOwnerEntity()
                 if (owner is LivingEntity) {
                     owner.swing(InteractionHand.MAIN_HAND, true)
@@ -653,6 +660,7 @@ open class Pokemon : ShowdownIdentifiable {
                 if (owner != null) {
                     level.playSoundServer(owner.position(), CobblemonSounds.POKE_BALL_THROW, volume = 0.6F)
                 }
+//                println("SEND OUT: ${it.pokemon.species.name} ${position.x}, ${position.y}, ${position.z}")
                 it.ownerUUID = getOwnerUUID()
                 it.phasingTargetId = source.id
                 it.beamMode = 1
@@ -663,6 +671,7 @@ open class Pokemon : ShowdownIdentifiable {
                 }
 
                 it.after(seconds = THROW_DURATION) {
+//                    println("THROW DURATION ${it.pokemon.species.name}")
                     it.phasingTargetId = -1
                 }
 
@@ -806,7 +815,7 @@ open class Pokemon : ShowdownIdentifiable {
     }
 
     fun isFireImmune(): Boolean {
-        return ElementalTypes.FIRE in types || !form.behaviour.moving.swim.hurtByLava
+        return !form.behaviour.moving.swim.hurtByLava || (primaryType == ElementalTypes.FIRE || secondaryType == ElementalTypes.FIRE)
     }
 
     fun isPositionSafe(world: Level, pos: Vec3): Boolean {
@@ -924,7 +933,7 @@ open class Pokemon : ShowdownIdentifiable {
      *
      * @param stack The new [ItemStack] being set as the held item.
      * @param decrement If the given [stack] should have [ItemStack.decrement] invoked with the parameter of 1. Default is true.
-     * @return The existing [ItemStack] being held or the [stack] if [HeldItemEvent.Pre] is canceled.
+     * @return The existing [ItemStack] being held or [ItemStack.EMPTY] if [HeldItemEvent.Pre] is canceled.
      *
      * @see [HeldItemEvent]
      */
@@ -942,7 +951,7 @@ open class Pokemon : ShowdownIdentifiable {
             }
             return event.returning
         })
-        return stack
+        return ItemStack.EMPTY
     }
 
     /**
@@ -1014,16 +1023,17 @@ open class Pokemon : ShowdownIdentifiable {
         this.experience = other.experience
         this.setFriendship(other.friendship)
         // Applied before current health for calcs to take place
-        other.ivs.doWithoutEmitting {
-            this.ivs.forEach {
-                other.ivs[it.key] = it.value
+        this.ivs.doWithoutEmitting {
+            other.ivs.forEach {
+                this.ivs[it.key] = it.value
             }
         }
-        other.evs.doWithoutEmitting {
-            this.evs.forEach {
-                other.evs[it.key] = it.value
+        this.evs.doWithoutEmitting {
+            other.evs.forEach {
+                this.evs[it.key] = it.value
             }
         }
+        this.features = other.features
         this.currentHealth = other.currentHealth
         this.gender = other.gender
         this.moveSet.copyFrom(other.moveSet)
@@ -1058,7 +1068,11 @@ open class Pokemon : ShowdownIdentifiable {
     fun getOwnerEntity(): LivingEntity? {
         return storeCoordinates.get()?.let {
             if (isPlayerOwned()) {
-                server()?.playerList?.getPlayer(it.store.uuid)
+                if (it.store is PlayerPartyStore) {
+                    return it.store.playerUUID.getPlayer()
+                } else {
+                    return server()?.playerList?.getPlayer(it.store.uuid)
+                }
             } else if (isNPCOwned()) {
                 (it.store as NPCPartyStore).npc
             } else {
@@ -1660,6 +1674,7 @@ open class Pokemon : ShowdownIdentifiable {
     }
 
     companion object {
+        val entityIds = mutableSetOf<UUID>()
         /**
          * The [FriendshipMutationCalculator] used when a Pokémon levels up.
          */

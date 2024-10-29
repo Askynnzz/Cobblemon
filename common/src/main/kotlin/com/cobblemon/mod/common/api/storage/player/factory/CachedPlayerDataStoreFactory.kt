@@ -18,13 +18,14 @@ import com.cobblemon.mod.common.util.removeIf
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A type of data store that keeps a cache, entries are evicted when the cached player disconnects from the server
  */
 class CachedPlayerDataStoreFactory<T : InstancedPlayerData>(val backend: PlayerDataStoreBackend<T>) : PlayerInstancedDataFactory<T> {
 
-    private val cache = mutableMapOf<UUID, T>()
+    private val cache = ConcurrentHashMap<UUID, T>()
 
     override fun setup(server: MinecraftServer) {
         backend.setup(server);

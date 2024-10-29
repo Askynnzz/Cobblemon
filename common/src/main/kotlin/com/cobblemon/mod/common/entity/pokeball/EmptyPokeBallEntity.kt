@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonEntities.EMPTY_POKEBALL
 import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.PokemonCapturePreEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokeBallCaptureCalculatedEvent
 import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitEvent
 import com.cobblemon.mod.common.api.events.pokemon.PokemonCapturedEvent
@@ -348,6 +349,15 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
                 after(seconds = captureTime) {
                     // Dupes occurred by double-adding Pokémon, this hopefully prevents it triple-condom style
                     if (pokemon.pokemon.isWild() && pokemon.isAlive && !captureFuture.isDone) {
+                        CobblemonEvents.POKEMON_CAPTURE_PRE.postThen(
+                            event = PokemonCapturePreEvent(player, pokemon.pokemon, pokeBall),
+                            ifSucceeded = {
+                            },
+                            ifCanceled = {
+                                breakFree()
+                                return@after
+                            }
+                        )
                         pokemon.discard()
                         discard()
                         captureFuture.complete(true)

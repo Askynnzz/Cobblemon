@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.storage.player.GeneralPlayerData
 import com.cobblemon.mod.common.api.storage.player.PlayerDataExtension
 import com.cobblemon.mod.common.api.storage.player.PlayerInstancedDataStoreTypes
 import com.cobblemon.mod.common.util.adapters.IdentifierAdapter
+import com.cobblemon.mod.common.util.cobblemonResource
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.mongodb.client.MongoClient
@@ -35,7 +36,7 @@ class PlayerDataMongoBackend(mongoClient: MongoClient, databaseName: String, col
         starterLocked = !Cobblemon.starterConfig.allowStarterOnJoin,
         starterSelected =  false,
         starterUUID =  null,
-        keyItems = mutableSetOf(),
+        keyItems = mutableSetOf(cobblemonResource("key_stone"), cobblemonResource("z_ring")),
         extraData = mutableMapOf(),
         battleTheme = CobblemonSounds.PVP_BATTLE.location
     )}

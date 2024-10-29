@@ -12,6 +12,8 @@ import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.BattleStartEvent
 import com.cobblemon.mod.common.api.storage.party.PartyStore
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
@@ -115,8 +117,8 @@ object BattleBuilder {
         return if (errors.isEmpty) {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
-                side1 = BattleSide(player1Actor),
-                side2 = BattleSide(player2Actor)
+                side1 = BattleSide(player1Actor, leadingPokemon = leadingPokemonPlayer1),
+                side2 = BattleSide(player2Actor, leadingPokemon = leadingPokemonPlayer2)
             ).ifSuccessful {
                 it.battlePartyStores.addAll(battlePartyStores)
             }
@@ -280,12 +282,18 @@ object BattleBuilder {
             errors.participantErrors[wildActor] += BattleStartError.alreadyInBattle(wildActor)
         }
 
-        playerActor.battleTheme = pokemonEntity.getBattleTheme()
+        CobblemonEvents.BATTLE_START.postThen(
+            event = BattleStartEvent(playerActor, wildActor),
+            ifSucceeded = { },
+            ifCanceled = {
+                errors.participantErrors[playerActor] += BattleStartError.targetIsBusy(wildActor.getName())
+            }
+        )
 
         return if (errors.isEmpty) {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
-                side1 = BattleSide(playerActor),
+                side1 = BattleSide(playerActor, leadingPokemon = leadingPokemon),
                 side2 = BattleSide(wildActor)
             ).ifSuccessful {
                 if (!cloneParties) {

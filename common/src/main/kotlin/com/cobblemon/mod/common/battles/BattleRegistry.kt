@@ -16,12 +16,19 @@ import com.cobblemon.mod.common.api.events.battles.BattleStartedPreEvent
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemProvider
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.pokemon.status.Statuses
+import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
+import com.cobblemon.mod.common.battles.actor.TrainerBattleActor
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.battles.runner.ShowdownService
+import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
+import com.cobblemon.mod.common.entity.pokemon.effects.IllusionEffect
+import com.cobblemon.mod.common.util.server
 import com.google.gson.GsonBuilder
+import net.minecraft.server.level.ServerLevel
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.LivingEntity
 
 object BattleRegistry {
 
@@ -161,6 +168,7 @@ object BattleRegistry {
             repeat(battle.format.battleType.slotsPerActor) {
                 actor.activePokemon.add(ActiveBattlePokemon(actor))
             }
+
             val entities = actor.pokemonList.mapNotNull { it.entity }
             entities.forEach { it.battleId = battle.battleId }
         }
@@ -229,6 +237,10 @@ object BattleRegistry {
 
     fun getBattleByParticipatingPlayerId(playerId: UUID): PokemonBattle? {
         return battleMap.values.find { playerId in it.playerUUIDs }
+    }
+
+    fun getBattleBySpectatorId(playerId: UUID): PokemonBattle? {
+        return battleMap.values.find { playerId in it.spectators }
     }
 
     fun tick() {

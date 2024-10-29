@@ -302,6 +302,7 @@ open class PokemonBattle(
             .forEach{it.pokemon.heal()}
         actors.forEach { actor ->
             actor.pokemonList.forEach { battlePokemon ->
+                battlePokemon.clearBattleFeatures()
                 battlePokemon.entity?.let { entity -> battlePokemon.postBattleEntityOperation(entity) }
                 if (battlePokemon.effectedPokemon.entity != null
                         && battlePokemon.effectedPokemon.entity?.beamMode == 0
@@ -502,7 +503,10 @@ open class PokemonBattle(
 
     fun checkForInputDispatch() {
         if (checkForfeit()) return  // ignore actors that are still choosing, their choices don't matter anymore
-        val readyToInput = (actors.any { !it.mustChoose && it.responses.isNotEmpty() } && actors.none { it.mustChoose })
+        val readyToInput = (actors.any { !it.mustChoose && it.responses.isNotEmpty() } && actors.none {
+            LOGGER.info("${it.getName().string} (Must Choose: ${it.mustChoose}): ${it.responses}")
+            it.mustChoose
+        })
         if (readyToInput && captureActions.isEmpty()) {
             actors.filter { it.responses.isNotEmpty() }.forEach { it.writeShowdownResponse() }
             actors.forEach { it.responses.clear() ; it.request = null }

@@ -9,8 +9,9 @@
 package com.cobblemon.mod.common.net.serverhandling
 
 import com.cobblemon.mod.common.Cobblemon
-import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.NPCEvent
+import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.events.pokemon.PokemonSeenEvent
 import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
 import com.cobblemon.mod.common.api.text.red
@@ -48,10 +49,18 @@ object ChallengeHandler : ServerNetworkPacketHandler<BattleChallengePacket> {
         } ?: return
 
         val leadingPokemon = player.party()[packet.selectedPokemonId]?.uuid ?: return   // validate id
-        if (targetedEntity is PokemonEntity && player.canInteractWith(targetedEntity, Cobblemon.config.battleWildMaxDistance) && targetedEntity.canBattle(player)) {
-            BattleBuilder.pve(player, targetedEntity, leadingPokemon)
-                .ifSuccessful { battle -> this.flagAsSeen(battle, targetedEntity) }
-                .ifErrored { it.sendTo(player) { it.red() } }
+        if (targetedEntity is PokemonEntity) {
+            if (!targetedEntity.canBattle(player)) {
+                if (targetedEntity.pokemon.species.name.lowercase() == "trainer") {
+                    CobblemonEvents.NPC_EVENT.post(NPCEvent(player, targetedEntity, leadingPokemon))
+                }
+                return
+            }
+            if (player.canInteractWith(targetedEntity, Cobblemon.config.battleWildMaxDistance) && targetedEntity.canBattle(player)) {
+                BattleBuilder.pve(player, targetedEntity, leadingPokemon)
+                    .ifSuccessful { battle -> this.flagAsSeen(battle, targetedEntity) }
+                    .ifErrored { it.sendTo(player) { it.red() } }
+            }
         }
         else if (targetedEntity is ServerPlayer) {
             ChallengeManager.setLead(player, leadingPokemon)

@@ -46,15 +46,19 @@ open class PlayerLevelRangeInfluence(
         return if (System.currentTimeMillis() - lastCalculatedTime > recalculationMillis) {
             lastCalculatedTime = System.currentTimeMillis()
 
-            val party = Cobblemon.storage.getParty(uuid, server()!!.registryAccess())
-            previousRange = if (party.any()) {
-                //val minimumLevel = party.minOf { it.level }
-                val maximumLevel = party.maxOf { it.level }
-                IntRange(max(maximumLevel - variation, 1), min(config.maxPokemonLevel, max(maximumLevel + variation, config.minimumLevelRangeMax)))
-            } else {
-                noPokemonRange
+            try {
+                val party = Cobblemon.storage.getParty(uuid, server()!!.registryAccess())
+                previousRange = if (party.any()) {
+                    //val minimumLevel = party.minOf { it.level }
+                    val maximumLevel = party.maxOf { it.level }
+                    IntRange(max(maximumLevel - variation, 1), min(config.maxPokemonLevel, max(maximumLevel + variation, config.minimumLevelRangeMax)))
+                } else {
+                    noPokemonRange
+                }
+                previousRange
+            } catch (e: Exception) {
+                previousRange
             }
-            previousRange
         } else {
             previousRange
         }

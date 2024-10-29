@@ -224,10 +224,10 @@ object PokemonSpecies : JsonDataRegistry<Species> {
         val otherFormes = if (form == null && species.forms.isNotEmpty()) species.forms.map { "${this.name}-${it.name}" } else emptyList()
         val formeOrder = if (form == null && this.otherFormes.isNotEmpty()) arrayListOf(this.name, *this.otherFormes.toTypedArray()) else emptyList()
         val abilities: Map<String, String> = mapOf(
-            "0" to "No Ability",
-            "1" to "No Ability",
-            "H" to "No Ability",
-            "S" to "No Ability"
+            "0" to if (form != null) form.abilities.first().template.name else "No Ability",
+            "1" to if (form != null) form.abilities.first().template.name else "No Ability",
+            "H" to if (form != null) form.abilities.first().template.name else "No Ability",
+            "S" to if (form != null) form.abilities.first().template.name else "No Ability"
         )
         val types = (form?.types ?: species.types).map { it.name.replaceFirstChar(Char::uppercase) }
         val preevo: String? = (form?.preEvolution ?: species.preEvolution)?.let { if (it.form == it.species.standardForm) createShowdownName(it.species) else "${createShowdownName(it.species)}-${it.form.name}" }

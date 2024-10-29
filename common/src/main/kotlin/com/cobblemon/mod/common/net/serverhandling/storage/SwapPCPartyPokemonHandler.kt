@@ -9,6 +9,8 @@
 package com.cobblemon.mod.common.net.serverhandling.storage
 
 import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.storage.PCEvent
 import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
 import com.cobblemon.mod.common.api.storage.pc.link.PCLinkManager
 import com.cobblemon.mod.common.net.messages.client.storage.pc.ClosePCPacket
@@ -22,6 +24,16 @@ object SwapPCPartyPokemonHandler : ServerNetworkPacketHandler<SwapPCPartyPokemon
         val pc = PCLinkManager.getPC(player) ?: return run { ClosePCPacket(null).sendToPlayer(player) }
         val partyPokemon = party[packet.partyPosition] ?: return
         val pcPokemon = pc[packet.pcPosition] ?: return
+
+        CobblemonEvents.PC_EVENT.postThen(
+            event = PCEvent(player),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                ClosePCPacket(null).sendToPlayer(player)
+                return
+            }
+        )
 
         if (partyPokemon.uuid != packet.partyPokemonID || pcPokemon.uuid != packet.pcPokemonID) {
             return

@@ -9,6 +9,8 @@
 package com.cobblemon.mod.common.net.serverhandling.storage.pc
 
 import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.storage.PCEvent
 import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
 import com.cobblemon.mod.common.api.storage.pc.link.PCLinkManager
 import com.cobblemon.mod.common.net.messages.client.storage.pc.ClosePCPacket
@@ -24,6 +26,15 @@ object MovePCPokemonToPartyHandler : ServerNetworkPacketHandler<MovePCPokemonToP
         if (pokemon.uuid != packet.pokemonID) {
             return
         }
+        CobblemonEvents.PC_EVENT.postThen(
+            event = PCEvent(player),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                ClosePCPacket(null).sendToPlayer(player)
+                return
+            }
+        )
         val partyPosition = packet.partyPosition?.takeIf { party[it] == null } ?: party.getFirstAvailablePosition() ?: return
         pc.remove(packet.pcPosition)
         party[partyPosition] = pokemon

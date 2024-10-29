@@ -14,17 +14,22 @@ import com.mojang.serialization.Dynamic
 
 class ShoulderStateJsonFix(output: Schema) : PokemonFix(output) {
     override fun fixPokemonData(dynamic: Dynamic<*>): Dynamic<*> {
-        val stateJson = dynamic.get("State").result()
-        //State not here
-        if (stateJson.isEmpty) {
-            return dynamic
+        var baseDynamic = dynamic
+
+        baseDynamic.get(DataKeys.POKEMON_STATE).result().ifPresent { state ->
+            if (!state.get(DataKeys.POKEMON_STATE_TYPE).result().isPresent) {
+                baseDynamic = baseDynamic.remove(DataKeys.POKEMON_STATE)
+            } else if (!state.get(DataKeys.POKEMON_STATE_SHOULDER).result().isPresent) {
+                baseDynamic = baseDynamic.remove(DataKeys.POKEMON_STATE)
+            } else if (!state.get(DataKeys.POKEMON_STATE_PLAYER_UUID).result().isPresent) {
+                baseDynamic = baseDynamic.remove(DataKeys.POKEMON_STATE)
+            } else if (!state.get(DataKeys.POKEMON_STATE_ID).result().isPresent) {
+                baseDynamic = baseDynamic.remove(DataKeys.POKEMON_STATE)
+            } else if (!state.get(DataKeys.POKEMON_STATE_POKEMON_UUID).result().isPresent) {
+                baseDynamic = baseDynamic.remove(DataKeys.POKEMON_STATE)
+            }
         }
 
-        if (stateJson.get().mapValues.getOrThrow().isEmpty() ||
-            !stateJson.get().mapValues.getOrThrow().containsKey(dynamic.createString(DataKeys.POKEMON_STATE_TYPE))) {
-            return dynamic.remove("State")
-        }
-
-        return dynamic
+        return baseDynamic
     }
 }

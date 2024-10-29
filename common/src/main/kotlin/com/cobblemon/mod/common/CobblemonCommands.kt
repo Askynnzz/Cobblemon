@@ -41,7 +41,7 @@ object CobblemonCommands {
         PcCommand.register(dispatcher)
         SpawnPokemonFromPool.register(dispatcher)
         PokeboxCommand.register(dispatcher)
-        PokedexCommand.register(dispatcher)
+        //PokedexCommand.register(dispatcher)
         TestStoreCommand.register(dispatcher)
         QueryLearnsetCommand.register(dispatcher)
         TestPcSlotCommand.register(dispatcher)

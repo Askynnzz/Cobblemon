@@ -147,6 +147,7 @@ open class PartyStore(override val uuid: UUID) : PokemonStore<PartyPosition>() {
     override fun initialize() {
         for (slot in slots.indices) {
             val pokemon = get(slot) ?: continue
+//            println("IN INITIALIZE POKEMON NAME: ${pokemon.species.name}")
             pokemon.storeCoordinates.set(StoreCoordinates(this, PartyPosition(slot)))
             trackPokemon(pokemon)
         }

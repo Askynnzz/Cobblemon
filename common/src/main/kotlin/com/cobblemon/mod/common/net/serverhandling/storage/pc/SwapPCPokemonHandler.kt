@@ -8,6 +8,8 @@
 
 package com.cobblemon.mod.common.net.serverhandling.storage.pc
 
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.storage.PCEvent
 import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
 import com.cobblemon.mod.common.api.storage.pc.link.PCLinkManager
 import com.cobblemon.mod.common.net.messages.client.storage.pc.ClosePCPacket
@@ -21,6 +23,15 @@ object SwapPCPokemonHandler : ServerNetworkPacketHandler<SwapPCPokemonPacket> {
         if (pc[packet.position1]?.uuid != packet.pokemon1ID || pc[packet.position2]?.uuid != packet.pokemon2ID) {
             return
         }
+        CobblemonEvents.PC_EVENT.postThen(
+            event = PCEvent(player),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                ClosePCPacket(null).sendToPlayer(player)
+                return
+            }
+        )
         pc.swap(packet.position1, packet.position2)
     }
 }

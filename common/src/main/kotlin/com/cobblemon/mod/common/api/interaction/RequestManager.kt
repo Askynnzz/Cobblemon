@@ -9,6 +9,8 @@
 package com.cobblemon.mod.common.api.interaction
 
 import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.trade.TradeEvent
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.api.text.aqua
@@ -150,6 +152,23 @@ abstract class RequestManager<T : ServerPlayerActionRequest> {
             request.notify(request.sender, true, "ui.interact.unavailable")
         // new request
         else {
+            CobblemonEvents.TRADE_EVENT.postThen(
+                event = TradeEvent(request.sender),
+                ifSucceeded = {
+                },
+                ifCanceled = {
+                    return false
+                }
+            )
+            CobblemonEvents.TRADE_EVENT.postThen(
+                event = TradeEvent(request.receiver),
+                ifSucceeded = {
+                },
+                ifCanceled = {
+                    return false
+                }
+            )
+
             this.addRequest(request)
             afterOnServer(seconds = request.expiryTime.toFloat()) { this.cancelRequest(request, true) }
             this.onSend(request)
@@ -166,6 +185,14 @@ abstract class RequestManager<T : ServerPlayerActionRequest> {
 
     /** Accepts a pending inbound [requestID] for [player]. */
     fun acceptRequest(player: ServerPlayer, requestID: UUID, target: ServerPlayer? = null): Boolean {
+        CobblemonEvents.TRADE_EVENT.postThen(
+            event = TradeEvent(player),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                return false
+            }
+        )
         var accepted = false
         val request = this.getInboundRequest(player, requestID)
 

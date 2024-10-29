@@ -22,7 +22,7 @@ import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
 class UpkeepInstruction : InterpreterInstruction {
     override fun invoke(battle: PokemonBattle) {
         battle.dispatch {
-            battle.actors.forEach { it.upkeep() }
+            battle.actors.filter { it.needsUpkeep() }.forEach { it.upkeep() }
             GO
         }
     }

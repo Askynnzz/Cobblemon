@@ -65,7 +65,17 @@ class PokemonPastureBlockEntity(pos: BlockPos, state: BlockState) :
         val pcId: UUID,
         val entityId: Int
     ) {
-        fun getPokemon() = Cobblemon.storage.getPC(pcId, server()!!.registryAccess())[pokemonId]
+        fun getPokemon(): Pokemon? {
+            if (server()!!.playerList.getPlayer(playerId) == null) {
+                try {
+                    val pokemon = Cobblemon.storage.getPC(pcId, server()!!.registryAccess())[pokemonId]
+                    pokemon?.recall()
+                } catch (_: Exception) {}
+                return null
+            }
+            return Cobblemon.storage.getPC(pcId, server()!!.registryAccess())[pokemonId]
+        }
+
         val box = AABB(minRoamPos.toVec3d(), maxRoamPos.toVec3d())
         open fun canRoamTo(pos: BlockPos) = box.contains(pos.center)
 
@@ -271,12 +281,14 @@ class PokemonPastureBlockEntity(pos: BlockPos, state: BlockState) :
     fun checkPokemon() {
         val deadLinks = mutableListOf<UUID>()
         tetheredPokemon.forEach {
-            val pokemon = it.getPokemon()
-            if (pokemon == null) {
-                deadLinks.add(it.pokemonId)
-            } else if (pokemon.tetheringId == null || pokemon.tetheringId != it.tetheringId) {
-                deadLinks.add(it.pokemonId)
-            }
+            try {
+                val pokemon = it.getPokemon()
+                if (pokemon == null) {
+                    deadLinks.add(it.pokemonId)
+                } else if (pokemon.tetheringId == null || pokemon.tetheringId != it.tetheringId) {
+                    deadLinks.add(it.pokemonId)
+                }
+            } catch (_: Exception) {}
         }
         deadLinks.forEach(::releasePokemon)
         ticksUntilCheck = Cobblemon.config.pastureBlockUpdateTicks

@@ -13,6 +13,7 @@ import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.net.messages.client.SetClientPlayerDataPacket
 import com.cobblemon.mod.common.api.storage.player.client.ClientGeneralPlayerData
 import com.cobblemon.mod.common.api.storage.player.client.ClientInstancedPlayerData
+import com.cobblemon.mod.common.util.cobblemonResource
 import java.util.UUID
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.resources.ResourceLocation
@@ -26,7 +27,7 @@ data class GeneralPlayerData(
     var starterLocked: Boolean,
     var starterSelected: Boolean,
     var starterUUID: UUID?,
-    var keyItems: MutableSet<ResourceLocation>,
+    var keyItems: MutableSet<ResourceLocation> = mutableSetOf(cobblemonResource("key_stone"), cobblemonResource("z_ring")),
     var battleTheme: ResourceLocation?,
     val extraData: MutableMap<String, PlayerDataExtension>,
 ) : InstancedPlayerData {

@@ -34,6 +34,9 @@ transitive-extendable method net/minecraft/world/entity/LivingEntity canBreatheU
 transitive-extendable class net/minecraft/world/level/block/grower/TreeGrower
 accessible method net/minecraft/world/level/block/state/BlockBehaviour codec ()Lcom/mojang/serialization/MapCodec;
 accessible method net/minecraft/network/protocol/game/ClientboundAddEntityPacket <init> (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
+accessible field net/minecraft/world/entity/LivingEntity jumping Z
+accessible field net/minecraft/world/entity/ai/attributes/AttributeMap attributes Ljava/util/Map;
+transitive-extendable method net/minecraft/world/entity/LivingEntity travelRidden (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;)V
 
 transitive-accessible field net/minecraft/world/entity/player/Inventory compartments Ljava/util/List;
 #transitive-accessible method net/minecraft/world/gen/feature/TreeFeature createStraightBlobTree (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;IIII)Lnet/minecraft/world/level/levelgen/feature/configurations/TreeConfiguration$TreeConfigurationBuilder;

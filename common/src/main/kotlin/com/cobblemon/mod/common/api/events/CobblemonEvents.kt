@@ -10,9 +10,18 @@ package com.cobblemon.mod.common.api.events
 
 import com.cobblemon.mod.common.api.events.battles.BattleFaintedEvent
 import com.cobblemon.mod.common.api.events.battles.BattleFledEvent
+import com.cobblemon.mod.common.api.events.battles.BattleHPEvent
+import com.cobblemon.mod.common.api.events.battles.BattlePickMoveEvent
+import com.cobblemon.mod.common.api.events.battles.BattleStartEvent
 import com.cobblemon.mod.common.api.events.battles.BattleStartedPostEvent
 import com.cobblemon.mod.common.api.events.battles.BattleStartedPreEvent
+import com.cobblemon.mod.common.api.events.battles.BattleSwitchEvent
+import com.cobblemon.mod.common.api.events.battles.BattleTerastallizeEvent
+import com.cobblemon.mod.common.api.events.battles.BattleUseMoveEvent
 import com.cobblemon.mod.common.api.events.battles.BattleVictoryEvent
+import com.cobblemon.mod.common.api.events.battles.GimmighoulEvent
+import com.cobblemon.mod.common.api.events.battles.NPCEvent
+import com.cobblemon.mod.common.api.events.battles.PokemonCapturePreEvent
 import com.cobblemon.mod.common.api.events.battles.instruction.FormeChangeEvent
 import com.cobblemon.mod.common.api.events.battles.instruction.MegaEvolutionEvent
 import com.cobblemon.mod.common.api.events.battles.instruction.TerastallizationEvent
@@ -41,8 +50,11 @@ import com.cobblemon.mod.common.api.events.pokemon.evolution.EvolutionTestedEven
 import com.cobblemon.mod.common.api.events.pokemon.healing.PokemonHealedEvent
 import com.cobblemon.mod.common.api.events.pokemon.interaction.ExperienceCandyUseEvent
 import com.cobblemon.mod.common.api.events.pokemon.interaction.PokemonInteractionGUICreationEvent
+import com.cobblemon.mod.common.api.events.pokemon.interaction.SwapHeldItemEvent
 import com.cobblemon.mod.common.api.events.starter.StarterChosenEvent
+import com.cobblemon.mod.common.api.events.storage.PCEvent
 import com.cobblemon.mod.common.api.events.storage.ReleasePokemonEvent
+import com.cobblemon.mod.common.api.events.trade.TradeEvent
 import com.cobblemon.mod.common.api.events.world.BigRootPropagatedEvent
 import com.cobblemon.mod.common.api.reactive.CancelableObservable
 import com.cobblemon.mod.common.api.reactive.EventObservable
@@ -86,6 +98,38 @@ object CobblemonEvents {
     val POKE_BALL_CAPTURE_CALCULATED = EventObservable<PokeBallCaptureCalculatedEvent>()
     @JvmField
     val POKEMON_CAPTURED = EventObservable<PokemonCapturedEvent>()
+    @JvmField
+    val POKEMON_CAPTURE_PRE = CancelableObservable<PokemonCapturePreEvent>()
+
+    @JvmField
+    val BATTLE_USE_MOVE = EventObservable<BattleUseMoveEvent>()
+
+    @JvmField
+    val BATTLE_PICK_MOVE = EventObservable<BattlePickMoveEvent>()
+
+    @JvmField
+    val BATTLE_SWITCH = EventObservable<BattleSwitchEvent>()
+
+    @JvmField
+    val BATTLE_TERA = EventObservable<BattleTerastallizeEvent>()
+
+    @JvmField
+    val BATTLE_HP = EventObservable<BattleHPEvent>()
+
+    @JvmField
+    val GIMMIGHOUL_FAKE = EventObservable<GimmighoulEvent>()
+
+    @JvmField
+    val NPC_EVENT = EventObservable<NPCEvent>()
+
+    @JvmField
+    val PC_EVENT = CancelableObservable<PCEvent>()
+
+    @JvmField
+    val TRADE_EVENT = CancelableObservable<TradeEvent>()
+
+    @JvmField
+    val BATTLE_START = CancelableObservable<BattleStartEvent>()
     @JvmField
     val FOSSIL_REVIVED = EventObservable<FossilRevivedEvent>()
     @JvmField

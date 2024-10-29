@@ -28,7 +28,12 @@ class PpUpdateInstruction( val message: BattleMessage): InterpreterInstruction {
             moveDatum.forEach { moveData ->
                 val moveIdAndPp = moveData.split(": ")
                 val moveId = moveIdAndPp[0]
-                val movePp = moveIdAndPp[1]
+                val movePp = if (moveIdAndPp.size > 1) {
+                    moveIdAndPp[1]
+                } else {
+                    println("MOVE PP THIS WOULD HAVE CRASHED BEFORE")
+                    "1"
+                }
                 val move = pokemon.effectedPokemon.moveSet.firstOrNull { move -> move.name.equals(moveId, true) } ?: return@dispatch GO
                 move.currentPp = movePp.toInt()
             }

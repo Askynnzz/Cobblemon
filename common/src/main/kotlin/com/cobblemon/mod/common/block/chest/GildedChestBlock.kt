@@ -9,6 +9,8 @@
 package com.cobblemon.mod.common.block.chest
 
 import com.cobblemon.mod.common.CobblemonSounds
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.GimmighoulEvent
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.block.entity.GildedChestBlockEntity
@@ -187,6 +189,7 @@ class GildedChestBlock(settings: Properties, val type: Type = Type.RED) : BaseEn
     ): InteractionResult {
         if (isFake()) {
             if (player is ServerPlayer) {
+                CobblemonEvents.GIMMIGHOUL_FAKE.post(GimmighoulEvent(player))
                 return spawnPokemon(world, pos, state, player)
             } else {
                 return InteractionResult.SUCCESS

@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.spawning.SpawnCause
 import com.cobblemon.mod.common.api.spawning.context.SpawningContext
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.tags.FluidTags
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 
 /**
@@ -30,7 +31,7 @@ import net.minecraft.world.level.block.state.BlockState
 interface SpawningContextCalculator<I : SpawningContextInput, O : SpawningContext> {
     companion object {
         val isAirCondition: (BlockState) -> Boolean = { it.isAir || (!it.isSolid && !it.fluidState.`is`(FluidTags.WATER)) }
-        val isSolidCondition: (BlockState) -> Boolean = { it.isSolid }
+        val isSolidCondition: (BlockState) -> Boolean = { it.isSolid || it.`is`(Blocks.POWDER_SNOW)}
         val isWaterCondition: (BlockState) -> Boolean = { it.fluidState.`is`(FluidTags.WATER) && it.fluidState.isSource  }
         val isLavaCondition: (BlockState) -> Boolean = { it.fluidState.`is`(FluidTags.LAVA) && it.fluidState.isSource }
 

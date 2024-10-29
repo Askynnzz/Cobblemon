@@ -19,11 +19,14 @@ import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
 import com.cobblemon.mod.common.api.storage.pc.PCStore
 import com.cobblemon.mod.common.platform.events.PlatformEvents
 import com.cobblemon.mod.common.platform.events.ServerPlayerEvent
+import com.cobblemon.mod.common.util.getPlayer
 import com.cobblemon.mod.common.util.subscribeOnServer
 import java.util.UUID
 import java.util.concurrent.Executors
 import net.minecraft.core.RegistryAccess
 import net.minecraft.server.level.ServerPlayer
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * A [PokemonStoreFactory] that is backed by a file. This implementation will now handle persistence and scheduling
@@ -46,12 +49,23 @@ open class FileBackedPokemonStoreFactory<S>(
             saveAll(it.server.registryAccess())
             passedTicks = 0
         }
+
+        if (passedTicks % 10 == 0) {
+            storeCaches.forEach { (store, cache) ->
+                for (key in cache.cacheMap.keys()) {
+                    if (key.getPlayer() == null) {
+                        cache.cacheMap.remove(key)
+                        LOGGER.info("Removed logged out player '$key' from ${store.name} cache.")
+                    }
+                }
+            }
+        }
     }
 
     protected var saveExecutor = Executors.newSingleThreadExecutor()
-    protected val storeCaches = mutableMapOf<Class<out PokemonStore<*>>, StoreCache<*, *>>()
+    protected val storeCaches = ConcurrentHashMap<Class<out PokemonStore<*>>, StoreCache<*, *>>()
     protected inner class StoreCache<E : StorePosition, T : PokemonStore<E>> {
-        val cacheMap = mutableMapOf<UUID, T>()
+        val cacheMap = ConcurrentHashMap<UUID, T>()
     }
 
     protected fun <E : StorePosition, T : PokemonStore<E>> getStoreCache(storeClass: Class<T>): StoreCache<E, T> {
@@ -59,7 +73,7 @@ open class FileBackedPokemonStoreFactory<S>(
         return cache as StoreCache<E, T>
     }
 
-    private val dirtyStores = mutableSetOf<PokemonStore<*>>()
+    private val dirtyStores = CopyOnWriteArrayList<PokemonStore<out StorePosition>>()
 
     override fun getPlayerParty(playerID: UUID, registryAccess: RegistryAccess) = getStore(PlayerPartyStore::class.java, playerID, registryAccess, partyConstructor)
     override fun getPC(playerID: UUID, registryAccess: RegistryAccess) = getStore(PCStore::class.java, playerID, registryAccess, pcConstructor)
@@ -90,6 +104,7 @@ open class FileBackedPokemonStoreFactory<S>(
             loaded.initialize()
             track(loaded)
             cache[uuid] = loaded
+            LOGGER.info("Loaded $uuid from and now put in ${storeClass.name} cache.")
             return loaded
         }
     }
@@ -97,17 +112,29 @@ open class FileBackedPokemonStoreFactory<S>(
     fun save(store: PokemonStore<*>, registryAccess: RegistryAccess) {
         val serialized = SerializedStore(store::class.java, store.uuid, adapter.serialize(store, registryAccess))
         dirtyStores.remove(store)
-        saveExecutor.submit { adapter.save(serialized.storeClass, serialized.uuid, serialized.serializedForm) }
+        saveExecutor.submit {
+            try {
+                adapter.save(serialized.storeClass, serialized.uuid, serialized.serializedForm)
+            } catch (e: Exception) {
+                LOGGER.error("Save: Failed to save ${serialized.uuid} of ${serialized.storeClass.name}.", e)
+            }
+        }
     }
 
     fun saveAll(registryAccess: RegistryAccess) {
-        LOGGER.debug("Serializing ${dirtyStores.size} Pokémon stores.")
-        val serializedStores = dirtyStores.map { SerializedStore(it::class.java, it.uuid, adapter.serialize(it, registryAccess)) }
+        LOGGER.info("Serializing ${dirtyStores.size} Pokémon stores.")
+        val serializedStores = dirtyStores.map { SerializedStore(it::class.java, it.uuid, adapter.serialize(it as PokemonStore<*>, registryAccess)) }
         dirtyStores.clear()
-        LOGGER.debug("Queueing save.")
+        LOGGER.info("Queueing save.")
         saveExecutor.submit {
-            serializedStores.forEach { adapter.save(it.storeClass, it.uuid, it.serializedForm) }
-            LOGGER.debug("Saved ${serializedStores.size} Pokémon stores.")
+            serializedStores.forEach {
+                try {
+                    adapter.save(it.storeClass, it.uuid, it.serializedForm)
+                } catch (e: Exception) {
+                    LOGGER.error("Save All: Failed to save ${it.uuid} of ${it.storeClass.name}.", e)
+                }
+            }
+            LOGGER.info("Saved ${serializedStores.size} Pokémon stores.")
         }
     }
 

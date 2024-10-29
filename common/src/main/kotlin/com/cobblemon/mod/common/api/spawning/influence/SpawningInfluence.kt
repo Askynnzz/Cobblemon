@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.spawning.context.SpawningContext
 import com.cobblemon.mod.common.api.spawning.context.calculators.SpawningContextCalculator
 import com.cobblemon.mod.common.api.spawning.detail.SpawnAction
 import com.cobblemon.mod.common.api.spawning.detail.SpawnDetail
+import com.cobblemon.mod.common.pokemon.Pokemon
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -34,6 +35,7 @@ interface SpawningInfluence {
     fun affectWeight(detail: SpawnDetail, ctx: SpawningContext, weight: Float): Float = weight
     /** Affects the spawn action prior to it generating the entity. */
     fun affectAction(action: SpawnAction<*>) {}
+    fun affectPokemon(pokemon: Pokemon) {}
     /** Applies some influence over the entity that's been spawned. */
     fun affectSpawn(entity: Entity) {}
     /** Applies some influence over the weight of spawn buckets. */

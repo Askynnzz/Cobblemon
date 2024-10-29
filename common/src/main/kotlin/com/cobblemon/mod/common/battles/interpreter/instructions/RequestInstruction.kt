@@ -8,8 +8,10 @@
 
 package com.cobblemon.mod.common.battles.interpreter.instructions
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
+import com.cobblemon.mod.common.api.battles.model.actor.AIBattleActor
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.battles.BattleRegistry
 import com.cobblemon.mod.common.battles.ShowdownActionRequest
@@ -38,10 +40,15 @@ class RequestInstruction(val battleActor: BattleActor, val message: BattleMessag
             // This request won't be acted on until the start of next turn
             battleActor.sendUpdate(BattleQueueRequestPacket(request))
             battleActor.request = request
+
+            Cobblemon.LOGGER.info("Request set for ${battleActor.getName().string}: ${battleActor.request}")
+
             battleActor.responses.clear()
+
             // We need to send this out because 'upkeep' isn't received until the request is handled since the turn won't swap
             if (request.forceSwitch.contains(true)) {
                 battle.doWhenClear {
+                    println("> Requesting move choice from ${battleActor.getName().string}")
                     battleActor.mustChoose = true
                     battleActor.sendUpdate(BattleMakeChoicePacket())
                 }

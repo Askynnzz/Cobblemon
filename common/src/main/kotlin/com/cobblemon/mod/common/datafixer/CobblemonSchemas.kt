@@ -87,6 +87,7 @@ object CobblemonSchemas {
         builder.addFixer(ItemStackComponentizationFix(schema1))
         builder.addFixer(BlockPosUpdateFix(schema1))
         builder.addFixer(FeatureFix(schema1))
+        builder.addFixer(JsonFix(schema1))
         builder.addFixer(MovesetJsonFix(schema1))
         builder.addFixer(ShoulderStateJsonFix(schema1))
         builder.addFixer(NicknameFix(schema1))

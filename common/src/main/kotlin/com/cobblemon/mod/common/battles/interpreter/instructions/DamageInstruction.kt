@@ -12,6 +12,8 @@ import com.bedrockk.molang.runtime.MoLangRuntime
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.BattleHPEvent
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext
 import com.cobblemon.mod.common.api.moves.animations.ActionEffects
 import com.cobblemon.mod.common.api.moves.animations.UsersProvider
@@ -68,6 +70,7 @@ class DamageInstruction(
             }
         }
         val newHealth = privateMessage.argumentAt(1)?.split(" ")?.get(0) ?: return
+        CobblemonEvents.BATTLE_HP.post(BattleHPEvent(battle, battlePokemon, newHealth))
         val effect = privateMessage.effect()
         val source = privateMessage.battlePokemonFromOptional(battle)
         source?.let { ShowdownInterpreter.broadcastOptionalAbility(battle, effect, it) }

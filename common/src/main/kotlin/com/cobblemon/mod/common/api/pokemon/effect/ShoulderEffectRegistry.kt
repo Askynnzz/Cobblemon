@@ -33,7 +33,7 @@ object ShoulderEffectRegistry {
 
     // Internal so 3rd party can't accidentally subscriber over n over.
     internal fun register() {
-        PlatformEvents.SERVER_PLAYER_LOGIN.subscribe { this.refreshEffects(it.player) }
+        //PlatformEvents.SERVER_PLAYER_LOGIN.subscribe { this.refreshEffects(it.player) }
     }
 
     fun register(name: String, effect: Class<out ShoulderEffect>) = effect.also { effects[name] = it }

@@ -14,6 +14,8 @@ import com.bedrockk.molang.runtime.value.StringValue
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.interpreter.Effect
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.BattleUseMoveEvent
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.addStandardFunctions
 import com.cobblemon.mod.common.api.moves.Moves
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext
@@ -29,6 +31,7 @@ import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.pokemon.evolution.progress.UseMoveEvolutionProgress
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.cobblemonResource
+import com.cobblemon.mod.common.util.getPlayer
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -57,6 +60,12 @@ class MoveInstruction(
         userPokemon = message.battlePokemon(0, battle)!!
         targetPokemon = message.battlePokemon(2, battle)
         val targetPokemon = targetPokemon // So smart non-null casts can happen
+        val players = battle.actors
+            .map { it.uuid }
+            .mapNotNull { it.getPlayer() }
+            .toList()
+
+        CobblemonEvents.BATTLE_USE_MOVE.post(BattleUseMoveEvent(battle, players, userPokemon, move))
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)
@@ -77,6 +86,7 @@ class MoveInstruction(
             }
 
             val lang = when {
+                userPokemon.effectedPokemon.species.resourceIdentifier.toString().equals("cobblemon:ancientgene") && move.name == "revivalblessing" -> null
                 optionalEffect?.id == "magicbounce" ->
                     battleLang("ability.magicbounce", pokemonName, move.displayName)
                 move.name != "struggle" && spreadTargetPokemon.isEmpty() && targetPokemon != null && targetPokemon != userPokemon && targetPokemon.health > 0 ->
@@ -84,7 +94,7 @@ class MoveInstruction(
                 else ->
                     battleLang("used_move", pokemonName, move.displayName)
             }
-            battle.broadcastChatMessage(lang)
+            lang?.let { battle.broadcastChatMessage(it) }
             battle.majorBattleActions[userPokemon.uuid] = message
 
             val providers = mutableListOf<Any>(battle)

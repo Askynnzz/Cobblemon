@@ -95,7 +95,7 @@ object CobblemonHeldItemManager : BaseCobblemonHeldItemManager() {
         val consumeHeldItems = this.shouldConsumeItem(pokemon, battle, itemID)
         if (battleMessage.hasOptionalArgument("silent")) {
             if (consumeHeldItems) {
-                this.take(pokemon, itemID)
+//                this.take(pokemon, itemID)
             }
             return
         }
@@ -143,14 +143,14 @@ object CobblemonHeldItemManager : BaseCobblemonHeldItemManager() {
         val consumeHeldItems = this.shouldConsumeItem(pokemon, battle, itemID)
         // These are sent when showdown wants the client to animate something but not produce any text
         if (battleMessage.hasOptionalArgument("silent")) {
-            if (consumeHeldItems) this.take(pokemon, itemID)
+//            if (consumeHeldItems) this.take(pokemon, itemID)
             return
         }
         val battlerName = pokemon.getName()
         val itemName = this.nameOf(itemID)
         if (battleMessage.hasOptionalArgument("eat")) {
             battle.broadcastChatMessage(battleLang("item.eat", battlerName, itemName))
-            if (consumeHeldItems) this.take(pokemon, itemID)
+//            if (consumeHeldItems) this.take(pokemon, itemID)
             return
         }
         val sourceName = battleMessage.battlePokemonFromOptional(battle)?.getName() ?: Component.literal("UNKNOWN")
@@ -164,7 +164,7 @@ object CobblemonHeldItemManager : BaseCobblemonHeldItemManager() {
                     -> battleLang("enditem.$itemID", battlerName)
             }
         }
-        if (consumeHeldItems) this.take(pokemon, itemID)
+//        if (consumeHeldItems) this.take(pokemon, itemID)
         battle.broadcastChatMessage(text)
     }
 

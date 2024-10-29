@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.api.battles.model.actor
 
 import com.bedrockk.molang.runtime.struct.QueryStruct
 import com.bedrockk.molang.runtime.value.StringValue
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asMoLangValue
 import com.cobblemon.mod.common.api.net.NetworkPacket
@@ -92,13 +93,38 @@ abstract class BattleActor(
 
     fun upkeep() {
         val request = request ?: return
-        val forceSwitchPokemon = request.forceSwitch.mapIndexedNotNull { index, b -> if (b) activePokemon[index] else null }
-        if (forceSwitchPokemon.isEmpty()) {
-            return
+
+        if (this is AIBattleActor) {
+            if (request.forceSwitch.isEmpty()) {
+                return
+            }
+        } else {
+            val forceSwitchPokemon = request.forceSwitch.mapIndexedNotNull { index, b -> if (b) activePokemon[index] else null }
+            if (forceSwitchPokemon.isEmpty()) {
+                return
+            }
         }
 
+        println("> Upkeep force switch for ${getName().string}")
         sendUpdate(BattleMakeChoicePacket())
+    }
+
+    fun needsUpkeep(): Boolean {
+        val request = request ?: return false
+
+        if (this is AIBattleActor) {
+            if (request.forceSwitch.isEmpty()) {
+                return false
+            }
+        } else {
+            val forceSwitchPokemon = request.forceSwitch.mapIndexedNotNull { index, b -> if (b) activePokemon[index] else null }
+            if (forceSwitchPokemon.isEmpty()) {
+                return false
+            }
+        }
+
         mustChoose = true
+        return true
     }
 
     fun setActionResponses(responses: List<ShowdownActionResponse>) {

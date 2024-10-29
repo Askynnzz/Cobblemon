@@ -42,6 +42,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -224,5 +225,26 @@ public abstract class PlayerMixin extends LivingEntity implements ScannableEntit
     @Override
     public LivingEntity resolveEntityScan() {
         return this;
+    }
+
+    @Shadow
+    private long timeEntitySatOnShoulder;
+
+    @Overwrite(remap = true)
+    public boolean setEntityOnShoulder(CompoundTag entityNbt) {
+        if (!this.isPassenger()) {
+            if (this.getShoulderEntityLeft().isEmpty()) {
+                this.setShoulderEntityLeft(entityNbt);
+                this.timeEntitySatOnShoulder = this.level().getGameTime();
+                return true;
+            }
+            if (this.getShoulderEntityRight().isEmpty()) {
+                this.setShoulderEntityRight(entityNbt);
+                this.timeEntitySatOnShoulder = this.level().getGameTime();
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }

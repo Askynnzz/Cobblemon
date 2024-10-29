@@ -45,8 +45,10 @@ class PokemonSpawnAction(
         } else {
             null
         }?.createStack(ctx)
-        val sourcePlayer = ctx.cause.entity as? ServerPlayer
-        val entity = props.createEntity(ctx.world, sourcePlayer)
+
+        val pokemon = props.create()
+        ctx.influences.forEach { it.affectPokemon(pokemon) }
+        val entity = PokemonEntity(ctx.world, pokemon)
         entity.spawnCause = ctx.cause
         SeasonFeatureHandler.updateSeason(entity.pokemon, Cobblemon.seasonResolver(ctx.world, ctx.position))
         if (heldItem != null) {

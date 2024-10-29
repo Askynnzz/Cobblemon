@@ -14,6 +14,7 @@ import com.bedrockk.molang.runtime.value.StringValue
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asStruct
 import com.cobblemon.mod.common.api.moves.MoveSet
+import com.cobblemon.mod.common.api.pokemon.feature.BattleFormFeature
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemManager
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemProvider
 import com.cobblemon.mod.common.api.pokemon.stats.Stat
@@ -123,12 +124,39 @@ open class BattlePokemon(
     }
 
     fun isSentOut() = actor.battle.activePokemon.any { it.battlePokemon == this }
-    fun canBeSentOut() =
-        if (actor.request?.side?.pokemon?.any { it.reviving } == true) {
-            !isSentOut() && !willBeSwitchedIn && health <= 0
+    fun canBeSentOut(): Boolean {
+        val reviving = actor.request?.side?.pokemon?.any { it.reviving } == true
+        println("${actor.getName().string} ${originalPokemon.species.name} canBeSentOut: reviving: $reviving isSentOut: ${isSentOut()} willBeSwitchedIn: $willBeSwitchedIn health: $health")
+
+        if (reviving) {
+            return !isSentOut() && !willBeSwitchedIn && health <= 0
         } else {
-            !isSentOut() && !willBeSwitchedIn && health > 0
+            return !isSentOut() && !willBeSwitchedIn && health > 0
         }
+    }
+
+    fun setBattleFeature(formName: String, enabled: Boolean) {
+        this.effectedPokemon.getFeature<BattleFormFeature>(formName)?.let {
+            it.enabled = enabled
+            this.effectedPokemon.updateAspects()
+        }
+    }
+
+    fun clearBattleFeatures() {
+        var modified = false
+
+        this.effectedPokemon.features.forEach {
+
+            if (it is BattleFormFeature) {
+                it.enabled = false
+                modified = true
+            }
+        }
+
+        if (modified) {
+            this.effectedPokemon.updateAspects()
+        }
+    }
 
     fun getIllusion(): BattlePokemon? = this.actor.activePokemon.find { it.battlePokemon == this }?.illusion
 }

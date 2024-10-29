@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.block
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.block.entity.DisplayCaseBlockEntity
 import com.cobblemon.mod.common.item.PokeBallItem
 import com.mojang.serialization.MapCodec
@@ -101,9 +102,13 @@ class DisplayCaseBlock(settings: Properties) : BaseEntityBlock(settings) {
         newState: BlockState,
         moved: Boolean
     ) {
-        val entity = world.getBlockEntity(pos) as DisplayCaseBlockEntity
-        if (!entity.getStack().isEmpty) {
-            Containers.dropContentsOnDestroy(state, newState, world, pos)
+        try {
+            val entity = world.getBlockEntity(pos) as DisplayCaseBlockEntity
+            if (!entity.getStack().isEmpty) {
+                Containers.dropContentsOnDestroy(state, newState, world, pos)
+            }
+        } catch (e: ClassCastException) {
+            Cobblemon.LOGGER.info("Failed to cast block entity to DisplayCaseBlockEntity")
         }
         super.onRemove(state, world, pos, newState, moved)
     }

@@ -27,10 +27,18 @@ class PartyMemberRequirement : EvolutionRequirement {
     }
 
     val target = PokemonProperties()
+    val type: String? = null
+    val gender: String? = null
     val contains = true
     override fun check(pokemon: Pokemon): Boolean {
         val party = pokemon.storeCoordinates.get()?.store as? PartyStore ?: return false
-        val has = party.any { member -> member.uuid != pokemon.uuid && this.target.matches(member) }
+        var has = party.any { member -> member.uuid != pokemon.uuid && this.target.matches(member) }
+        if (type != null) {
+            has = party.any { member -> member.uuid != pokemon.uuid && member.types.any { it.name.equals(type, true) } }
+        }
+        if (gender != null) {
+            has = pokemon.gender.name.equals(gender, true)
+        }
         return this.contains == has
     }
 }

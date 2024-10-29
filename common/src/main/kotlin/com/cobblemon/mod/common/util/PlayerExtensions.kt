@@ -398,7 +398,7 @@ fun Inventory.usableItems() = offhand + items
  */
 fun Player.giveOrDropItemStack(stack: ItemStack, playSound: Boolean = true) {
     val inserted = this.inventory.add(stack)
-    if (inserted && stack.isEmpty) {
+    if (inserted && !stack.isEmpty) {
         stack.count = 1
         this.dropFakeItem(stack)
         if (playSound) {

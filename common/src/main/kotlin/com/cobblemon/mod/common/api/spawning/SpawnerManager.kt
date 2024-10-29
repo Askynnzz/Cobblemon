@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.spawning.spawner.Spawner
 import com.cobblemon.mod.common.api.spawning.spawner.TickingSpawner
 import com.cobblemon.mod.common.util.server
 import com.cobblemon.mod.common.world.gamerules.CobblemonGameRules.DO_POKEMON_SPAWNING
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * A manager of various spawners. This is a class in which you should register
@@ -25,7 +26,7 @@ import com.cobblemon.mod.common.world.gamerules.CobblemonGameRules.DO_POKEMON_SP
  * @since February 5th, 2022
  */
 open class SpawnerManager {
-    val spawners = mutableListOf<Spawner>()
+    val spawners = CopyOnWriteArrayList<Spawner>()
         get() {
             if (server()?.isSameThread == false) {
                 Cobblemon.LOGGER.error("Illegal access to spawners list from non-server thread!")
@@ -33,7 +34,7 @@ open class SpawnerManager {
             }
             return field
         }
-    val influences = mutableListOf<SpawningInfluence>()
+    val influences = CopyOnWriteArrayList<SpawningInfluence>()
         get() {
             if (server()?.isSameThread == false) {
                 Cobblemon.LOGGER.error("Illegal access to influences from non-server thread!")

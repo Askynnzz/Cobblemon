@@ -12,6 +12,7 @@ import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.interaction.RequestManager
 import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.pokemon.TradeCompletedEvent
+import com.cobblemon.mod.common.api.events.trade.TradeEvent
 import com.cobblemon.mod.common.api.interaction.ServerPlayerActionRequest
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.text.aqua
@@ -72,6 +73,24 @@ object TradeManager : RequestManager<TradeManager.TradeRequest>() {
     }
 
     override fun canAccept(request: TradeRequest): Boolean {
+        CobblemonEvents.TRADE_EVENT.postThen(
+            event = TradeEvent(request.sender),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                return false
+            }
+        )
+
+        CobblemonEvents.TRADE_EVENT.postThen(
+            event = TradeEvent(request.receiver),
+            ifSucceeded = {
+            },
+            ifCanceled = {
+                return false
+            }
+        )
+
         if (request.sender.party().none()) {
             request.notifySender(true, "error.insufficient_pokemon.self")
             request.notifyReceiver(true, "error.insufficient_pokemon.other", request.sender.name.copy().aqua())

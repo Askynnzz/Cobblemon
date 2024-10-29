@@ -27,7 +27,11 @@ object ServerTickHandler {
 
             // Party tick
             for (player in server.playerList.players) {
-                player.party().onSecondPassed(player)
+                try {
+                    player.party().onSecondPassed(player)
+                } catch (e: Exception) {
+                    Cobblemon.LOGGER.error("Exception while ticking party for player ${player.name.string}", e)
+                }
             }
         }
     }

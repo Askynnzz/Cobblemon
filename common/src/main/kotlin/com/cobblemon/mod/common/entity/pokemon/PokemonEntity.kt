@@ -30,9 +30,9 @@ import com.cobblemon.mod.common.api.molang.ObjectValue
 import com.cobblemon.mod.common.api.net.serializers.PlatformTypeDataSerializer
 import com.cobblemon.mod.common.api.net.serializers.PoseTypeDataSerializer
 import com.cobblemon.mod.common.api.net.serializers.StringSetDataSerializer
-import com.cobblemon.mod.common.api.pokemon.PokemonSpecies
 import com.cobblemon.mod.common.api.pokemon.feature.ChoiceSpeciesFeatureProvider
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature
+import com.cobblemon.mod.common.api.pokemon.feature.IntSpeciesFeature
 import com.cobblemon.mod.common.api.pokemon.feature.SpeciesFeatures
 import com.cobblemon.mod.common.api.pokemon.feature.StringSpeciesFeature
 import com.cobblemon.mod.common.api.pokemon.status.Statuses
@@ -43,6 +43,7 @@ import com.cobblemon.mod.common.api.scheduling.SchedulingTracker
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.api.spawning.BestSpawner
 import com.cobblemon.mod.common.api.spawning.SpawnCause
+import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.api.types.ElementalTypes
 import com.cobblemon.mod.common.battles.BagItems
 import com.cobblemon.mod.common.battles.BattleBuilder
@@ -87,6 +88,7 @@ import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -111,7 +113,6 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
-import net.minecraft.util.Mth.clamp
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
@@ -124,6 +125,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.Shearable
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
@@ -228,6 +230,13 @@ open class PokemonEntity(
         get() = entityData.get(BATTLE_ID).isPresent
     val friendship: Int
         get() = entityData.get(FRIENDSHIP)
+    var ridingSpeed: Float = 0.0f
+    var jumpForwardVelocity: Float = 0.0f
+    var canSwim: Boolean = false
+    var canFly: Boolean = false
+    var isAccelerationRiding = true
+    var flySpeed: Float = 0.0f
+    var superJump: Boolean = true
 
     var drops: DropTable? = null
 
@@ -328,6 +337,38 @@ open class PokemonEntity(
         builder.define(EVOLUTION_STARTED, false)
     }
 
+    private var jumpStrength = 0.0
+    private var isJumping = false
+    fun startJumping() {
+        if (!this.isJumping) {
+            this.isJumping = true
+            this.jumpStrength = 0.0
+        }
+    }
+    fun chargeJump() {
+        if (this.isJumping) {
+            this.jumpStrength += 0.05
+            if (this.jumpStrength > 1.0) {
+                this.jumpStrength = 1.0
+            }
+        }
+    }
+    fun executeJump() {
+        if (this.isJumping && this.onGround()) {
+            var jumpVelocity = (this.jumpStrength * 0.5) + 0.42
+            if (this.superJump && this.jumpStrength > 0.9) {
+                jumpVelocity = 3.0
+            }
+            val forwardVelocity = jumpForwardVelocity * (1 + this.jumpStrength) // Adjust the multiplier to change the forward boost
+            val f = this.yRot * 0.017453292F
+            val forwardX = -Mth.sin(f) * forwardVelocity
+            val forwardZ = Mth.cos(f) * forwardVelocity
+            this.setDeltaMovement(this.deltaMovement.x + forwardX, jumpVelocity, this.deltaMovement.z + forwardZ)
+            this.hasImpulse = true
+            this.isJumping = false
+        }
+    }
+
     override fun onSyncedDataUpdated(data: EntityDataAccessor<*>) {
         super.onSyncedDataUpdated(data)
         // "But it's imposs-" shut up nerd, it happens during super construction and that's before delegate is assigned by class construction
@@ -340,7 +381,7 @@ open class PokemonEntity(
             SPECIES -> refreshDimensions()
             POSE_TYPE -> {
                 val value = entityData.get(data) as PoseType
-                if (value == PoseType.FLY || value == PoseType.HOVER) {
+                if ((value == PoseType.FLY || value == PoseType.HOVER) && (!this.hasExactlyOnePlayerPassenger())) {
                     setNoGravity(true)
                 } else {
                     setNoGravity(false)
@@ -366,6 +407,20 @@ open class PokemonEntity(
             }
         }
     }
+
+    fun executeFly() {
+        var jumpVelocity = (flySpeed * 0.5) + 0.42
+        val forwardVelocity = jumpForwardVelocity * (1 + flySpeed) // Adjust the multiplier to change the forward boost
+        val f = this.yRot * 0.017453292F
+        val forwardX = -Mth.sin(f) * forwardVelocity
+        val forwardZ = Mth.cos(f) * forwardVelocity
+        this.setDeltaMovement(this.deltaMovement.x + forwardX, jumpVelocity, this.deltaMovement.z + forwardZ)
+        this.hasImpulse = true
+        this.isJumping = false
+    }
+    private var currentSpeed = 0.0f
+    private val accelerationRate = 0.05f // Adjust the acceleration rate as needed
+    private var accelerationCounter = 0
 
     override fun canStandOnFluid(state: FluidState): Boolean {
 //        val node = navigation.currentPath?.currentNode
@@ -467,6 +522,11 @@ open class PokemonEntity(
             }
         }
 
+        if (!this.pokemon.isWild() && this.pokemon.getOwnerPlayer() == null) {
+            this.tethering = null
+            this.pokemon.recall()
+        }
+
         schedulingTracker.update(1 / 20F)
     }
 
@@ -488,10 +548,17 @@ open class PokemonEntity(
         return pokemon.isFireImmune()
     }
 
+    override fun calculateFallDamage(f: Float, g: Float): Int {
+        return Mth.ceil((f * 0.5f - 3.0f) * g)
+    }
+
     /**
      * Prevents flying type Pokémon from taking fall damage.
      */
-    override fun causeFallDamage(fallDistance: Float, damageMultiplier: Float, damageSource: DamageSource): Boolean {
+    override fun causeFallDamage(fallDistance: Float, damageMultiplier: Float, damageSource: DamageSource?): Boolean {
+        if (calculateFallDamage(fallDistance, damageMultiplier) <= 0) {
+            return false
+        }
         return if (ElementalTypes.FLYING in pokemon.types || pokemon.ability.name == "levitate" || pokemon.species.behaviour.moving.fly.canFly) {
             false
         } else {
@@ -500,6 +567,9 @@ open class PokemonEntity(
     }
 
     override fun isInvulnerableTo(damageSource: DamageSource): Boolean {
+        if (this.pokemon.species.name.lowercase() == "trainer") {
+            return true
+        }
         // If the entity is busy, it cannot be hurt.
         if (busyLocks.isNotEmpty()) {
             return true
@@ -639,22 +709,27 @@ open class PokemonEntity(
             val minRoamPos = NbtUtils.readBlockPos(tetheringNBT, DataKeys.TETHER_MIN_ROAM_POS).get()
             val maxRoamPos = NbtUtils.readBlockPos(tetheringNBT, DataKeys.TETHER_MAX_ROAM_POS).get()
 
-            val loadedPokemon = Cobblemon.storage.getPC(pcId, registryAccess())[pokemonId]
-            if (loadedPokemon != null && loadedPokemon.tetheringId == tetheringId) {
-                pokemon = loadedPokemon
-                tethering = PokemonPastureBlockEntity.Tethering(
-                    minRoamPos = minRoamPos,
-                    maxRoamPos = maxRoamPos,
-                    playerId = playerId,
-                    playerName = "",
-                    tetheringId = tetheringId,
-                    pokemonId = pokemonId,
-                    pcId = pcId,
-                    entityId = id // Doesn't really matter on the entity
-                )
-            } else {
-                pokemon = this.createSidedPokemon()
-                health = 0F
+            try {
+                val loadedPokemon = Cobblemon.storage.getPC(pcId, registryAccess())[pokemonId]
+                if (loadedPokemon != null && loadedPokemon.tetheringId == tetheringId) {
+                    pokemon = loadedPokemon
+                    tethering = PokemonPastureBlockEntity.Tethering(
+                        minRoamPos = minRoamPos,
+                        maxRoamPos = maxRoamPos,
+                        playerId = playerId,
+                        playerName = "",
+                        tetheringId = tetheringId,
+                        pokemonId = pokemonId,
+                        pcId = pcId,
+                        entityId = id // Doesn't really matter on the entity
+                    )
+                } else {
+                    pokemon = this.createSidedPokemon()
+                    health = 0F
+                }
+            } catch (e: Exception) {
+                this.discard()
+                return
             }
         } else {
             val ops = registryAccess().createSerializationContext(NbtOps.INSTANCE)
@@ -997,6 +1072,8 @@ open class PokemonEntity(
             return false
         } else if (player.isPartyBusy()) {
             return false
+        } else if (pokemon.species.name.lowercase() == "trainer") {
+            return false
         }
 
         return true
@@ -1112,7 +1189,13 @@ open class PokemonEntity(
             player.sendSystemMessage(lang("held_item.already_holding", this.pokemon.getDisplayName(), stack.hoverName))
             return true
         }
+
         val returned = this.pokemon.swapHeldItem(stack = stack, decrement = !player.isCreative)
+        if (returned.isEmpty) {
+            player.sendSystemMessage("You cannot put this held item on a Pokemon!".red())
+            return false
+        }
+
         val text = when {
             giving.isEmpty -> lang("held_item.take", returned.hoverName, this.pokemon.getDisplayName())
             returned.isEmpty -> lang("held_item.give", this.pokemon.getDisplayName(), giving.hoverName)
@@ -1292,10 +1375,10 @@ open class PokemonEntity(
     // Copy and paste of how vanilla checks it, unfortunately no util method you can only add then wait for the result
     fun hasRoomToMount(player: Player): Boolean {
         return (player.shoulderEntityLeft.isEmpty || player.shoulderEntityRight.isEmpty)
-                && !player.isPassenger()
+                /*&& !player.isPassenger()
                 && player.onGround()
                 && !player.isInWater
-                && !player.isInPowderSnow
+                && !player.isInPowderSnow*/
     }
 
     fun cry() {
@@ -1344,11 +1427,97 @@ open class PokemonEntity(
         }
     }
 
+    fun getAttribute(attribute: Holder<Attribute>, value: Double): AttributeInstance {
+        val instance = AttributeInstance(attribute) {}
+        instance.baseValue = value
+        return instance
+    }
+
     override fun travel(movementInput: Vec3) {
-        val prevBlockPos = this.blockPosition()
         if (beamMode != 3) { // Don't let Pokémon move during recall
-            super.travel(movementInput)
-            this.updateBlocksTraveled(prevBlockPos)
+            if (this.hasExactlyOnePlayerPassenger()) {
+                this.getAttribute(Attributes.STEP_HEIGHT)?.baseValue = 2.0
+                val player = this.firstPassenger as? Player ?: return
+                this.xRot = player.xRot * 0.5f
+                this.yRot = player.yRot
+                this.setRot(this.yRot, this.xRot)
+                this.yRotO = this.yRot
+                this.yHeadRot = this.yRot
+                this.yBodyRot = this.yRot
+                val forward = player.zza
+                val sideways = player.xxa
+
+                if (this.canFly) {
+                    if (player.jumping) {
+                        val stamina = this.pokemon.getFeature<IntSpeciesFeature>("stamina") ?: return
+                        if (stamina.value > 0) {
+                            stamina.value -= 1
+                            if (stamina.value < 0) {
+                                stamina.value = 0
+                            }
+                            this.executeFly()
+                        }
+                    }
+                } else {
+                    if (player.jumping) {
+                        if (!this.isJumping) {
+                            this.startJumping()
+                        }
+                        this.chargeJump()
+                    } else if (this.isJumping) {
+                        // Execute jump
+                        this.executeJump()
+                    }
+                }
+
+                val maxSpeed = if (this.aspects.contains("run")) 0.4f else this.ridingSpeed
+                val targetSpeed = if (this.isAccelerationRiding) maxSpeed else this.ridingSpeed
+
+                if (this.isAccelerationRiding) {
+                    if (deltaMovement.x == 0.0 && deltaMovement.z == 0.0) {
+                        currentSpeed = 0.0f
+                    }
+                    accelerationCounter++
+                    if (accelerationCounter % 5 == 0) {
+                        if (currentSpeed < targetSpeed) {
+                            currentSpeed += accelerationRate
+                            if (currentSpeed > targetSpeed) {
+                                currentSpeed = targetSpeed
+                            }
+                        }
+                    }
+                } else {
+                    currentSpeed = targetSpeed
+                }
+
+                if (this.isInWater && this.canSwim && !this.behaviour.moving.swim.canWalkOnWater) {
+                    this.setSpeed(currentSpeed)
+                    this.moveRelative(currentSpeed, Vec3(sideways.toDouble(), movementInput.y, forward.toDouble()))
+                    this.move(MoverType.SELF, this.deltaMovement)
+                    this.deltaMovement = this.deltaMovement.scale(0.9)
+                } else {
+                    if (!this.aspects.contains("dig")) {
+                        this.setSpeed(currentSpeed)
+                        super.travel(Vec3(sideways.toDouble(), movementInput.y, forward.toDouble()))
+                    }
+                }
+            } else {
+                super.travel(movementInput)
+                currentSpeed = 0.0f // Reset the speed if the player is no longer riding
+            }
+        }
+    }
+
+    override fun jumpFromGround() {
+        if (this.onGround()) {
+            var jumpVelocity = 0.42
+            this.setDeltaMovement(this.deltaMovement.x, jumpVelocity, this.deltaMovement.z)
+            this.hasImpulse = true
+            if (this.isSprinting) {
+                val f = this.yRot * 0.017453292F
+                this.setDeltaMovement(this.deltaMovement.add((-Mth.sin(f) * 0.2), 0.0, (Mth.cos(f) * 0.2)))
+            }
+            this.hasImpulse = true
         }
         if (isBattling && this.isInWater) {
             // Prevent swimmers from sinking in battle
@@ -1371,6 +1540,9 @@ open class PokemonEntity(
     }
 
     override fun isPushable(): Boolean {
+        if (this.pokemon.species.name.lowercase() == "trainer") {
+            return false
+        }
         return beamMode != 3 && super.isPushable()
     }
 
@@ -1598,4 +1770,3 @@ open class PokemonEntity(
         return this
     }
 }
-
