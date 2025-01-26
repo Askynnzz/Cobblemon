@@ -71,6 +71,7 @@ import com.cobblemon.mod.common.pokeball.PokeBall
 import com.cobblemon.mod.common.pokedex.scanner.PokedexEntityData
 import com.cobblemon.mod.common.pokedex.scanner.ScannableEntity
 import com.cobblemon.mod.common.pokemon.FormData
+import com.cobblemon.mod.common.pokemon.OriginalTrainerType
 import com.cobblemon.mod.common.pokemon.Pokemon
 import com.cobblemon.mod.common.pokemon.Species
 import com.cobblemon.mod.common.pokemon.activestate.ActivePokemonState
@@ -128,6 +129,8 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.Shearable
+import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.control.MoveControl
@@ -522,7 +525,7 @@ open class PokemonEntity(
             }
         }
 
-        if (!this.pokemon.isWild() && this.pokemon.getOwnerPlayer() == null) {
+        if (!this.pokemon.isWild() && this.pokemon.originalTrainerType != OriginalTrainerType.NPC && this.pokemon.getOwnerPlayer() == null) {
             this.tethering = null
             this.pokemon.recall()
         }

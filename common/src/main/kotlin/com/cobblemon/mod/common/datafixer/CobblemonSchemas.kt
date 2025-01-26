@@ -13,6 +13,7 @@ import com.cobblemon.mod.common.datafixer.fix.BlockPosUpdateFix
 import com.cobblemon.mod.common.datafixer.fix.EvolutionProxyNestingFix
 import com.cobblemon.mod.common.datafixer.fix.FeatureFix
 import com.cobblemon.mod.common.datafixer.fix.IvEvToIdentifierFix
+import com.cobblemon.mod.common.datafixer.fix.JsonFix
 import com.cobblemon.mod.common.datafixer.fix.MovesetJsonFix
 import com.cobblemon.mod.common.datafixer.fix.NicknameFix
 import com.cobblemon.mod.common.datafixer.fix.RaisedPPStagesFix

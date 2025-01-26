@@ -1104,7 +1104,7 @@ open class Pokemon : ShowdownIdentifiable {
     fun belongsTo(player: Player) = storeCoordinates.get()?.let { it.store.uuid == player.uuid } == true
     fun isPlayerOwned() = storeCoordinates.get()?.let { it.store is PlayerPartyStore || it.store is PCStore } == true
     fun isNPCOwned() = storeCoordinates.get()?.let { it.store is NPCPartyStore } == true
-    fun isWild() = storeCoordinates.get() == null
+    fun isWild() = this.originalTrainerType != OriginalTrainerType.NPC && storeCoordinates.get() == null
 
     /**
      * Set the [friendship] to the given value.
