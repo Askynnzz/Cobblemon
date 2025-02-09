@@ -203,6 +203,7 @@ class NPCEntity(world: Level) : AgeableMob(CobblemonEntities.NPC, world), Npc, P
         fun createAttributes(): AttributeSupplier.Builder = createMobAttributes()
             .add(Attributes.ATTACK_DAMAGE, 1.0)
             .add(Attributes.ATTACK_KNOCKBACK)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
 
         val NPC_CLASS = SynchedEntityData.defineId(NPCEntity::class.java, IdentifierDataSerializer)
         val ASPECTS = SynchedEntityData.defineId(NPCEntity::class.java, StringSetDataSerializer)
