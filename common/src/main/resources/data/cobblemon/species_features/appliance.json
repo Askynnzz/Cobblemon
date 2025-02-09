@@ -9,7 +9,9 @@
     "wash",
     "frost",
     "fan",
-    "mow"
+    "mow",
+    "radio",
+    "dowsing"
   ],
   "isAspect": true,
   "aspectFormat": "{{choice}}-appliance"
