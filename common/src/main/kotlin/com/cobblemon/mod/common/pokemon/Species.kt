@@ -89,7 +89,6 @@ class Species : ClientDataSynchronizer<Species>, ShowdownIdentifiable {
     var shoulderEffects = mutableListOf<ShoulderEffect>()
         private set
     var moves = Learnset()
-        private set
     var features = mutableSetOf<String>()
         private set
     var standingEyeHeight: Float? = null

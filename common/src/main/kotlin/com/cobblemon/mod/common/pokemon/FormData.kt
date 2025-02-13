@@ -72,7 +72,7 @@ class FormData(
     @SerializedName("shoulderEffects")
     private val _shoulderEffects: MutableList<ShoulderEffect>? = null,
     @SerializedName("moves")
-    private var _moves: Learnset? = null,
+    var _moves: Learnset? = null,
     @SerializedName("evolutions")
     private val _evolutions: MutableSet<Evolution>? = null,
     @SerializedName("abilities")
