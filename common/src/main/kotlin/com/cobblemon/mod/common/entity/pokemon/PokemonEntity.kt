@@ -30,11 +30,7 @@ import com.cobblemon.mod.common.api.molang.ObjectValue
 import com.cobblemon.mod.common.api.net.serializers.PlatformTypeDataSerializer
 import com.cobblemon.mod.common.api.net.serializers.PoseTypeDataSerializer
 import com.cobblemon.mod.common.api.net.serializers.StringSetDataSerializer
-import com.cobblemon.mod.common.api.pokemon.feature.ChoiceSpeciesFeatureProvider
-import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature
-import com.cobblemon.mod.common.api.pokemon.feature.IntSpeciesFeature
-import com.cobblemon.mod.common.api.pokemon.feature.SpeciesFeatures
-import com.cobblemon.mod.common.api.pokemon.feature.StringSpeciesFeature
+import com.cobblemon.mod.common.api.pokemon.feature.*
 import com.cobblemon.mod.common.api.pokemon.status.Statuses
 import com.cobblemon.mod.common.api.reactive.ObservableSubscription
 import com.cobblemon.mod.common.api.reactive.SimpleObservable
@@ -84,10 +80,6 @@ import com.cobblemon.mod.common.pokemon.properties.UncatchableProperty
 import com.cobblemon.mod.common.util.*
 import com.cobblemon.mod.common.world.gamerules.CobblemonGameRules
 import com.mojang.serialization.Codec
-import java.util.EnumSet
-import java.util.Optional
-import java.util.UUID
-import java.util.concurrent.CompletableFuture
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.BuiltInRegistries
@@ -119,16 +111,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.effect.MobEffects
-import net.minecraft.world.entity.AgeableMob
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityDimensions
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.ExperienceOrb
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.MoverType
-import net.minecraft.world.entity.Pose
-import net.minecraft.world.entity.Shearable
+import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
@@ -149,6 +132,8 @@ import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import java.util.*
+import java.util.concurrent.CompletableFuture
 
 @Suppress("unused")
 open class PokemonEntity(
@@ -411,16 +396,13 @@ open class PokemonEntity(
         }
     }
 
-    fun executeFly() {
+    fun executeFly(forward: Float, sideways: Float) {
         var jumpVelocity = (flySpeed * 0.5) + 0.42
-        val forwardVelocity = jumpForwardVelocity * (1 + flySpeed) // Adjust the multiplier to change the forward boost
-        val f = this.yRot * 0.017453292F
-        val forwardX = -Mth.sin(f) * forwardVelocity
-        val forwardZ = Mth.cos(f) * forwardVelocity
-        this.setDeltaMovement(this.deltaMovement.x + forwardX, jumpVelocity, this.deltaMovement.z + forwardZ)
+        this.setDeltaMovement(this.deltaMovement.x + sideways * flySpeed, jumpVelocity, this.deltaMovement.z + forward * flySpeed)
         this.hasImpulse = true
         this.isJumping = false
     }
+
     private var currentSpeed = 0.0f
     private val accelerationRate = 0.05f // Adjust the acceleration rate as needed
     private var accelerationCounter = 0
@@ -1458,8 +1440,14 @@ open class PokemonEntity(
                             if (stamina.value < 0) {
                                 stamina.value = 0
                             }
-                            this.executeFly()
+                            this.executeFly(forward, sideways)
+                            this.moveRelative(currentSpeed, Vec3(sideways.toDouble(), movementInput.y, forward.toDouble()))
+                            this.move(MoverType.SELF, this.deltaMovement)
+                            this.deltaMovement = this.deltaMovement.scale(0.9)
                         }
+                    } else {
+                        this.deltaMovement = deltaMovement.add(0.0, -(this.gravity) / 4.0, 0.0)
+                        this.move(MoverType.SELF, this.deltaMovement)
                     }
                 } else {
                     if (player.jumping) {
@@ -1499,7 +1487,7 @@ open class PokemonEntity(
                     this.move(MoverType.SELF, this.deltaMovement)
                     this.deltaMovement = this.deltaMovement.scale(0.9)
                 } else {
-                    if (!this.aspects.contains("dig")) {
+                    if (!this.aspects.contains("dig") && this.onGround()) {
                         this.setSpeed(currentSpeed)
                         super.travel(Vec3(sideways.toDouble(), movementInput.y, forward.toDouble()))
                     }
