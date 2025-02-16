@@ -31,7 +31,13 @@ interface CriticalCaptureProvider {
      * @return If the critical capture should occur
      */
     fun shouldHaveCriticalCapture(player: ServerPlayer, modifiedCatchRate: Float): Boolean {
-        val caughtCount = Cobblemon.playerDataManager.getPokedexData(player).getGlobalCalculatedValue(CaughtCount)
+        val caughtCount: Int
+        try {
+            caughtCount = Cobblemon.playerDataManager.getPokedexData(player).getGlobalCalculatedValue(CaughtCount)
+        } catch (e: Exception) {
+            return false
+        }
+
         val caughtMultiplier = when {
             caughtCount <= 30 -> 0F
             // This one is exact

@@ -294,7 +294,7 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
         delegate.tick(this)
 
         if (level().isServerSide()) {
-        
+
 
             if (this.tickCount > 600 && this.capturingPokemon == null) {
                 this.remove(RemovalReason.DISCARDED)
@@ -349,6 +349,10 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
                 after(seconds = captureTime) {
                     // Dupes occurred by double-adding Pokémon, this hopefully prevents it triple-condom style
                     if (pokemon.pokemon.isWild() && pokemon.isAlive && !captureFuture.isDone) {
+                        val party = player.safeParty() ?: return@after run {
+                            breakFree()
+                        }
+
                         CobblemonEvents.POKEMON_CAPTURE_PRE.postThen(
                             event = PokemonCapturePreEvent(player, pokemon.pokemon, pokeBall),
                             ifSucceeded = {
@@ -361,7 +365,7 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
                         pokemon.discard()
                         discard()
                         captureFuture.complete(true)
-                        val party = player.party()
+
                         pokemon.pokemon.caughtBall = pokeBall
                         pokeBall.effects.forEach { effect -> effect.apply(player, pokemon.pokemon) }
                         party.add(pokemon.pokemon)
@@ -491,6 +495,11 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
     }
 
     fun beginCapture() {
+        if (owner == null) {
+            this.breakFree()
+            return
+        }
+
         // We have hit the ground, time to stop falling and start shaking! Calculate capture.
         capturingPokemon?.setPositionSafely(position())
         val thrower = owner as LivingEntity

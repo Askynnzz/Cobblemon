@@ -129,9 +129,9 @@ class HealingMachineBlockEntity(
     fun completeHealing() {
         val currentUser = currentUser ?: return clearData()
         val player = currentUser.getPlayer()
+
         if (player != null) {
-            val party = player.party()
-            party.heal()
+            player.safeParty()?.heal()
             player.sendSystemMessage(lang("healingmachine.healed").green(), true)
         } else {
             val npc = level

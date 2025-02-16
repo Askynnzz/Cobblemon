@@ -17,6 +17,7 @@ import com.cobblemon.mod.common.api.dialogue.Dialogue
 import com.cobblemon.mod.common.api.dialogue.DialogueManager
 import com.cobblemon.mod.common.api.reactive.Observable.Companion.filter
 import com.cobblemon.mod.common.api.reactive.Observable.Companion.takeFirst
+import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
 import com.cobblemon.mod.common.battles.BattleRegistry
 import com.cobblemon.mod.common.battles.TeamManager
 import com.cobblemon.mod.common.client.CobblemonClient
@@ -54,6 +55,13 @@ import kotlin.math.sin
 
 // Stuff like getting their party
 fun ServerPlayer.party() = Cobblemon.storage.getParty(this)
+fun ServerPlayer.safeParty(): PlayerPartyStore? {
+    return try {
+        Cobblemon.storage.getParty(this)
+    } catch (e: Exception) {
+        null
+    }
+}
 fun ServerPlayer.pc() = Cobblemon.storage.getPC(this)
 fun ServerPlayer.pokedex() = Cobblemon.playerDataManager.getPokedexData(this)
 val ServerPlayer.activeDialogue: ActiveDialogue?

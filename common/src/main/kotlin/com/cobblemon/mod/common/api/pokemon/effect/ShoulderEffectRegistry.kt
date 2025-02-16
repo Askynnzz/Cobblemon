@@ -13,6 +13,7 @@ import com.cobblemon.mod.common.platform.events.PlatformEvents
 import com.cobblemon.mod.common.pokemon.activestate.ShoulderedState
 import com.cobblemon.mod.common.pokemon.effects.PotionBaseEffect
 import com.cobblemon.mod.common.util.party
+import com.cobblemon.mod.common.util.safeParty
 import net.minecraft.server.level.ServerPlayer
 import org.jetbrains.annotations.ApiStatus
 
@@ -53,7 +54,7 @@ object ShoulderEffectRegistry {
     }
 
     private fun refreshEffects(player: ServerPlayer) {
-        player.party().filter { it.state is ShoulderedState }.forEach { pkm ->
+        player.safeParty()?.filter { it.state is ShoulderedState }?.forEach { pkm ->
             pkm.form.shoulderEffects.forEach {
                 it.applyEffect(
                     pokemon = pkm,
