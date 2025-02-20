@@ -8,7 +8,6 @@
 
 package com.cobblemon.mod.common.net.serverhandling.pokedex.scanner
 
-import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.events.CobblemonEvents.POKEMON_SCANNED
 import com.cobblemon.mod.common.api.events.pokedex.scanning.PokemonScannedEvent
 import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
@@ -19,6 +18,7 @@ import com.cobblemon.mod.common.pokedex.scanner.PlayerScanningDetails
 import com.cobblemon.mod.common.pokedex.scanner.PokedexUsageContext
 import com.cobblemon.mod.common.pokedex.scanner.PokemonScanner
 import com.cobblemon.mod.common.pokedex.scanner.ScannableEntity
+import com.cobblemon.mod.common.util.safePokedex
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 
@@ -41,7 +41,7 @@ object FinishScanningHandler : ServerNetworkPacketHandler<FinishScanningPacket> 
             val ticksScan = progressTick?.let { server.tickCount - it } ?: return
             if (targetEntity.uuid == inProgressUUID && ticksScan >= PokedexUsageContext.SUCCESS_SCAN_SERVER_TICKS) {
                 val scannableEntity = targetEntity as? ScannableEntity ?: return
-                val dex = Cobblemon.playerDataManager.getPokedexData(player)
+                val dex = player.safePokedex() ?: return
                 val pokedexEntityData = scannableEntity.resolvePokemonScan()
                 if (pokedexEntityData != null){
                     val newInformation = dex.getNewInformation(pokedexEntityData)

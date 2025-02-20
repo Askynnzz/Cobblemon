@@ -15,6 +15,7 @@ import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.dialogue.ActiveDialogue
 import com.cobblemon.mod.common.api.dialogue.Dialogue
 import com.cobblemon.mod.common.api.dialogue.DialogueManager
+import com.cobblemon.mod.common.api.pokedex.PokedexManager
 import com.cobblemon.mod.common.api.reactive.Observable.Companion.filter
 import com.cobblemon.mod.common.api.reactive.Observable.Companion.takeFirst
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
@@ -64,6 +65,13 @@ fun ServerPlayer.safeParty(): PlayerPartyStore? {
 }
 fun ServerPlayer.pc() = Cobblemon.storage.getPC(this)
 fun ServerPlayer.pokedex() = Cobblemon.playerDataManager.getPokedexData(this)
+fun ServerPlayer.safePokedex(): PokedexManager? {
+    return try {
+        Cobblemon.playerDataManager.getPokedexData(this)
+    } catch (e: Exception) {
+        null
+    }
+}
 val ServerPlayer.activeDialogue: ActiveDialogue?
     get() = DialogueManager.activeDialogues[uuid]
 val ServerPlayer.isInDialogue: Boolean
