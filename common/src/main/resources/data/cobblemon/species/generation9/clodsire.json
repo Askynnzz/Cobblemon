@@ -184,6 +184,6 @@
     "tutor:waterpulse",
     "tutor:zenheadbutt"
   ],
-  "preEvolution": "wooper paldean",
+  "preEvolution": "wooper form=paldean",
   "evolutions": []
 }
