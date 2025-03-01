@@ -8,20 +8,7 @@
 
 package com.cobblemon.mod.common.api.events
 
-import com.cobblemon.mod.common.api.events.battles.BattleFaintedEvent
-import com.cobblemon.mod.common.api.events.battles.BattleFledEvent
-import com.cobblemon.mod.common.api.events.battles.BattleHPEvent
-import com.cobblemon.mod.common.api.events.battles.BattlePickMoveEvent
-import com.cobblemon.mod.common.api.events.battles.BattleStartEvent
-import com.cobblemon.mod.common.api.events.battles.BattleStartedPostEvent
-import com.cobblemon.mod.common.api.events.battles.BattleStartedPreEvent
-import com.cobblemon.mod.common.api.events.battles.BattleSwitchEvent
-import com.cobblemon.mod.common.api.events.battles.BattleTerastallizeEvent
-import com.cobblemon.mod.common.api.events.battles.BattleUseMoveEvent
-import com.cobblemon.mod.common.api.events.battles.BattleVictoryEvent
-import com.cobblemon.mod.common.api.events.battles.GimmighoulEvent
-import com.cobblemon.mod.common.api.events.battles.NPCEvent
-import com.cobblemon.mod.common.api.events.battles.PokemonCapturePreEvent
+import com.cobblemon.mod.common.api.events.battles.*
 import com.cobblemon.mod.common.api.events.battles.instruction.FormeChangeEvent
 import com.cobblemon.mod.common.api.events.battles.instruction.MegaEvolutionEvent
 import com.cobblemon.mod.common.api.events.battles.instruction.TerastallizationEvent
@@ -50,7 +37,6 @@ import com.cobblemon.mod.common.api.events.pokemon.evolution.EvolutionTestedEven
 import com.cobblemon.mod.common.api.events.pokemon.healing.PokemonHealedEvent
 import com.cobblemon.mod.common.api.events.pokemon.interaction.ExperienceCandyUseEvent
 import com.cobblemon.mod.common.api.events.pokemon.interaction.PokemonInteractionGUICreationEvent
-import com.cobblemon.mod.common.api.events.pokemon.interaction.SwapHeldItemEvent
 import com.cobblemon.mod.common.api.events.starter.StarterChosenEvent
 import com.cobblemon.mod.common.api.events.storage.PCEvent
 import com.cobblemon.mod.common.api.events.storage.ReleasePokemonEvent
@@ -276,4 +262,9 @@ object CobblemonEvents {
     val HATCH_EGG_PRE = CancelableObservable<HatchEggEvent.Pre>()
     @JvmField
     val HATCH_EGG_POST = EventObservable<HatchEggEvent.Post>()
+
+    @JvmField
+    val BATTLE_CHOICE_REQUESTED = EventObservable<BattleChoiceRequestedEvent>()
+    @JvmField
+    val BATTLE_CHOICE_MADE = EventObservable<BattleChoiceMadeEvent>()
 }

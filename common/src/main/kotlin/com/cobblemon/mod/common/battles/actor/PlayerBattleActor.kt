@@ -13,10 +13,13 @@ import com.cobblemon.mod.common.CobblemonNetwork
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.battles.model.actor.EntityBackedBattleActor
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.BattleChoiceRequestedEvent
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.pokemon.experience.BattleExperienceSource
 import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.getPlayer
@@ -24,7 +27,6 @@ import java.util.UUID
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.phys.Vec3
 
 class PlayerBattleActor(
@@ -65,5 +67,10 @@ class PlayerBattleActor(
 
     override fun sendUpdate(packet: NetworkPacket<*>) {
         CobblemonNetwork.sendPacketToPlayers(getPlayerUUIDs().mapNotNull { it.getPlayer() }, packet)
+
+        if (packet is BattleMakeChoicePacket) {
+            val player = this.entity ?: return
+            CobblemonEvents.BATTLE_CHOICE_REQUESTED.post(BattleChoiceRequestedEvent(player, packet))
+        }
     }
 }

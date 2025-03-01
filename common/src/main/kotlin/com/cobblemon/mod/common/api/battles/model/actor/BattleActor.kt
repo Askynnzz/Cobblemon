@@ -12,6 +12,9 @@ import com.bedrockk.molang.runtime.struct.QueryStruct
 import com.bedrockk.molang.runtime.value.StringValue
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.BattleChoiceMadeEvent
+import com.cobblemon.mod.common.api.events.battles.BattleChoiceRequestedEvent
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asMoLangValue
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.battles.ActiveBattlePokemon
@@ -25,6 +28,7 @@ import com.cobblemon.mod.common.item.battle.BagItem
 import com.cobblemon.mod.common.net.messages.client.battle.BattleApplyPassResponsePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
+import com.cobblemon.mod.common.util.getPlayer
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.UUID
@@ -147,6 +151,11 @@ abstract class BattleActor(
         if (expectingPassActions.size > 0) {
             throw IllegalActionChoiceException(this, "Invalid action choice: a capture was expected. Are you hacking me?")
         }
+
+        this.uuid.getPlayer()?.let { player ->
+            CobblemonEvents.BATTLE_CHOICE_MADE.post(BattleChoiceMadeEvent(player))
+        }
+
         mustChoose = false
         battle.checkForInputDispatch()
     }
