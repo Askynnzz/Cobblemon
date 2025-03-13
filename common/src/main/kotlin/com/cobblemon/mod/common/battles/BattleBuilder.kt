@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.battles.BattleStartEvent
+import com.cobblemon.mod.common.api.events.battles.NPCDefineBattleActorEvent
 import com.cobblemon.mod.common.api.storage.party.PartyStore
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
@@ -348,7 +349,9 @@ object BattleBuilder {
             return errors
         }
 
-        val npcActor = NPCBattleActor(npcEntity, npcParty, npcEntity.skill ?: npcEntity.npc.skill)
+        val event = NPCDefineBattleActorEvent(player, npcEntity, NPCBattleActor(npcEntity, npcParty, npcEntity.skill ?: npcEntity.npc.skill))
+        CobblemonEvents.NPC_DEFINE_BATTLE_ACTOR.post(event)
+        val npcActor = event.battleActor
 //        if (npcEntity.battleIds.get().isPresent) {
 //            errors.participantErrors[npcActor] += BattleStartError.alreadyInBattle(npcActor)
 //        }

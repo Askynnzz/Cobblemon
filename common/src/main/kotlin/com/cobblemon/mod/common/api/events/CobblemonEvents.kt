@@ -109,6 +109,9 @@ object CobblemonEvents {
     val NPC_EVENT = EventObservable<NPCEvent>()
 
     @JvmField
+    val NPC_DEFINE_BATTLE_ACTOR = EventObservable<NPCDefineBattleActorEvent>()
+
+    @JvmField
     val PC_EVENT = CancelableObservable<PCEvent>()
 
     @JvmField

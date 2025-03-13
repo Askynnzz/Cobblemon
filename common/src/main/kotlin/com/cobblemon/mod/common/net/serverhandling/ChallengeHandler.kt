@@ -19,6 +19,7 @@ import com.cobblemon.mod.common.battles.BattleBuilder
 import com.cobblemon.mod.common.battles.BattleTypes
 import com.cobblemon.mod.common.battles.ChallengeManager
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
+import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleChallengeNotificationPacket
 import com.cobblemon.mod.common.net.messages.server.BattleChallengePacket
@@ -59,6 +60,12 @@ object ChallengeHandler : ServerNetworkPacketHandler<BattleChallengePacket> {
             if (player.canInteractWith(targetedEntity, Cobblemon.config.battleWildMaxDistance) && targetedEntity.canBattle(player)) {
                 BattleBuilder.pve(player, targetedEntity, leadingPokemon)
                     .ifSuccessful { battle -> this.flagAsSeen(battle, targetedEntity) }
+                    .ifErrored { it.sendTo(player) { it.red() } }
+            }
+        }
+        else if (targetedEntity is NPCEntity) {
+            if (player.canInteractWith(targetedEntity, Cobblemon.config.battleWildMaxDistance)) {
+                BattleBuilder.pvn(player, targetedEntity, leadingPokemon)
                     .ifErrored { it.sendTo(player) { it.red() } }
             }
         }

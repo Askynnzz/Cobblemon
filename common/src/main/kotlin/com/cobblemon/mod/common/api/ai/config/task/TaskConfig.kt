@@ -33,6 +33,7 @@ fun interface TaskConfig {
             "random" to RandomTaskConfig::class.java,
             "stay_afloat" to StayAfloatTaskConfig::class.java,
             "look_at_entities" to LookAtEntitiesTaskConfig::class.java,
+            "look_at_players" to LookAtPlayersTaskConfig::class.java,
             "do_nothing" to DoNothingTaskConfig::class.java,
             "get_angry_at_attacker" to GetAngryAtAttackerTaskConfig::class.java,
             "stop_being_angry_if_attacker_dead" to StopBeingAngryIfAttackerDeadTaskConfig::class.java,

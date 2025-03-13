@@ -11,15 +11,10 @@ package com.cobblemon.mod.common
 import com.bedrockk.molang.Expression
 import com.cobblemon.mod.common.api.ai.config.BrainConfig
 import com.cobblemon.mod.common.api.ai.config.task.TaskConfig
-import com.cobblemon.mod.common.api.data.DataRegistry
 import com.cobblemon.mod.common.api.data.JsonDataRegistry
 import com.cobblemon.mod.common.api.molang.ExpressionLike
 import com.cobblemon.mod.common.api.reactive.SimpleObservable
-import com.cobblemon.mod.common.util.adapters.ActivityAdapter
-import com.cobblemon.mod.common.util.adapters.BrainConfigAdapter
-import com.cobblemon.mod.common.util.adapters.ExpressionAdapter
-import com.cobblemon.mod.common.util.adapters.ExpressionLikeAdapter
-import com.cobblemon.mod.common.util.adapters.TaskConfigAdapter
+import com.cobblemon.mod.common.util.adapters.*
 import com.cobblemon.mod.common.util.cobblemonResource
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
