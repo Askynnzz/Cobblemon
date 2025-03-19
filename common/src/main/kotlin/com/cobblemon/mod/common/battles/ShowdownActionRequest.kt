@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.battles
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
@@ -81,6 +82,10 @@ class ShowdownActionRequest(
                     else -> cobblemonResource("z_ring")
                 }
                 if (!player.hasKeyItem(triggerItem)) moveset.blockGimmick(gimmick)
+            }
+
+            if (moveset.canMegaEvo && moveset.moves.any { it.id == "dragonascent" } && !Cobblemon.permissionValidator.hasPermission(player, "quests.mega_rayquaza.completed", 4)) {
+                moveset.canMegaEvo = false
             }
         }
     }
