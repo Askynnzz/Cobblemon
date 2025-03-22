@@ -31,7 +31,7 @@ data class BattleFormat(
     companion object {
         val GEN_9_SINGLES = BattleFormat(
             battleType = BattleTypes.SINGLES,
-            ruleSet = setOf(BattleRules.OBTAINABLE, BattleRules.PAST, BattleRules.UNOBTAINABLE)
+            ruleSet = setOf(BattleRules.OBTAINABLE, BattleRules.PAST, BattleRules.UNOBTAINABLE, BattleRules.SLEEP_CLAUSE)
         )
 
         val GEN_9_DOUBLES = BattleFormat(
