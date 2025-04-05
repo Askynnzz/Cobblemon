@@ -50,6 +50,7 @@ class FormeChangeInstruction(val message: BattleMessage): InterpreterInstruction
                 val form = battlePokemon.effectedPokemon.species.forms.find { it.name.equals(formName, true) }
                 if (form != null) {
                     battlePokemon.clearBattleFeatures()
+                    println("FORME CHANGE: ${form.aspects[0]} ALL ASPECTS: ${form.aspects}")
                     battlePokemon.setBattleFeature(form.aspects[0], true)
                 }
                 val lang = when(formName) {

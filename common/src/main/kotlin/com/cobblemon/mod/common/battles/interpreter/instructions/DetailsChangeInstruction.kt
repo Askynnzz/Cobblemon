@@ -33,7 +33,13 @@ class DetailsChangeInstruction(val message: BattleMessage): InterpreterInstructi
         val formName = message.argumentAt(1)?.split(',')?.get(0)?.substringAfter('-')?.lowercase() ?: return
         battle.dispatchWaiting {
             val pokemonName = battlePokemon.getName()
-            battlePokemon.setBattleFeature(formName, true)
+            println("DETAILS CHANGE: ${formName}")
+            val effectiveForm = when (formName) {
+                "mega-x" -> "mega_x"
+                "mega-y" -> "mega_y"
+                else -> formName
+            }
+            battlePokemon.setBattleFeature(effectiveForm, true)
             battlePokemon.sendUpdate()
 
             val flatHp = message.argumentAt(1)?.split("/")?.getOrNull(0)?.toFloatOrNull() ?: return@dispatchWaiting
