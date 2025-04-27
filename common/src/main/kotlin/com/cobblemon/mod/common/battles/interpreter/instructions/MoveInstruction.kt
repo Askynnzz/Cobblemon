@@ -91,6 +91,8 @@ class MoveInstruction(
                     battleLang("ability.magicbounce", pokemonName, move.displayName)
                 move.name != "struggle" && spreadTargetPokemon.isEmpty() && targetPokemon != null && targetPokemon != userPokemon && targetPokemon.health > 0 ->
                     battleLang("used_move_on", pokemonName, move.displayName, targetPokemon.getName())
+                move.name == "rebirth" ->
+                    battleLang("move.rebirth", pokemonName, extractLastPart(message.rawMessage))
                 else ->
                     battleLang("used_move", pokemonName, move.displayName)
             }
@@ -145,6 +147,17 @@ class MoveInstruction(
             holds = context.holds // Reference so future things can check on this action effect's holds
             future.thenApply { holds.clear() }
             return@dispatch UntilDispatch { "effects" !in holds }
+        }
+    }
+
+    fun extractLastPart(input: String): String {
+        val pattern = Regex("\\|([^|]+)\\|([^|]+)$")
+        val matchResult = pattern.find(input)
+        return if (matchResult != null) {
+            val (secondToLast, last) = matchResult.destructured
+            "$secondToLast and $last"
+        } else {
+            ""
         }
     }
 }
