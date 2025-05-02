@@ -49,6 +49,7 @@ class SpawnPool(val name: String) : JsonDataRegistry<SpawnSet>, Iterable<SpawnDe
             details.addAll(set.filter { it.isValid() })
         }
         precalculate()
+        observable.emit(this)
     }
 
     val details = mutableListOf<SpawnDetail>()
