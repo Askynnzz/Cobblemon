@@ -387,7 +387,7 @@ open class PokemonEntity(
                 if ((value == PoseType.FLY || value == PoseType.HOVER) && (!this.hasExactlyOnePlayerPassenger())) {
                     setNoGravity(true)
                 } else {
-                    if (!this.pokemon.aspects.contains("chest")) {
+                    if (!this.pokemon.aspects.contains("chest") && !this.pokemon.aspects.contains("chest2") && !this.pokemon.aspects.contains("chest3")) {
                         setNoGravity(false)
                     }
                 }
