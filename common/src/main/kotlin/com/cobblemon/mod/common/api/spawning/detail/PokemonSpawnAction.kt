@@ -41,8 +41,8 @@ class PokemonSpawnAction(
         val props = props.copy()
         props.level = levelRange.random()
         val pokemon = props.create()
-        ctx.influences.forEach { it.affectPokemon(pokemon) }
-        val entity = PokemonEntity(ctx.world, pokemon)
+        spawnablePosition.influences.forEach { it.affectPokemon(pokemon) }
+        val entity = PokemonEntity(spawnablePosition.world, pokemon)
         entity.spawnCause = spawnablePosition.cause
         SeasonFeatureHandler.updateSeason(entity.pokemon, Cobblemon.seasonResolver(spawnablePosition.world, spawnablePosition.position))
         val heldItem = heldItem

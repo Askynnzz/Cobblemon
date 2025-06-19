@@ -316,7 +316,6 @@ object CobblemonEvents {
     // -------------------------------------------------------------------------------------
     @JvmField
     val SELECT_DRIVER = EventObservable<SelectDriverEvent>()
-}
 
     @JvmField
     val BATTLE_CHOICE_REQUESTED = EventObservable<BattleChoiceRequestedEvent>()

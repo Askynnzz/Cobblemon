@@ -447,38 +447,6 @@ open class PokemonEntity(
         builder.define(RIDE_BOOSTS, emptyMap())
     }
 
-    private var jumpStrength = 0.0
-    private var isJumping = false
-    fun startJumping() {
-        if (!this.isJumping) {
-            this.isJumping = true
-            this.jumpStrength = 0.0
-        }
-    }
-    fun chargeJump() {
-        if (this.isJumping) {
-            this.jumpStrength += 0.05
-            if (this.jumpStrength > 1.0) {
-                this.jumpStrength = 1.0
-            }
-        }
-    }
-    fun executeJump() {
-        if (this.isJumping && this.onGround()) {
-            var jumpVelocity = (this.jumpStrength * 0.5) + 0.42
-            if (this.superJump && this.jumpStrength > 0.9) {
-                jumpVelocity = 3.0
-            }
-            val forwardVelocity = jumpForwardVelocity * (1 + this.jumpStrength) // Adjust the multiplier to change the forward boost
-            val f = this.yRot * 0.017453292F
-            val forwardX = -Mth.sin(f) * forwardVelocity
-            val forwardZ = Mth.cos(f) * forwardVelocity
-            this.setDeltaMovement(this.deltaMovement.x + forwardX, jumpVelocity, this.deltaMovement.z + forwardZ)
-            this.hasImpulse = true
-            this.isJumping = false
-        }
-    }
-
     override fun onSyncedDataUpdated(data: EntityDataAccessor<*>) {
         super.onSyncedDataUpdated(data)
         // "But it's imposs-" shut up nerd, it happens during super construction and that's before delegate is assigned by class construction
@@ -515,20 +483,6 @@ open class PokemonEntity(
             }
         }
     }
-
-    fun executeFly() {
-        var jumpVelocity = (flySpeed * 0.5) + 0.42
-        val forwardVelocity = jumpForwardVelocity * (1 + flySpeed) // Adjust the multiplier to change the forward boost
-        val f = this.yRot * 0.017453292F
-        val forwardX = -Mth.sin(f) * forwardVelocity
-        val forwardZ = Mth.cos(f) * forwardVelocity
-        this.setDeltaMovement(this.deltaMovement.x + forwardX, jumpVelocity, this.deltaMovement.z + forwardZ)
-        this.hasImpulse = true
-        this.isJumping = false
-    }
-    private var currentSpeed = 0.0f
-    private val accelerationRate = 0.05f // Adjust the acceleration rate as needed
-    private var accelerationCounter = 0
 
     override fun canStandOnFluid(state: FluidState): Boolean {
 //        val node = navigation.currentPath?.currentNode
@@ -1739,8 +1693,9 @@ open class PokemonEntity(
     }
 
     override fun travel(movementInput: Vec3) {
-        if (beamMode != 3) { // Don't let Pokémon move during recall
+        val prevBlockPos = this.blockPosition()
 
+        if (beamMode != 3) { // Don't let Pokémon move during recall
             //Prevent current travel logic when riding a pokemon.
             val riders = this.passengers.filterIsInstance<LivingEntity>()
             if ( riders.isEmpty() || this.controllingPassenger == null) {

@@ -277,8 +277,8 @@ class PokemonServerDelegate : PokemonSideDelegate {
         val isSleeping = (entity.brain.getMemory(CobblemonMemories.POKEMON_SLEEPING).orElse(false) || entity.pokemon.status?.status == Statuses.SLEEP) && entity.behaviour.resting.canSleep
         val isMoving = entity.entityData.get(PokemonEntity.MOVING)
         val isPassenger = entity.isPassenger
-        val isUnderwater = entity.getIsSubmerged() || (entity.hasExactlyOnePlayerPassenger() && entity.canSwim && entity.isInWater)
-        val isFlying = entity.getBehaviourFlag(PokemonBehaviourFlag.FLYING) || (entity.hasExactlyOnePlayerPassenger() && entity.canFly && !entity.onGround() && !entity.isInWater)
+        val isUnderwater = entity.getIsSubmerged()
+        val isFlying = entity.getBehaviourFlag(PokemonBehaviourFlag.FLYING)
 
         val poseType = when {
             isPassenger -> PoseType.STAND
