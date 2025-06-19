@@ -188,7 +188,15 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
                 discard()
                 val player = this.owner as? ServerPlayer
                 if (player?.isCreative == false) {
-                    spawnAtLocation(defaultItem)
+                    CobblemonEvents.THROWN_POKEBALL_HIT_BLOCK.postThen(
+                        event = ThrownPokeballHitBlockEvent(this, hitResult),
+                        ifSucceeded = {
+                            spawnAtLocation(defaultItem)
+                        },
+                        ifCanceled = {
+                            return
+                        }
+                    )
                 }
             }
         } else {
@@ -196,7 +204,6 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
             deltaMovement = Vec3.ZERO
         }
 
-        CobblemonEvents.THROWN_POKEBALL_HIT_BLOCK.post(ThrownPokeballHitBlockEvent(this, hitResult))
     }
 
     override fun onHitEntity(hitResult: EntityHitResult) {
