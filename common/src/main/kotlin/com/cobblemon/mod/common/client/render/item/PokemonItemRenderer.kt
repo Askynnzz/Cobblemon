@@ -9,8 +9,8 @@
 package com.cobblemon.mod.common.client.render.item
 
 import com.cobblemon.mod.common.client.render.models.blockbench.FloatingState
-import com.cobblemon.mod.common.client.render.models.blockbench.repository.PokemonModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.RenderContext
+import com.cobblemon.mod.common.client.render.models.blockbench.repository.VaryingModelRepository
 import com.cobblemon.mod.common.entity.PoseType
 import com.cobblemon.mod.common.item.PokemonItem
 import com.cobblemon.mod.common.util.math.fromEulerXYZDegrees
@@ -38,7 +38,7 @@ class PokemonItemRenderer : CobblemonBuiltinItemRenderer {
         val state = FloatingState()
         state.currentAspects = aspects
         matrices.pushPose()
-        val model = PokemonModelRepository.getPoser(species.resourceIdentifier, state)
+        val model = VaryingModelRepository.getPoser(species.resourceIdentifier, state)
         model.context = context
         context.put(RenderContext.RENDER_STATE, RenderContext.RenderState.PROFILE)
         context.put(RenderContext.SPECIES, species.resourceIdentifier)
@@ -46,7 +46,7 @@ class PokemonItemRenderer : CobblemonBuiltinItemRenderer {
         context.put(RenderContext.POSABLE_STATE, state)
         state.currentModel = model
 
-        val renderLayer = RenderType.entityCutout(PokemonModelRepository.getTexture(species.resourceIdentifier, state))
+        val renderLayer = RenderType.entityCutout(VaryingModelRepository.getTexture(species.resourceIdentifier, state))
 
         val transformations = positions[mode]!!
 
@@ -59,7 +59,6 @@ class PokemonItemRenderer : CobblemonBuiltinItemRenderer {
         state.setPoseToFirstSuitable(PoseType.PORTRAIT)
         model.applyAnimations(null, state, 0F, 0F, 0F, 0F, 0F)
 
-        matrices.translate(model.profileTranslation.x, model.profileTranslation.y, -4.0)
         matrices.scale(model.profileScale, model.profileScale, 0.15F)
 
         val rotation = Quaternionf().fromEulerXYZDegrees(Vector3f(transformations.rotation.x, transformations.rotation.y, transformations.rotation.z))
@@ -75,7 +74,7 @@ class PokemonItemRenderer : CobblemonBuiltinItemRenderer {
 
         // x = red, y = green, z = blue, w = alpha
         val tint = pokemonItem.tint(stack)
-        model.withLayerContext(vertexConsumers, state, PokemonModelRepository.getLayers(species.resourceIdentifier, state)) {
+        model.withLayerContext(vertexConsumers, state, VaryingModelRepository.getLayers(species.resourceIdentifier, state)) {
             val tintRed = (tint.x * 255).toInt()
             val tintGreen = (tint.y * 255).toInt()
             val tintBlue = (tint.z * 255).toInt()
@@ -98,37 +97,37 @@ class PokemonItemRenderer : CobblemonBuiltinItemRenderer {
 
         init {
             positions[ItemDisplayContext.GUI] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(1.0, -1.9, -0.5),
-                PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
+                PokemonItemRenderer().Transformation(1.0, -0.2, -0.5),
+                PokemonItemRenderer().Transformation(0.5F, -0.5F, -3.5F),
                 PokemonItemRenderer().Transformation(0F, 35F, 0F)
             )
             positions[ItemDisplayContext.FIXED] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(1.0, -2.0, 3.0),
-                PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
+                PokemonItemRenderer().Transformation(1.0, -0.5, -5.0),
+                PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.1F),
                 PokemonItemRenderer().Transformation(0F, 35F - 180F, 0F)
             )
             positions[ItemDisplayContext.FIRST_PERSON_RIGHT_HAND] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(2.75, -1.2, 5.0),
+                PokemonItemRenderer().Transformation(2.75, 0.0, 1.0),
                 PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
                 PokemonItemRenderer().Transformation(0F, 35F, 0F)
             )
             positions[ItemDisplayContext.FIRST_PERSON_LEFT_HAND] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(-0.75, -1.2, 5.0),
+                PokemonItemRenderer().Transformation(-0.75, 0.0, 1.0),
                 PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
                 PokemonItemRenderer().Transformation(0F, -35F, 0F)
             )
             positions[ItemDisplayContext.THIRD_PERSON_RIGHT_HAND] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(1.0, -2.6, 2.75),
+                PokemonItemRenderer().Transformation(1.0, -1.0, -1.25),
                 PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
                 PokemonItemRenderer().Transformation(0F, 35F, 0F)
             )
             positions[ItemDisplayContext.THIRD_PERSON_LEFT_HAND] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(1.0, -2.6, 2.75),
+                PokemonItemRenderer().Transformation(1.0, -1.0, -1.25),
                 PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
                 PokemonItemRenderer().Transformation(0F, -35F, 0F)
             )
             positions[ItemDisplayContext.GROUND] = PokemonItemRenderer().Transformations(
-                PokemonItemRenderer().Transformation(1.0, -2.6, 3.0),
+                PokemonItemRenderer().Transformation(1.0, -0.5, -1.0),
                 PokemonItemRenderer().Transformation(0.5F, -0.5F, -0.5F),
                 PokemonItemRenderer().Transformation(0F, 35F, 0F)
             )

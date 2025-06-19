@@ -53,16 +53,27 @@
       "canSleep": true,
       "light": "0-4"
     },
-    "idle": {
-      "pointsAtSpawn": true
-    },
     "moving": {
+      "walk": {
+        "walkSpeed": 0.12
+      },
       "swim": {
         "avoidsWater": true,
         "canSwimInWater": false
       }
     }
   },
+  "ai": [
+    {
+      "type": "add_tasks_to_activity",
+      "activity": "idle",
+      "tasksByPriority": {
+        "2": [
+          "point_to_spawn"
+        ]
+      }
+    }
+  ],
   "drops": {
     "amount": 4,
     "entries": [
@@ -199,7 +210,7 @@
       "id": "nosepass_probopass",
       "variant": "item_interact",
       "result": "probopass",
-      "consumeHeldItem": true,
+      "consumeHeldItem": false,
       "learnableMoves": [
         "triattack"
       ],

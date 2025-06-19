@@ -21,7 +21,7 @@ import com.cobblemon.mod.common.api.events.pokemon.evolution.EvolutionTestedEven
 import com.cobblemon.mod.common.api.moves.BenchedMove
 import com.cobblemon.mod.common.api.moves.MoveTemplate
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
-import com.cobblemon.mod.common.api.pokemon.evolution.requirement.EvolutionRequirement
+import com.cobblemon.mod.common.api.pokemon.requirement.Requirement
 import com.cobblemon.mod.common.api.tags.CobblemonItemTags
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.item.PokeBallItem
@@ -71,9 +71,9 @@ interface Evolution : EvolutionLike {
     var consumeHeldItem: Boolean
 
     /**
-     * The [EvolutionRequirement]s behind this evolution.
+     * The [Requirement]s behind this evolution.
      */
-    val requirements: MutableSet<EvolutionRequirement>
+    val requirements: MutableSet<Requirement>
 
     /**
      * The [MoveTemplate]s that will be offered to be learnt upon evolving.
@@ -105,6 +105,9 @@ interface Evolution : EvolutionLike {
      * @param pokemon The [Pokemon] being evolved.
      */
     fun evolve(pokemon: Pokemon): Boolean {
+        if (this.consumeHeldItem) {
+            pokemon.swapHeldItem(ItemStack.EMPTY)
+        }
         if (this.optional) {
             // All the networking is handled under the hood, see EvolutionController.
             return pokemon.evolutionProxy.server().add(this)
@@ -173,7 +176,7 @@ interface Evolution : EvolutionLike {
             pokemonEntity.after(11.2F) {
                 evolutionMethod(pokemon)
             }
-            pokemonEntity.after( seconds = 12F ) {
+            pokemonEntity.after(seconds = 12F) {
                 cryAnimation(pokemonEntity)
                 pokemonEntity.entityData.set(PokemonEntity.EVOLUTION_STARTED, false)
                 pokemon.getOwnerPlayer()?.sendSystemMessage(lang("ui.evolve.into", preEvoName, pokemon.species.translatedName))
@@ -219,10 +222,6 @@ interface Evolution : EvolutionLike {
         pokemon.lockedEvolutions.filterIsInstance<PassiveEvolution>().forEach { evolution -> evolution.attemptEvolution(pokemon) }
 
         this.shed(pokemon)
-
-        if (this.consumeHeldItem) {
-            pokemon.swapHeldItem(ItemStack.EMPTY)
-        }
 
         val ownerPlayer = pokemon.getOwnerPlayer()
         if (ownerPlayer != null && ownerPlayer.level().gameRules.getBoolean(CobblemonGameRules.DO_POKEMON_LOOT)) {
