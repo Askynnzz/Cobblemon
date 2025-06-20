@@ -195,10 +195,8 @@ class PokemonServerDelegate : PokemonSideDelegate {
         }
 
         if (entity.ownerUUID != null && entity.pokemon.storeCoordinates.get() == null) {
-//            println("STORE COORDINATES")
             return entity.discard()
         } else if (entity.pokemon.isNPCOwned() && entity.owner?.isAlive != true) {
-//            println("NPC OWNED")
             return entity.discard()
         } else if (entity.pokemon.isNPCOwned() && entity.ownerUUID == null) {
             entity.ownerUUID = entity.pokemon.getOwnerUUID()
@@ -206,7 +204,6 @@ class PokemonServerDelegate : PokemonSideDelegate {
 
         val tethering = entity.tethering
         if (tethering != null && entity.pokemon.tetheringId != tethering.tetheringId) {
-//            println("TETHERING")
             return entity.discard()
         }
 
@@ -247,7 +244,6 @@ class PokemonServerDelegate : PokemonSideDelegate {
         }
 
         if (entity.ownerUUID != null && entity.owner == null && entity.tethering == null) {
-//            println("DISCARDED OWNERUUID")
             entity.remove(Entity.RemovalReason.DISCARDED)
         }
 

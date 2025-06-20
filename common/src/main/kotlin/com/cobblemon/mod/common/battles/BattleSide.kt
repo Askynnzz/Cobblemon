@@ -11,11 +11,9 @@ package com.cobblemon.mod.common.battles
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
-import com.cobblemon.mod.common.client.entity.PokemonClientDelegate
 import com.cobblemon.mod.common.net.messages.client.effect.SpawnSnowstormEntityParticlePacket
 import com.cobblemon.mod.common.util.cobblemonResource
 import net.minecraft.network.chat.Component
-import java.util.UUID
 
 /**
  * Unlike the Showdown side.ts, this can represent multiple actors.
@@ -23,7 +21,7 @@ import java.util.UUID
  * @author Hiroku
  * @since March 9th, 2022
  */
-class BattleSide(vararg val actors: BattleActor, val leadingPokemon: UUID? = null) {
+class BattleSide(vararg val actors: BattleActor) {
     val activePokemon: List<ActiveBattlePokemon>
         get() = actors.flatMap { it.activePokemon }
 

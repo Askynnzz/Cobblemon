@@ -118,8 +118,8 @@ object BattleBuilder {
         return if (errors.isEmpty) {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
-                side1 = BattleSide(player1Actor, leadingPokemon = leadingPokemonPlayer1),
-                side2 = BattleSide(player2Actor, leadingPokemon = leadingPokemonPlayer2)
+                side1 = BattleSide(player1Actor),
+                side2 = BattleSide(player2Actor)
             ).ifSuccessful {
                 it.battlePartyStores.addAll(battlePartyStores)
             }
@@ -283,6 +283,8 @@ object BattleBuilder {
             errors.participantErrors[wildActor] += BattleStartError.alreadyInBattle(wildActor)
         }
 
+        playerActor.battleTheme = pokemonEntity.getBattleTheme()
+
         CobblemonEvents.BATTLE_START.postThen(
             event = BattleStartEvent(playerActor, wildActor),
             ifSucceeded = { },
@@ -294,7 +296,7 @@ object BattleBuilder {
         return if (errors.isEmpty) {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
-                side1 = BattleSide(playerActor, leadingPokemon = leadingPokemon),
+                side1 = BattleSide(playerActor),
                 side2 = BattleSide(wildActor)
             ).ifSuccessful {
                 if (!cloneParties) {

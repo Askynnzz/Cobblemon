@@ -150,7 +150,6 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.effect.MobEffects
-import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.Brain
 import net.minecraft.world.entity.AgeableMob
 import net.minecraft.world.entity.Entity
@@ -1593,10 +1592,10 @@ open class PokemonEntity(
     // Copy and paste of how vanilla checks it, unfortunately no util method you can only add then wait for the result
     fun hasRoomToMount(player: Player): Boolean {
         return (player.shoulderEntityLeft.isEmpty || player.shoulderEntityRight.isEmpty)
-                /*&& !player.isPassenger
+                && !player.isPassenger
                 && player.onGround()
                 && !player.isInWater
-                && !player.isInPowderSnow*/
+                && !player.isInPowderSnow
     }
 
     fun cry() {
@@ -1694,8 +1693,8 @@ open class PokemonEntity(
 
     override fun travel(movementInput: Vec3) {
         val prevBlockPos = this.blockPosition()
-
         if (beamMode != 3) { // Don't let Pokémon move during recall
+
             //Prevent current travel logic when riding a pokemon.
             val riders = this.passengers.filterIsInstance<LivingEntity>()
             if ( riders.isEmpty() || this.controllingPassenger == null) {
@@ -2353,4 +2352,6 @@ open class PokemonEntity(
     override fun isFlying() = this.getBehaviourFlag(PokemonBehaviourFlag.FLYING)
     override fun couldStopFlying() = isFlying() && !behaviour.moving.walk.avoidsLand && behaviour.moving.walk.canWalk
     override fun setFlying(state: Boolean) {
-        setBehaviourFlag(PokemonBehaviourFlag.FLYING, state)}}
+        setBehaviourFlag(PokemonBehaviourFlag.FLYING, state)
+    }
+}

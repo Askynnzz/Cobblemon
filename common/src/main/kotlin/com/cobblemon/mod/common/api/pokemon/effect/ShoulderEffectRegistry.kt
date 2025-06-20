@@ -9,10 +9,8 @@
 package com.cobblemon.mod.common.api.pokemon.effect
 
 import com.cobblemon.mod.common.api.scheduling.ServerTaskTracker
-import com.cobblemon.mod.common.platform.events.PlatformEvents
 import com.cobblemon.mod.common.pokemon.activestate.ShoulderedState
 import com.cobblemon.mod.common.pokemon.effects.PotionBaseEffect
-import com.cobblemon.mod.common.util.party
 import com.cobblemon.mod.common.util.safeParty
 import net.minecraft.server.level.ServerPlayer
 import org.jetbrains.annotations.ApiStatus
