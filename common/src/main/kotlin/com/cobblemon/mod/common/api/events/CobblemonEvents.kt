@@ -28,6 +28,7 @@ import com.cobblemon.mod.common.api.events.fishing.*
 import com.cobblemon.mod.common.api.events.item.LeftoversCreatedEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokeBallCaptureCalculatedEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokemonCatchRateEvent
+import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitBlockEvent
 import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitEvent
 import com.cobblemon.mod.common.api.events.pokedex.scanning.PokemonScannedEvent
 import com.cobblemon.mod.common.api.events.pokemon.*
@@ -86,6 +87,10 @@ object CobblemonEvents {
 
     @JvmField
     val THROWN_POKEBALL_HIT = CancelableObservable<ThrownPokeballHitEvent>()
+
+    @JvmField
+    val THROWN_POKEBALL_HIT_BLOCK = CancelableObservable<ThrownPokeballHitBlockEvent>()
+
     @JvmField
     val POKEMON_CATCH_RATE = EventObservable<PokemonCatchRateEvent>()
     @JvmField

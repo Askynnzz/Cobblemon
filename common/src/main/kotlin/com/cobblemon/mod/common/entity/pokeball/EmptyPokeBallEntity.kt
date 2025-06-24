@@ -14,8 +14,10 @@ import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonEntities.EMPTY_POKEBALL
 import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.battles.GimmighoulEvent
 import com.cobblemon.mod.common.api.events.battles.PokemonCapturePreEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokeBallCaptureCalculatedEvent
+import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitBlockEvent
 import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitEvent
 import com.cobblemon.mod.common.api.events.pokemon.PokemonCapturedEvent
 import com.cobblemon.mod.common.api.net.serializers.StringSetDataSerializer
@@ -185,13 +187,22 @@ class EmptyPokeBallEntity : ThrowableItemProjectile, PosableEntity, WaterDragMod
                 discard()
                 val player = this.owner as? ServerPlayer
                 if (player?.isCreative == false) {
-                    spawnAtLocation(defaultItem)
+                    CobblemonEvents.THROWN_POKEBALL_HIT_BLOCK.postThen(
+                        event = ThrownPokeballHitBlockEvent(this, hitResult),
+                        ifSucceeded = {
+                            spawnAtLocation(defaultItem)
+                        },
+                        ifCanceled = {
+                            return
+                        }
+                    )
                 }
             }
         } else {
             setNoGravity(false)
             deltaMovement = Vec3.ZERO
         }
+
     }
 
     override fun onHitEntity(hitResult: EntityHitResult) {
