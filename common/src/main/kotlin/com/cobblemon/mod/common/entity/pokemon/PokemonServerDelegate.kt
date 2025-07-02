@@ -17,6 +17,8 @@ import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.OrientationControllable
 import com.cobblemon.mod.common.api.entity.PokemonSender
 import com.cobblemon.mod.common.api.entity.PokemonSideDelegate
+import com.cobblemon.mod.common.api.molang.MoLangFunctions.addPokemonEntityFunctions
+import com.cobblemon.mod.common.api.molang.MoLangFunctions.addPokemonFunctions
 import com.cobblemon.mod.common.api.molang.ObjectValue
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
@@ -29,6 +31,7 @@ import com.cobblemon.mod.common.pokemon.activestate.ActivePokemonState
 import com.cobblemon.mod.common.pokemon.activestate.SentOutState
 import com.cobblemon.mod.common.util.asUUID
 import com.cobblemon.mod.common.util.getIsSubmerged
+import com.cobblemon.mod.common.util.getMemorySafely
 import com.cobblemon.mod.common.util.math.geometry.toRadians
 import com.cobblemon.mod.common.util.playSoundServer
 import com.cobblemon.mod.common.util.update
@@ -59,6 +62,8 @@ class PokemonServerDelegate : PokemonSideDelegate {
         updatePathfindingPenalties(pokemon)
 //        entity.registerGoals()
         updateMaxHealth()
+        entity.struct.addPokemonFunctions(pokemon)
+        entity.struct.addPokemonEntityFunctions(entity)
     }
 
     fun updatePathfindingPenalties(pokemon: Pokemon) {
@@ -182,6 +187,7 @@ class PokemonServerDelegate : PokemonSideDelegate {
         if (this::entity.isInitialized) {
             when (data) {
                 PokemonEntity.BEHAVIOUR_FLAGS -> updatePoseType()
+                PokemonEntity.SPECIES -> entity.refreshRiding()
             }
         }
     }
@@ -270,7 +276,7 @@ class PokemonServerDelegate : PokemonSideDelegate {
             return
         }
 
-        val isSleeping = (entity.brain.getMemory(CobblemonMemories.POKEMON_SLEEPING).orElse(false) || entity.pokemon.status?.status == Statuses.SLEEP) && entity.behaviour.resting.canSleep
+        val isSleeping = (entity.brain.getMemorySafely(CobblemonMemories.POKEMON_SLEEPING).orElse(false) || entity.pokemon.status?.status == Statuses.SLEEP) && entity.behaviour.resting.canSleep
         val isMoving = entity.entityData.get(PokemonEntity.MOVING)
         val isPassenger = entity.isPassenger
         val isUnderwater = entity.getIsSubmerged()
