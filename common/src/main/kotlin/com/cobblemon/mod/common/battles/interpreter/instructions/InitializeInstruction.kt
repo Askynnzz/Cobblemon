@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.battles.interpreter.instructions
 
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
+import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
 import com.cobblemon.mod.common.battles.dispatch.DispatchResult
@@ -21,6 +22,7 @@ import com.cobblemon.mod.common.net.messages.client.battle.BattleQueueRequestPac
 import com.cobblemon.mod.common.net.messages.client.battle.BattleSetTeamPokemonPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
 
 /**
  * Format: |start
@@ -61,12 +63,25 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
             battle.actors.forEach { other ->
                 val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map {
+                    val moves = it.moveSet.getMovesWithNulls().map { move ->
+                        if (move == null) return@map null
+                        return@map DeltaMoveDTO(move.displayName, 0)
+                    }
                     DeltaBattlePokemonDTO(
                         it.uuid,
                         it.effectedPokemon.isFainted(),
-                        listOf(null, null, null, null),
-                        null,
-                        mapOf()
+                        it.effectedPokemon.ability.name,
+                        moves,
+                        it.effectedPokemon.heldItem,
+                        mapOf(
+                            Stats.ATTACK to 2.0/5.0,
+                            Stats.DEFENCE to 2.0/4.0,
+                            Stats.SPECIAL_ATTACK to 2.0/3.0,
+                            Stats.SPECIAL_DEFENCE to 3.0/2.0,
+                            Stats.SPEED to 4.0/2.0,
+                            Stats.EVASION to 5.0/2.0,
+                            Stats.ACCURACY to 6.0/3.0
+                        )
                     )
                 })
                 other.sendUpdate(packet)

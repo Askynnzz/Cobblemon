@@ -18,6 +18,7 @@ import com.cobblemon.mod.common.api.pokemon.feature.BattleFormFeature
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemManager
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemProvider
 import com.cobblemon.mod.common.api.pokemon.stats.Stat
+import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.battles.actor.MultiPokemonBattleActor
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
@@ -25,6 +26,7 @@ import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleUpdateTeamPokemonPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorInformationPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
 import com.cobblemon.mod.common.pokemon.IVs
 import com.cobblemon.mod.common.pokemon.Nature
 import com.cobblemon.mod.common.pokemon.Pokemon
@@ -122,6 +124,11 @@ open class BattlePokemon(
     }
 
     fun sendUpdate() {
+        val moves = effectedPokemon.moveSet.getMovesWithNulls().map { move ->
+            if (move == null) return@map null
+            return@map DeltaMoveDTO(move.displayName, 0)
+        }
+
         actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
         actor.battle.actors.forEach {
             it.sendUpdate(DeltaBattleActorInformationPacket(
@@ -129,9 +136,18 @@ open class BattlePokemon(
                 DeltaBattlePokemonDTO(
                     this.effectedPokemon.uuid,
                     this.effectedPokemon.isFainted(),
-                    listOf(null, null, null, null),
-                    null,
-                    mapOf()
+                    effectedPokemon.ability.name,
+                    moves,
+                    effectedPokemon.heldItem,
+                    mapOf(
+                        Stats.ATTACK to 2.0/5.0,
+                        Stats.DEFENCE to 2.0/4.0,
+                        Stats.SPECIAL_ATTACK to 2.0/3.0,
+                        Stats.SPECIAL_DEFENCE to 3.0/2.0,
+                        Stats.SPEED to 4.0/2.0,
+                        Stats.EVASION to 5.0/2.0,
+                        Stats.ACCURACY to 6.0/3.0
+                    )
                 )
             ))
         }
