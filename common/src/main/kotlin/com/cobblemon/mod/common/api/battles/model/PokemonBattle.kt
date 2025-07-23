@@ -47,6 +47,8 @@ import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleEndPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
 import com.cobblemon.mod.common.pokemon.evolution.progress.DefeatEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.progress.LastBattleCriticalHitsEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.requirements.DefeatRequirement
@@ -238,6 +240,11 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
+
+        val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
+            turn = turn
+        ))
+        this.actors.forEach { it.sendUpdate(updatePacket) }
     }
 
     fun end() {

@@ -11,13 +11,22 @@ package com.cobblemon.mod.fabric.net
 import com.cobblemon.mod.common.CobblemonNetwork
 import com.cobblemon.mod.common.NetworkManager
 import com.cobblemon.mod.common.api.net.NetworkPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
 
 object CobblemonFabricNetworkManager : NetworkManager {
     fun registerMessages() {
         CobblemonNetwork.s2cPayloads.map { FabricPacketInfo(it) }.forEach { it.registerPacket(client = true) }
+        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(DeltaBattleActorTeamPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, DeltaBattleActorTeamPacket::decode))
+        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(DeltaBattleActorInformationPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, DeltaBattleActorInformationPacket::decode))
+        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(DeltaBattleInformationPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, DeltaBattleInformationPacket::decode))
         CobblemonNetwork.c2sPayloads.map { FabricPacketInfo(it) }.forEach { it.registerPacket(client = false) }
     }
 

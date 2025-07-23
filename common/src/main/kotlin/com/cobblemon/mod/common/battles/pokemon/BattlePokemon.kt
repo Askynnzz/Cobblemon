@@ -23,6 +23,8 @@ import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleUpdateTeamPokemonPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
 import com.cobblemon.mod.common.pokemon.IVs
 import com.cobblemon.mod.common.pokemon.Nature
 import com.cobblemon.mod.common.pokemon.Pokemon
@@ -121,6 +123,18 @@ open class BattlePokemon(
 
     fun sendUpdate() {
         actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
+        actor.battle.actors.forEach {
+            it.sendUpdate(DeltaBattleActorInformationPacket(
+                actor.uuid,
+                DeltaBattlePokemonDTO(
+                    this.effectedPokemon.uuid,
+                    this.effectedPokemon.isFainted(),
+                    listOf(null, null, null, null),
+                    null,
+                    mapOf()
+                )
+            ))
+        }
     }
 
     fun isSentOut() = actor.battle.activePokemon.any { it.battlePokemon == this }

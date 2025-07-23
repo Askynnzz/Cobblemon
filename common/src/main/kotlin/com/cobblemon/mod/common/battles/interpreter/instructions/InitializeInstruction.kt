@@ -8,7 +8,6 @@
 
 package com.cobblemon.mod.common.battles.interpreter.instructions
 
-import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
@@ -20,6 +19,8 @@ import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacke
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleQueueRequestPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleSetTeamPokemonPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
 
 /**
  * Format: |start
@@ -58,6 +59,10 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
 
         battle.actors.forEach { actor ->
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
+            battle.actors.forEach { other ->
+                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { DeltaBattlePokemonDTO(it.uuid, it.effectedPokemon.isFainted()) })
+                other.sendUpdate(packet)
+            }
             val req = actor.request ?: return@forEach
             actor.sendUpdate(BattleQueueRequestPacket(req))
         }
