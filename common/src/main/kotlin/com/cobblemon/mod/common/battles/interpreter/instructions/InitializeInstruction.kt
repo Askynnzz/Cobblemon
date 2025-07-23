@@ -60,7 +60,15 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
         battle.actors.forEach { actor ->
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
             battle.actors.forEach { other ->
-                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { DeltaBattlePokemonDTO(it.uuid, it.effectedPokemon.isFainted()) })
+                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map {
+                    DeltaBattlePokemonDTO(
+                        it.uuid,
+                        it.effectedPokemon.isFainted(),
+                        listOf(null, null, null, null),
+                        null,
+                        mapOf()
+                    )
+                })
                 other.sendUpdate(packet)
             }
             val req = actor.request ?: return@forEach
