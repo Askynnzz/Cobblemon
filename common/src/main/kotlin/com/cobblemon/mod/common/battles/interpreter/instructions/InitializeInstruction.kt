@@ -61,27 +61,39 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
 
         battle.actors.forEach { actor ->
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
-            battle.actors.forEach { other ->
-                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map {
-                    val moves = it.moveSet.getMovesWithNulls().map { move ->
-                        if (move == null) return@map null
-                        return@map DeltaMoveDTO(move.displayName, 0)
-                    }
+
+            actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { pokemon ->
+                val boostMultipliers = pokemon.boosts.mapValues { pokemon.getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
+                val moves = pokemon.moveSet.getMovesWithNulls().map { move ->
+                    if (move == null) return@map null
+                    return@map DeltaMoveDTO(move.displayName, 0)
+                }
+                DeltaBattlePokemonDTO(
+                    pokemon.uuid,
+                    pokemon.effectedPokemon.isFainted(),
+                    pokemon.effectedPokemon.ability.name,
+                    moves,
+                    pokemon.effectedPokemon.heldItem,
+                    boostMultipliers,
+                    speed = pokemon.effectedPokemon.speed,
+                    BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(pokemon, true, pokemon.getIllusion())
+                )
+            }))
+
+            val otherActors = battle.actors.filter { it != actor }
+
+            otherActors.forEach { other ->
+                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { pokemon ->
+                    val boostMultipliers = pokemon.boosts.mapValues { pokemon.getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
                     DeltaBattlePokemonDTO(
-                        it.uuid,
-                        it.effectedPokemon.isFainted(),
-                        it.effectedPokemon.ability.name,
-                        moves,
-                        it.effectedPokemon.heldItem,
-                        mapOf(
-                            Stats.ATTACK to 2.0/5.0,
-                            Stats.DEFENCE to 2.0/4.0,
-                            Stats.SPECIAL_ATTACK to 2.0/3.0,
-                            Stats.SPECIAL_DEFENCE to 3.0/2.0,
-                            Stats.SPEED to 4.0/2.0,
-                            Stats.EVASION to 5.0/2.0,
-                            Stats.ACCURACY to 6.0/3.0
-                        )
+                        pokemon.uuid,
+                        pokemon.effectedPokemon.isFainted(),
+                        pokemon.revealedAbility,
+                        pokemon.revealedMoves,
+                        pokemon.revealedHeldItem,
+                        boostMultipliers,
+                        speed = null,
+                        null
                     )
                 })
                 other.sendUpdate(packet)

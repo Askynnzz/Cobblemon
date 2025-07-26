@@ -28,6 +28,7 @@ import com.cobblemon.mod.common.battles.dispatch.InstructionSet
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
 import com.cobblemon.mod.common.battles.dispatch.UntilDispatch
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
 import com.cobblemon.mod.common.pokemon.evolution.progress.UseMoveEvolutionProgress
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.cobblemonResource
@@ -66,6 +67,15 @@ class MoveInstruction(
             .toList()
 
         CobblemonEvents.BATTLE_USE_MOVE.post(BattleUseMoveEvent(battle, players, userPokemon, move))
+
+        val moveIndex = userPokemon.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        if (userPokemon.revealedMoves[moveIndex] == null) {
+            userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
+        }
+        else {
+            userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+        }
+        userPokemon.sendUpdate()
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)

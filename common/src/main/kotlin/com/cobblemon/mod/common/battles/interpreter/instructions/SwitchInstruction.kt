@@ -91,6 +91,7 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                             ).thenApply {
                                 actor.stillSendingOutCount--
                             }
+                            activePokemon.battlePokemon?.sendUpdate()
                             WaitDispatch(0.5F)  // we're already waiting 1.5 seconds. this prevents flooding from consecutive SwitchInstructions
                         }
                     }
@@ -170,6 +171,8 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
             // If we can't find the entity for some reason then we're going to skip the recall animation
             val sendOutFuture = CompletableFuture<Unit>()
             (pokemonEntity?.recallWithAnimation() ?: CompletableFuture.completedFuture(Unit)).thenApply {
+                activePokemon.battlePokemon?.boosts?.clear()
+                activePokemon.battlePokemon?.sendUpdate()
                 // Queue actual swap and send-in after the animation has ended
                 actor.pokemonList.swap(actor.activePokemon.indexOf(activePokemon), actor.pokemonList.indexOf(newPokemon))
                 activePokemon.battlePokemon = newPokemon

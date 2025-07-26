@@ -37,6 +37,8 @@ class DeltaBattleActorInformationPacket(val actor: UUID, val update: DeltaBattle
         }
         buffer.writeNullable(update.heldItem) { _, item -> buffer.writeItemStack(item) }
         buffer.writeMap(update.buffs, { _, v -> buffer.writeEnum(v) }, { _, v -> buffer.writeDouble(v) })
+        buffer.writeNullable(update.speed) { _, v -> buffer.writeInt(v) }
+        buffer.writeNullable(update.activeBattlePokemonDTO) { _, v -> v.saveToBuffer(buffer) }
     }
 
     companion object {
@@ -49,7 +51,9 @@ class DeltaBattleActorInformationPacket(val actor: UUID, val update: DeltaBattle
                 ability = buffer.readNullable { buffer.readString() },
                 moves = buffer.readList { buffer.readNullable { DeltaMoveDTO(buffer.readText(), buffer.readInt()) } },
                 heldItem = buffer.readNullable { buffer.readItemStack() },
-                buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() })
+                buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() }),
+                speed = buffer.readNullable { buffer.readInt() },
+                activeBattlePokemonDTO = buffer.readNullable { BattleInitializePacket.ActiveBattlePokemonDTO.loadFromBuffer(buffer) }
             )
         )
     }
@@ -61,10 +65,12 @@ data class DeltaBattlePokemonDTO(
     val ability: String?,
     val moves: List<DeltaMoveDTO?>,
     val heldItem: ItemStack?,
-    val buffs: Map<Stats, Double>
+    val buffs: Map<Stats, Double>,
+    val speed: Int?,
+    val activeBattlePokemonDTO: BattleInitializePacket.ActiveBattlePokemonDTO?
 )
 
 data class DeltaMoveDTO(
     val move: Component,
-    val timesUsed: Int
+    var timesUsed: Int
 )

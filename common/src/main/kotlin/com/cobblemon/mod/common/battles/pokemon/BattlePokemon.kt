@@ -23,6 +23,7 @@ import com.cobblemon.mod.common.battles.actor.MultiPokemonBattleActor
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
+import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleUpdateTeamPokemonPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorInformationPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
@@ -36,6 +37,7 @@ import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.server
 import java.util.UUID
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.world.item.ItemStack
 import java.util.function.Function
 
 open class BattlePokemon(
@@ -114,6 +116,11 @@ open class BattlePokemon(
 
     val contextManager = ContextManager()
 
+    val boosts = mutableMapOf<Stats, Int>()
+    val revealedAbility: String? = null
+    val revealedMoves: MutableList<DeltaMoveDTO?> = mutableListOf(null, null, null, null)
+    val revealedHeldItem: ItemStack? = null
+
     open fun getName(): MutableComponent {
         val displayPokemon = getIllusion()?.effectedPokemon ?: effectedPokemon
         return if (actor is PokemonBattleActor || actor is MultiPokemonBattleActor) {
@@ -123,31 +130,66 @@ open class BattlePokemon(
         }
     }
 
+    fun getBoostMultiplier(stat: Stats): Double {
+        return when (boosts[stat]) {
+            -6 -> 2.0 / 8.0
+            -5 -> 2.0 / 7.0
+            -4 -> 2.0 / 6.0
+            -3 -> 2.0 / 5.0
+            -2 -> 2.0 / 4.0
+            -1 -> 2.0 / 3.0
+            0 -> 2.0 / 2.0
+            1 -> 3.0 / 2.0
+            2 -> 4.0 / 2.0
+            3 -> 5.0 / 2.0
+            4 -> 6.0 / 2.0
+            5 -> 7.0 / 2.0
+            6 -> 8.0 / 2.0
+            else -> 1.0
+        }
+    }
+
     fun sendUpdate() {
-        val moves = effectedPokemon.moveSet.getMovesWithNulls().map { move ->
-            if (move == null) return@map null
-            return@map DeltaMoveDTO(move.displayName, 0)
+        actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
+
+        val moves = this.revealedMoves.toMutableList()
+        for (i in 0 until 4) {
+            if (moves[i] == null) {
+                val move = effectedPokemon.moveSet.getMovesWithNulls()[i]
+                if (move == null) continue
+                moves[i] = DeltaMoveDTO(move.displayName, 0)
+            }
         }
 
-        actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
-        actor.battle.actors.forEach {
-            it.sendUpdate(DeltaBattleActorInformationPacket(
+        val boostMultipliers = boosts.mapValues { getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
+
+        actor.sendUpdate(DeltaBattleActorInformationPacket(
+            actor.uuid,
+            DeltaBattlePokemonDTO(
+                this.effectedPokemon.uuid,
+                this.effectedPokemon.isFainted(),
+                this.effectedPokemon.ability.name,
+                moves,
+                this.effectedPokemon.heldItem,
+                boostMultipliers,
+                speed = effectedPokemon.speed,
+                BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, true, getIllusion())
+        )))
+
+        val otherActors = actor.battle.actors.filter { it != actor }
+        otherActors.forEach {
+            it.sendUpdate(
+                DeltaBattleActorInformationPacket(
                 actor.uuid,
                 DeltaBattlePokemonDTO(
                     this.effectedPokemon.uuid,
                     this.effectedPokemon.isFainted(),
-                    effectedPokemon.ability.name,
-                    moves,
-                    effectedPokemon.heldItem,
-                    mapOf(
-                        Stats.ATTACK to 2.0/5.0,
-                        Stats.DEFENCE to 2.0/4.0,
-                        Stats.SPECIAL_ATTACK to 2.0/3.0,
-                        Stats.SPECIAL_DEFENCE to 3.0/2.0,
-                        Stats.SPEED to 4.0/2.0,
-                        Stats.EVASION to 5.0/2.0,
-                        Stats.ACCURACY to 6.0/3.0
-                    )
+                    revealedAbility,
+                    revealedMoves,
+                    revealedHeldItem,
+                    boostMultipliers,
+                    speed = null,
+                    BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, false, getIllusion())
                 )
             ))
         }

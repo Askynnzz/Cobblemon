@@ -36,6 +36,8 @@ class DeltaBattleActorTeamPacket(val actor: UUID, val team: List<DeltaBattlePoke
             }
             pb.writeNullable(value.heldItem) { _, item -> buffer.writeItemStack(item) }
             pb.writeMap(value.buffs, { _, v -> buffer.writeEnum(v) }, { _, v -> buffer.writeDouble(v) })
+            buffer.writeNullable(value.speed) { _, v -> buffer.writeInt(v) }
+            buffer.writeNullable(value.activeBattlePokemonDTO) { _, v -> v.saveToBuffer(buffer) }
         }
     }
 
@@ -50,7 +52,9 @@ class DeltaBattleActorTeamPacket(val actor: UUID, val team: List<DeltaBattlePoke
                     ability = buffer.readNullable { buffer.readString() },
                     moves = buffer.readList { buffer.readNullable { DeltaMoveDTO(buffer.readText(), buffer.readInt()) } },
                     heldItem = buffer.readNullable { buffer.readItemStack() },
-                    buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() })
+                    buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() }),
+                    speed = buffer.readNullable { buffer.readInt() },
+                    activeBattlePokemonDTO = buffer.readNullable { BattleInitializePacket.ActiveBattlePokemonDTO.loadFromBuffer(buffer) }
                 )
             }
         )
