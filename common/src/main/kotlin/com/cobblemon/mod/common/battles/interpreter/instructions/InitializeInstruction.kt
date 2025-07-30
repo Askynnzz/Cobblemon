@@ -85,6 +85,12 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             otherActors.forEach { other ->
                 val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { pokemon ->
                     val boostMultipliers = pokemon.boosts.mapValues { pokemon.getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
+
+                    val activeBattlePokemon = battle.activePokemon.find { it.battlePokemon?.uuid == pokemon.uuid }?.battlePokemon
+                    val activeBattlePokemonDTO = activeBattlePokemon?.let {
+                        BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(it, false, it.getIllusion())
+                    }
+
                     DeltaBattlePokemonDTO(
                         pokemon.uuid,
                         pokemon.effectedPokemon.isFainted(),
@@ -93,7 +99,7 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
                         pokemon.revealedHeldItem,
                         boostMultipliers,
                         speed = null,
-                        null
+                        activeBattlePokemonDTO
                     )
                 })
                 other.sendUpdate(packet)
