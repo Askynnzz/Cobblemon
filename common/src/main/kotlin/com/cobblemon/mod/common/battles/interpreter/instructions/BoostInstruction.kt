@@ -51,14 +51,6 @@ class BoostInstruction(battle: PokemonBattle, val message: BattleMessage, val is
 
     override fun runActionEffect(battle: PokemonBattle, runtime: MoLangRuntime) {
         if (stages == 0) return // only play effect if there was a stat change
-        val stagesWithSign = if (isBoost) stages else -stages
-        if (pokemon.boosts[Stats.getStat(statKey)] == null) {
-            pokemon.boosts[Stats.getStat(statKey)] = stagesWithSign
-        }
-        else {
-            val curr = pokemon.boosts[Stats.getStat(statKey)]!!
-            pokemon.boosts[Stats.getStat(statKey)] = min(max(curr + stagesWithSign, -6), 6)
-        }
         battle.dispatch {
             val actionEffect = if (isBoost) BOOST_EFFECT else UNBOOST_EFFECT
             val providers = mutableListOf<Any>(battle)
@@ -81,6 +73,15 @@ class BoostInstruction(battle: PokemonBattle, val message: BattleMessage, val is
         val rootKey = if (isBoost) "boost" else "unboost"
 
         battle.dispatch {
+            val stagesWithSign = if (isBoost) stages else -stages
+            if (pokemon.boosts[Stats.getStat(statKey)] == null) {
+                pokemon.boosts[Stats.getStat(statKey)] = stagesWithSign
+            }
+            else {
+                val curr = pokemon.boosts[Stats.getStat(statKey)]!!
+                pokemon.boosts[Stats.getStat(statKey)] = min(max(curr + stagesWithSign, -6), 6)
+            }
+
             val lang = when {
                 message.hasOptionalArgument("zeffect") -> battleLang("$rootKey.$severity.zeffect", pokemon.getName(), stat)
                 else -> battleLang("$rootKey.$severity", pokemon.getName(), stat)
