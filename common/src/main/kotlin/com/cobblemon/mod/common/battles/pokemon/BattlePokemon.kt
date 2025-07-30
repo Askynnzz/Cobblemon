@@ -117,9 +117,11 @@ open class BattlePokemon(
     val contextManager = ContextManager()
 
     val boosts = mutableMapOf<Stats, Int>()
-    val revealedAbility: String? = null
+    var revealedAbility: String? = null
     val revealedMoves: MutableList<DeltaMoveDTO?> = mutableListOf(null, null, null, null)
-    val revealedHeldItem: ItemStack? = null
+    var revealedHeldItem: ItemStack? = null
+
+    var transformed: BattlePokemon? = null
 
     open fun getName(): MutableComponent {
         val displayPokemon = getIllusion()?.effectedPokemon ?: effectedPokemon

@@ -68,7 +68,12 @@ class MoveInstruction(
 
         CobblemonEvents.BATTLE_USE_MOVE.post(BattleUseMoveEvent(battle, players, userPokemon, move))
 
-        val moveIndex = userPokemon.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        val moveIndex = if (userPokemon.transformed != null) {
+            userPokemon.transformed!!.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        }
+        else {
+            userPokemon.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        }
         if (userPokemon.revealedMoves[moveIndex] == null) {
             userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
         }
