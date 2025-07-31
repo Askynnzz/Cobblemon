@@ -116,6 +116,7 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             battle.started = true
             battle.side1.playCries()
             afterOnServer(seconds = 1.0F) { battle.side2.playCries() }
+            battle.notifyActorsOfUpdates()
         }
     }
 }
