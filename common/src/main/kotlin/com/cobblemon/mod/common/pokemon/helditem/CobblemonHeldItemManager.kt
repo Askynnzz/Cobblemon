@@ -115,7 +115,19 @@ object CobblemonHeldItemManager : BaseCobblemonHeldItemManager() {
             "switcheroo", "trick" -> battleLang("item.trick", battlerName, itemName)
             else -> battleLang("item.$effectId", battlerName, itemName, sourceName)
         }
+
         battle.broadcastChatMessage(text)
+
+        if (this.giveItemEffect.contains(effectId)) {
+            val stack = this.itemIds[itemID]?.let { ItemStack(it) } ?: ItemStack.EMPTY
+            pokemon.revealedHeldItem = stack
+            pokemon.sendUpdate()
+        }
+        if (this.takeItemEffect.contains(effectId)) {
+            pokemon.revealedHeldItem = ItemStack.EMPTY
+            pokemon.sendUpdate()
+        }
+
         // If it's a take and give effect, we don't want to follow through if we are not consuming held items
         if (this.takeItemEffect.contains(effectId) && this.giveItemEffect.contains(effectId) && !consumeHeldItems) {
             return
@@ -148,6 +160,10 @@ object CobblemonHeldItemManager : BaseCobblemonHeldItemManager() {
         }
         val battlerName = pokemon.getName()
         val itemName = this.nameOf(itemID)
+
+        pokemon.revealedHeldItem = ItemStack.EMPTY
+        pokemon.sendUpdate()
+
         if (battleMessage.hasOptionalArgument("eat")) {
             battle.broadcastChatMessage(battleLang("item.eat", battlerName, itemName))
 //            if (consumeHeldItems) this.take(pokemon, itemID)
