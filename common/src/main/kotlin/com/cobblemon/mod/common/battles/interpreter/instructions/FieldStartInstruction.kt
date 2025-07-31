@@ -37,6 +37,7 @@ class FieldStartInstruction(val message: BattleMessage): InterpreterInstruction 
 
             val type = BattleContext.Type.valueOf(effect.rawData.substringAfterLast(" ").uppercase())
             battle.contextManager.add(ShowdownInterpreter.getContextFromAction(message, type, battle))
+            battle.notifyActorsOfUpdates()
         }
     }
 }

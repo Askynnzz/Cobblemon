@@ -81,6 +81,7 @@ class MoveInstruction(
             userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
         }
         userPokemon.sendUpdate()
+        battle.notifyActorsOfUpdates()
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)

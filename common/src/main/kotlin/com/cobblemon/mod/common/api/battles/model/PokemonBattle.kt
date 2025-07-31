@@ -14,6 +14,7 @@ import com.bedrockk.molang.runtime.value.DoubleValue
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.Cobblemon.LOGGER
 import com.cobblemon.mod.common.CobblemonNetwork
+import com.cobblemon.mod.common.api.battles.interpreter.BattleContext
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
@@ -240,9 +241,19 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
+        notifyActorsOfUpdates()
+    }
+
+    fun notifyActorsOfUpdates() {
+        val weather = this.contextManager.get(BattleContext.Type.WEATHER)?.firstOrNull()
+        val terrain = this.contextManager.get(BattleContext.Type.TERRAIN)?.firstOrNull()
+        val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
 
         val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
-            turn = turn
+            turn = turn,
+            weather = weather?.id,
+            terrain = terrain?.id,
+            room = room?.id,
         ))
         this.actors.forEach { it.sendUpdate(updatePacket) }
     }
