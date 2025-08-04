@@ -11,6 +11,7 @@ package com.cobblemon.mod.common.battles.interpreter.instructions
 import com.bedrockk.molang.runtime.MoLangRuntime
 import com.bedrockk.molang.runtime.value.DoubleValue
 import com.bedrockk.molang.runtime.value.StringValue
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.interpreter.Effect
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
@@ -74,14 +75,19 @@ class MoveInstruction(
         else {
             userPokemon.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
         }
-        if (userPokemon.revealedMoves[moveIndex] == null) {
-            userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
+        if (moveIndex == -1) {
+            Cobblemon.LOGGER.warn("Could not find move ${move.name} on pokemon ${userPokemon.getName()}")
         }
         else {
-            userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+            if (userPokemon.revealedMoves[moveIndex] == null) {
+                userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
+            }
+            else {
+                userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+            }
         }
         userPokemon.sendUpdate()
-        battle.notifyActorsOfUpdates()
+        battle.notifyAllOfDeltaUpdates()
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)

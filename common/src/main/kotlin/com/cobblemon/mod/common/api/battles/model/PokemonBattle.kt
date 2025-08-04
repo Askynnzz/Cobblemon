@@ -14,6 +14,7 @@ import com.bedrockk.molang.runtime.value.DoubleValue
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.Cobblemon.LOGGER
 import com.cobblemon.mod.common.CobblemonNetwork
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.battles.interpreter.BattleContext
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
@@ -241,21 +242,30 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
-        notifyActorsOfUpdates()
+        notifyAllOfDeltaUpdates()
     }
 
-    fun notifyActorsOfUpdates() {
+    fun notifyAllOfDeltaUpdates() {
+        val uuids = this.actors.map { it.uuid } + this.spectators
+        notifyOfDeltaUpdates(uuids)
+    }
+
+    fun notifyOfDeltaUpdates(uuids: List<UUID>) {
         val weather = this.contextManager.get(BattleContext.Type.WEATHER)?.firstOrNull()
         val terrain = this.contextManager.get(BattleContext.Type.TERRAIN)?.firstOrNull()
         val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
+        val side1Hazards = side1.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
+        val side2Hazards = side2.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
 
         val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
             turn = turn,
             weather = weather?.id,
             terrain = terrain?.id,
             room = room?.id,
+            side1Hazards = side1Hazards ?: emptyList(),
+            side2Hazards = side2Hazards ?: emptyList(),
         ))
-        this.actors.forEach { it.sendUpdate(updatePacket) }
+        uuids.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
     }
 
     fun end() {

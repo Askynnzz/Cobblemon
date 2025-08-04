@@ -47,7 +47,7 @@ class WeatherInstruction(val message: BattleMessage): InterpreterInstruction {
                     battleLang("weather.$oldWeather.end")
                 }
             }
-            battle.notifyActorsOfUpdates()
+            battle.notifyAllOfDeltaUpdates()
             battle.broadcastChatMessage(lang)
         }
     }

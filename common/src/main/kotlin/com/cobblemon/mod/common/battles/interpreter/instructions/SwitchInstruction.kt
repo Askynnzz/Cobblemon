@@ -136,6 +136,9 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                     if (publicMessage.effect()?.id == "batonpass") oldPokemon.contextManager.swap(pokemon.contextManager, BattleContext.Type.BOOST, BattleContext.Type.UNBOOST)
                     oldPokemon.contextManager.clear(BattleContext.Type.VOLATILE, BattleContext.Type.BOOST, BattleContext.Type.UNBOOST)
                     battle.majorBattleActions[oldPokemon.uuid] = publicMessage
+                    if (oldPokemon.transformed != null) {
+                        oldPokemon.revealedMoves.clear()
+                    }
                     oldPokemon.transformed = null
 
                     val publicName = (activePokemon.illusion ?: oldPokemon).effectedPokemon.getDisplayName()

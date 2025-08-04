@@ -11,6 +11,7 @@ package com.cobblemon.mod.common.battles.pokemon
 import com.bedrockk.molang.runtime.struct.QueryStruct
 import com.bedrockk.molang.runtime.value.DoubleValue
 import com.bedrockk.molang.runtime.value.StringValue
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asStruct
 import com.cobblemon.mod.common.api.moves.MoveSet
@@ -34,6 +35,7 @@ import com.cobblemon.mod.common.pokemon.Pokemon
 import com.cobblemon.mod.common.pokemon.properties.BattleCloneProperty
 import com.cobblemon.mod.common.pokemon.properties.UncatchableProperty
 import com.cobblemon.mod.common.util.battleLang
+import com.cobblemon.mod.common.util.getPlayer
 import com.cobblemon.mod.common.util.server
 import java.util.UUID
 import net.minecraft.network.chat.MutableComponent
@@ -117,10 +119,10 @@ open class BattlePokemon(
     val contextManager = ContextManager()
 
     val boosts = mutableMapOf<Stats, Int>()
+    var revealed = false
     var revealedAbility: String? = null
     val revealedMoves: MutableList<DeltaMoveDTO?> = mutableListOf(null, null, null, null)
     var revealedHeldItem: ItemStack? = null
-
     var transformed: BattlePokemon? = null
 
     open fun getName(): MutableComponent {
@@ -151,9 +153,7 @@ open class BattlePokemon(
         }
     }
 
-    fun sendUpdate() {
-        actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
-
+    fun toBattleDTO(ally: Boolean, forceReveal: Boolean = true): DeltaBattlePokemonDTO {
         val moves = this.revealedMoves.toMutableList()
         for (i in 0 until 4) {
             if (moves[i] == null) {
@@ -165,9 +165,9 @@ open class BattlePokemon(
 
         val boostMultipliers = boosts.mapValues { getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
 
-        actor.sendUpdate(DeltaBattleActorInformationPacket(
-            actor.uuid,
-            DeltaBattlePokemonDTO(
+        if (ally) {
+            val allyDto = BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, true, getIllusion())
+            return DeltaBattlePokemonDTO(
                 this.effectedPokemon.uuid,
                 this.effectedPokemon.isFainted(),
                 this.effectedPokemon.ability.name,
@@ -175,26 +175,44 @@ open class BattlePokemon(
                 this.effectedPokemon.heldItem,
                 boostMultipliers,
                 speed = effectedPokemon.speed,
-                BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, true, getIllusion())
-        )))
-
-        val otherActors = actor.battle.actors.filter { it != actor }
-        otherActors.forEach {
-            it.sendUpdate(
-                DeltaBattleActorInformationPacket(
-                actor.uuid,
-                DeltaBattlePokemonDTO(
-                    this.effectedPokemon.uuid,
-                    this.effectedPokemon.isFainted(),
-                    revealedAbility,
-                    revealedMoves,
-                    revealedHeldItem,
-                    boostMultipliers,
-                    speed = null,
-                    BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, false, getIllusion())
-                )
-            ))
+                allyDto
+            )
         }
+        else {
+            val nonAllyDto = BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, false, getIllusion())
+            return DeltaBattlePokemonDTO(
+                this.effectedPokemon.uuid,
+                this.effectedPokemon.isFainted(),
+                revealedAbility,
+                revealedMoves,
+                revealedHeldItem,
+                boostMultipliers,
+                speed = null,
+                if (forceReveal || revealed) nonAllyDto else null
+            )
+        }
+    }
+
+    fun updateDeltaInformation(uuids: List<UUID>) {
+        uuids.forEach {
+            if (actor.uuid == it) {
+                it.getPlayer()?.sendPacket(
+                    DeltaBattleActorInformationPacket(actor.uuid, toBattleDTO(true))
+                )
+            }
+            else {
+                it.getPlayer()?.sendPacket(
+                    DeltaBattleActorInformationPacket(actor.uuid, toBattleDTO(false))
+                )
+            }
+        }
+    }
+
+    fun sendUpdate() {
+        actor.sendUpdate(BattleUpdateTeamPokemonPacket(effectedPokemon))
+        this.revealed = true
+        val uuids = actor.battle.actors.map { it.uuid } + actor.battle.spectators
+        updateDeltaInformation(uuids)
     }
 
     fun isSentOut() = actor.battle.activePokemon.any { it.battlePokemon == this }

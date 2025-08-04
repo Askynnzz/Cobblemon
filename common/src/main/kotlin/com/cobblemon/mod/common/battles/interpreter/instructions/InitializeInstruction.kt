@@ -62,46 +62,15 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
         battle.actors.forEach { actor ->
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
 
-            actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { pokemon ->
-                val boostMultipliers = pokemon.boosts.mapValues { pokemon.getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
-                val moves = pokemon.moveSet.getMovesWithNulls().map { move ->
-                    if (move == null) return@map null
-                    return@map DeltaMoveDTO(move.displayName, 0)
-                }
-                DeltaBattlePokemonDTO(
-                    pokemon.uuid,
-                    pokemon.effectedPokemon.isFainted(),
-                    pokemon.effectedPokemon.ability.name,
-                    moves,
-                    pokemon.effectedPokemon.heldItem,
-                    boostMultipliers,
-                    speed = pokemon.effectedPokemon.speed,
-                    BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(pokemon, true, pokemon.getIllusion())
-                )
-            }))
+            val allyTeam = actor.pokemonList.map { it.toBattleDTO(true) }
+            val nonallyTeam = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
+
+            actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, allyTeam))
 
             val otherActors = battle.actors.filter { it != actor }
 
             otherActors.forEach { other ->
-                val packet = DeltaBattleActorTeamPacket(actor.uuid, actor.pokemonList.map { pokemon ->
-                    val boostMultipliers = pokemon.boosts.mapValues { pokemon.getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
-
-                    val activeBattlePokemon = battle.activePokemon.find { it.battlePokemon?.uuid == pokemon.uuid }?.battlePokemon
-                    val activeBattlePokemonDTO = activeBattlePokemon?.let {
-                        BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(it, false, it.getIllusion())
-                    }
-
-                    DeltaBattlePokemonDTO(
-                        pokemon.uuid,
-                        pokemon.effectedPokemon.isFainted(),
-                        pokemon.revealedAbility,
-                        pokemon.revealedMoves,
-                        pokemon.revealedHeldItem,
-                        boostMultipliers,
-                        speed = null,
-                        activeBattlePokemonDTO
-                    )
-                })
+                val packet = DeltaBattleActorTeamPacket(actor.uuid, nonallyTeam)
                 other.sendUpdate(packet)
             }
             val req = actor.request ?: return@forEach
@@ -116,7 +85,7 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             battle.started = true
             battle.side1.playCries()
             afterOnServer(seconds = 1.0F) { battle.side2.playCries() }
-            battle.notifyActorsOfUpdates()
+            battle.notifyAllOfDeltaUpdates()
         }
     }
 }
