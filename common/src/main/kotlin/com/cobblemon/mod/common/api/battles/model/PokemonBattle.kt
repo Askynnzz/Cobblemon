@@ -51,6 +51,7 @@ import com.cobblemon.mod.common.net.messages.client.battle.BattleEndPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.FieldEffect
 import com.cobblemon.mod.common.pokemon.evolution.progress.DefeatEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.progress.LastBattleCriticalHitsEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.requirements.DefeatRequirement
@@ -259,9 +260,9 @@ open class PokemonBattle(
 
         val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
             turn = turn,
-            weather = weather?.id,
-            terrain = terrain?.id,
-            room = room?.id,
+            weather = weather?.let { FieldEffect(it.id, it.turn) },
+            terrain = terrain?.let { FieldEffect(it.id, it.turn) },
+            room = room?.let { FieldEffect(it.id, it.turn) },
             side1Hazards = side1Hazards ?: emptyList(),
             side2Hazards = side2Hazards ?: emptyList(),
         ))
