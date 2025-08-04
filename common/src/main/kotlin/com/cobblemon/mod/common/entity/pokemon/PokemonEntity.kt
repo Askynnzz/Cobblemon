@@ -980,6 +980,7 @@ open class PokemonEntity(
                             val newColorFeature =
                                 StringSpeciesFeature(DataKeys.CAN_BE_COLORED, item.dyeColor.name.lowercase())
                             this.pokemon.features.add(newColorFeature)
+                            this.pokemon.onChange()
                             this.pokemon.anyChangeObservable.emit(pokemon)
                         }
 

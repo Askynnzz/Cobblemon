@@ -45,9 +45,9 @@ open class BottomlessStore(override val uuid: UUID) : PokemonStore<BottomlessPos
     override fun initialize() {
         pokemon.forEachIndexed { index, pokemon ->
             pokemon.storeCoordinates.set(StoreCoordinates(this, BottomlessPosition(index)))
-            pokemon.getChangeObservable().pipe(
-                stopAfter { it.storeCoordinates.get()?.store != this }
-            ).subscribe { storeChangeObservable.emit(Unit) }
+//            pokemon.getChangeObservable().pipe(
+//                stopAfter { it.storeCoordinates.get()?.store != this }
+//            ).subscribe { storeChangeObservable.emit(Unit) }
         }
     }
 
@@ -97,6 +97,10 @@ open class BottomlessStore(override val uuid: UUID) : PokemonStore<BottomlessPos
     }
 
     override fun getAnyChangeObservable() = storeChangeObservable
+
+    override fun onPokemonChange(pokemon: Pokemon) {
+        this.storeChangeObservable.emit(Unit)
+    }
 
     override fun setAtPosition(position: BottomlessPosition, pokemon: Pokemon?) {
         if (position.currentIndex == this.pokemon.size && pokemon != null) {
