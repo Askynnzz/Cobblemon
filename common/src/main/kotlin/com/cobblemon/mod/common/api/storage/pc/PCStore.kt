@@ -250,6 +250,10 @@ open class PCStore(
         }
     }
 
+    override fun onPokemonChange(pokemon: Pokemon) {
+        this.pcChangeObservable.emit(Unit)
+    }
+
     fun clearPC() {
         boxes.forEach { box ->
             box.getNonEmptySlots().forEach{

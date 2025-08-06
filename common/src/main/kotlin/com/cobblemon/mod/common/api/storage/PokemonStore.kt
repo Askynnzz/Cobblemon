@@ -168,4 +168,6 @@ abstract class PokemonStore<T : StorePosition> : Iterable<Pokemon> {
      * each change, accessed by [Pokemon.getChangeObservable].
      */
     abstract fun getAnyChangeObservable(): Observable<Unit>
+
+    abstract fun onPokemonChange(pokemon: Pokemon)
 }
