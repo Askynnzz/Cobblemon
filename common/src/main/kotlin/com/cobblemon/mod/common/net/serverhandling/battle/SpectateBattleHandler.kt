@@ -52,10 +52,12 @@ object SpectateBattleHandler : ServerNetworkPacketHandler<SpectateBattlePacket> 
             battle.spectators.add(player.uuid)
             player.sendPacket(BattleInitializePacket(battle, null))
             player.sendPacket(BattleMessagePacket(battle.chatLog))
-            battle.notifyOfDeltaUpdates(listOf(player.uuid))
-            battle.actors.forEach { actor ->
-                val team = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
-                player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
+            if (player.uuid in Cobblemon.deltaClientUsers) {
+                battle.notifyOfDeltaUpdates(listOf(player.uuid))
+                battle.actors.forEach { actor ->
+                    val team = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
+                    player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
+                }
             }
             target?.battleTheme?.let { player.sendPacket(BattleMusicPacket(it)) }
         }

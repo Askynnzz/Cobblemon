@@ -11,6 +11,7 @@ package com.cobblemon.mod.common.battles.pokemon
 import com.bedrockk.molang.runtime.struct.QueryStruct
 import com.bedrockk.molang.runtime.value.DoubleValue
 import com.bedrockk.molang.runtime.value.StringValue
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asStruct
@@ -194,7 +195,7 @@ open class BattlePokemon(
     }
 
     fun updateDeltaInformation(uuids: List<UUID>) {
-        uuids.forEach {
+        uuids.filter { it in Cobblemon.deltaClientUsers }.forEach {
             if (actor.uuid == it) {
                 it.getPlayer()?.sendPacket(
                     DeltaBattleActorInformationPacket(actor.uuid, toBattleDTO(true))

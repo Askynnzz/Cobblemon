@@ -266,7 +266,7 @@ open class PokemonBattle(
             side1Hazards = side1Hazards ?: emptyList(),
             side2Hazards = side2Hazards ?: emptyList(),
         ))
-        uuids.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
+        uuids.filter { it in Cobblemon.deltaClientUsers }.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
     }
 
     fun end() {

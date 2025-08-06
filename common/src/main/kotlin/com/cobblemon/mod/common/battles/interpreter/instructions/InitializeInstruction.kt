@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.battles.interpreter.instructions
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
@@ -65,14 +66,16 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             val allyTeam = actor.pokemonList.map { it.toBattleDTO(true) }
             val nonallyTeam = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
 
-            actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, allyTeam))
+            if (actor.uuid in Cobblemon.deltaClientUsers) {
+                actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, allyTeam))
+            }
 
-            val otherActors = battle.actors.filter { it != actor }
-
+            val otherActors = battle.actors.filter { it != actor && it.uuid in Cobblemon.deltaClientUsers }
             otherActors.forEach { other ->
                 val packet = DeltaBattleActorTeamPacket(actor.uuid, nonallyTeam)
                 other.sendUpdate(packet)
             }
+
             val req = actor.request ?: return@forEach
             actor.sendUpdate(BattleQueueRequestPacket(req))
         }
