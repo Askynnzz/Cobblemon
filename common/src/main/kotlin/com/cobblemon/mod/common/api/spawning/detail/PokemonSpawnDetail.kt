@@ -88,7 +88,6 @@ class PokemonSpawnDetail : SpawnDetail() {
             }
         }
 
-        struct.setDirectly("pokemon", pokemonStruct)
         super.autoLabel()
     }
 

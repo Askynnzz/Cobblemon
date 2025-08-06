@@ -89,14 +89,14 @@ open class PCBox(val pc: PCStore) : Iterable<Pokemon> {
     }
 
     fun trackPokemon(pokemon: Pokemon) {
-        pokemon.getChangeObservable()
-            .pipe(
-                stopAfter {
-                    val coordinates = it.storeCoordinates.get() ?: return@stopAfter true
-                    return@stopAfter coordinates.store !is PCStore || coordinates.store.uuid != pc.uuid || (coordinates.position as PCPosition).box != boxNumber
-                }
-            )
-            .subscribe { boxChangeEmitter.emit(Unit) }
+//        pokemon.getChangeObservable()
+//            .pipe(
+//                stopAfter {
+//                    val coordinates = it.storeCoordinates.get() ?: return@stopAfter true
+//                    return@stopAfter coordinates.store !is PCStore || coordinates.store.uuid != pc.uuid || (coordinates.position as PCPosition).box != boxNumber
+//                }
+//            )
+//            .subscribe { boxChangeEmitter.emit(Unit) }
     }
 
     fun sendTo(player: ServerPlayer) {

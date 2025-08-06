@@ -9,6 +9,7 @@
 package com.cobblemon.mod.common.api.spawning.detail
 
 import com.bedrockk.molang.runtime.struct.ArrayStruct
+import com.bedrockk.molang.runtime.struct.QueryStruct
 import com.bedrockk.molang.runtime.struct.VariableStruct
 import com.bedrockk.molang.runtime.value.DoubleValue
 import com.bedrockk.molang.runtime.value.StringValue
@@ -22,6 +23,9 @@ import com.cobblemon.mod.common.api.spawning.context.SpawningContext
 import com.cobblemon.mod.common.api.spawning.multiplier.WeightMultiplier
 import com.cobblemon.mod.common.api.text.text
 import com.cobblemon.mod.common.util.asTranslated
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
 
 /**
  * A spawnable unit in the Best Spawner API. This is extended for any kind of entity
@@ -55,23 +59,40 @@ abstract class SpawnDetail : ModDependant {
 
     var labels = mutableListOf<String>()
 
-    val struct: VariableStruct = VariableStruct()
+    /**
+     * This is calculated when the server starts. It is a set of all biome identifiers in which this spawn
+     * is possible. It is used as part of the [com.cobblemon.mod.common.api.spawning.condition.BiomePrecalculation].
+     */
+    @Transient
+    val validBiomes = mutableSetOf<ResourceLocation>()
+
+    @Transient
+    val struct: QueryStruct = QueryStruct(hashMapOf())
 
     override var neededInstalledMods = listOf<String>()
     override var neededUninstalledMods = listOf<String>()
 
     open fun autoLabel() {
-        struct.setDirectly("weight", DoubleValue(weight.toDouble()))
-        struct.setDirectly("percentage", DoubleValue(percentage.toDouble()))
-        struct.setDirectly("id", StringValue(id))
-        struct.setDirectly("bucket", StringValue(bucket.name))
-        struct.setDirectly("width", DoubleValue(width.toDouble()))
-        struct.setDirectly("height", DoubleValue(height.toDouble()))
-        struct.setDirectly("context", StringValue(context.name))
-        struct.setDirectly("labels", ArrayStruct(labels.mapIndexed { index, s -> "$index" to StringValue(s) }.toMap()))
     }
 
     open fun getName() = displayName?.asTranslated() ?: id.text()
+
+    open fun onServerLoad(server: MinecraftServer) {
+        val biomeRegistry = server.registryAccess().registryOrThrow(Registries.BIOME)
+        validBiomes.clear()
+
+        // Calculate in advance what biomes of this world the spawn detail is valid for.
+        biomeRegistry.holders().forEach { holder ->
+            val key = holder.unwrapKey().orElse(null) ?: return@forEach
+            if (conditions.isEmpty() || conditions.any { it.biomes == null || it.biomes!!.isEmpty() || it.biomes!!.any { it.fits(holder) } }) {
+                if (anticonditions.isEmpty() || anticonditions.none { it.biomes != null && it.biomes!!.any { it.fits(holder) } }) {
+                    if (compositeCondition?.isBiomeValid(holder) != false) {
+                        validBiomes.add(key.location())
+                    }
+                }
+            }
+        }
+    }
 
     open fun isSatisfiedBy(ctx: SpawningContext): Boolean {
         if (!ctx.preFilter(this)) {
