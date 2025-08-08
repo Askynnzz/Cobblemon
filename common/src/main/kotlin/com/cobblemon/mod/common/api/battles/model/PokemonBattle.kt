@@ -14,6 +14,8 @@ import com.bedrockk.molang.runtime.value.DoubleValue
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.Cobblemon.LOGGER
 import com.cobblemon.mod.common.CobblemonNetwork
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
+import com.cobblemon.mod.common.api.battles.interpreter.BattleContext
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
@@ -47,6 +49,9 @@ import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleEndPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.FieldEffect
 import com.cobblemon.mod.common.pokemon.evolution.progress.DefeatEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.progress.LastBattleCriticalHitsEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.requirements.DefeatRequirement
@@ -238,6 +243,30 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
+        notifyAllOfDeltaUpdates()
+    }
+
+    fun notifyAllOfDeltaUpdates() {
+        val uuids = this.actors.map { it.uuid } + this.spectators
+        notifyOfDeltaUpdates(uuids)
+    }
+
+    fun notifyOfDeltaUpdates(uuids: List<UUID>) {
+        val weather = this.contextManager.get(BattleContext.Type.WEATHER)?.firstOrNull()
+        val terrain = this.contextManager.get(BattleContext.Type.TERRAIN)?.firstOrNull()
+        val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
+        val side1Hazards = side1.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
+        val side2Hazards = side2.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
+
+        val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
+            turn = turn,
+            weather = weather?.let { FieldEffect(it.id, it.turn) },
+            terrain = terrain?.let { FieldEffect(it.id, it.turn) },
+            room = room?.let { FieldEffect(it.id, it.turn) },
+            side1Hazards = side1Hazards ?: emptyList(),
+            side2Hazards = side2Hazards ?: emptyList(),
+        ))
+        uuids.filter { it in Cobblemon.deltaClientUsers }.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
     }
 
     fun end() {

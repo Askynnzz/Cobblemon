@@ -11,6 +11,7 @@ package com.cobblemon.mod.common.battles.interpreter.instructions
 import com.bedrockk.molang.runtime.MoLangRuntime
 import com.bedrockk.molang.runtime.value.DoubleValue
 import com.bedrockk.molang.runtime.value.StringValue
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.interpreter.Effect
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
@@ -28,6 +29,7 @@ import com.cobblemon.mod.common.battles.dispatch.InstructionSet
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
 import com.cobblemon.mod.common.battles.dispatch.UntilDispatch
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
 import com.cobblemon.mod.common.pokemon.evolution.progress.UseMoveEvolutionProgress
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.cobblemonResource
@@ -66,6 +68,26 @@ class MoveInstruction(
             .toList()
 
         CobblemonEvents.BATTLE_USE_MOVE.post(BattleUseMoveEvent(battle, players, userPokemon, move))
+
+        val moveIndex = if (userPokemon.transformed != null) {
+            userPokemon.transformed!!.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        }
+        else {
+            userPokemon.moveSet.getMovesWithNulls().map { it?.name }.indexOf(move.name)
+        }
+        if (moveIndex == -1) {
+            Cobblemon.LOGGER.warn("Could not find move ${move.name} on pokemon ${userPokemon.getName()}")
+        }
+        else {
+            if (userPokemon.revealedMoves[moveIndex] == null) {
+                userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
+            }
+            else {
+                userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+            }
+        }
+        userPokemon.sendUpdate()
+        battle.notifyAllOfDeltaUpdates()
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)

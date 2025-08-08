@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.battles.ShowdownInterpreter
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
+import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.util.battleLang
 
 /**
@@ -43,7 +44,15 @@ class InvertBoostInstruction(val message: BattleMessage): InterpreterInstruction
             pokemon.contextManager.clear(BattleContext.Type.BOOST, BattleContext.Type.UNBOOST)
             newBoosts?.let { pokemon.contextManager.add(*it) }
             newUnboosts?.let { pokemon.contextManager.add(*it) }
+            invertBoosts(pokemon)
+            pokemon.sendUpdate()
             battle.minorBattleActions[pokemon.uuid] = message
         }
+    }
+
+    private fun invertBoosts(pokemon: BattlePokemon) {
+        val boosts = pokemon.boosts.toMap()
+        pokemon.boosts.clear()
+        boosts.forEach { k, v -> pokemon.boosts[k] = -v }
     }
 }
