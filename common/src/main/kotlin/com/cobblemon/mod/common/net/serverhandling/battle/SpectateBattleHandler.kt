@@ -55,7 +55,7 @@ object SpectateBattleHandler : ServerNetworkPacketHandler<SpectateBattlePacket> 
             if (player.uuid in Cobblemon.deltaClientUsers) {
                 battle.notifyOfDeltaUpdates(listOf(player.uuid))
                 battle.actors.forEach { actor ->
-                    val team = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
+                    val team = actor.pokemonList.map { it.toBattleDTO(false) }
                     player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
                 }
             }

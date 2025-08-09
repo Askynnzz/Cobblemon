@@ -63,8 +63,8 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
         battle.actors.forEach { actor ->
             actor.sendUpdate(BattleSetTeamPokemonPacket(actor.pokemonList.map { it.effectedPokemon }))
 
-            val allyTeam = actor.pokemonList.map { it.toBattleDTO(true) }
-            val nonallyTeam = actor.pokemonList.map { it.toBattleDTO(false, it.uuid in actor.activePokemon.map { it.battlePokemon?.uuid }) }
+            val allyTeam = actor.pokemonList.map { it.toBattleDTO(ally = true) }
+            val nonallyTeam = actor.pokemonList.map { it.toBattleDTO(ally = false) }
 
             if (actor.uuid in Cobblemon.deltaClientUsers) {
                 actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, allyTeam))
