@@ -48,7 +48,9 @@ import com.cobblemon.mod.common.entity.npc.NPCBattleActor
 import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleEndPacket
+import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
 import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
 import com.cobblemon.mod.common.net.messages.client.battle.FieldEffect
@@ -207,6 +209,25 @@ open class PokemonBattle(
         val pokemon = actor.getSide().activePokemon.find { it.getLetter() == letter }
             ?: throw IllegalStateException("Invalid pnx: $pnx - unknown pokemon")
         return actor to pokemon
+    }
+
+    fun startSpectating(player: ServerPlayer) {
+        if (Cobblemon.config.allowSpectating) return
+        spectators.add(player.uuid)
+        player.sendPacket(BattleInitializePacket(this, null))
+        player.sendPacket(BattleMessagePacket(chatLog))
+        if (player.uuid in Cobblemon.deltaClientUsers) {
+            notifyOfDeltaUpdates(listOf(player.uuid))
+            actors.forEach { actor ->
+                val team = actor.pokemonList.map { it.toBattleDTO(false) }
+                player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
+            }
+        }
+    }
+
+    fun stopSpectating(player: ServerPlayer) {
+        player.sendPacket(BattleEndPacket())
+        spectators.remove(player.uuid)
     }
 
     /**
