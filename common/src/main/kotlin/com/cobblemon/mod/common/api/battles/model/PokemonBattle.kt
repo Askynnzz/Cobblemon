@@ -276,18 +276,25 @@ open class PokemonBattle(
         val weather = this.contextManager.get(BattleContext.Type.WEATHER)?.firstOrNull()
         val terrain = this.contextManager.get(BattleContext.Type.TERRAIN)?.firstOrNull()
         val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
-        val side1Hazards = side1.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
-        val side2Hazards = side2.contextManager.get(BattleContext.Type.HAZARD)?.map { it.id }
+        val side1SidedEffects = getSidedFieldEffects(side1)
+        val side2SidedEffects = getSidedFieldEffects(side2)
 
         val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
             turn = turn,
             weather = weather?.let { FieldEffect(it.id, it.turn) },
             terrain = terrain?.let { FieldEffect(it.id, it.turn) },
             room = room?.let { FieldEffect(it.id, it.turn) },
-            side1Hazards = side1Hazards ?: emptyList(),
-            side2Hazards = side2Hazards ?: emptyList(),
+            side1SidedEffects = side1SidedEffects,
+            side2SidedEffects = side2SidedEffects,
         ))
         uuids.filter { it in Cobblemon.deltaClientUsers }.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
+    }
+
+    private fun getSidedFieldEffects(side: BattleSide): List<FieldEffect> {
+        val hazards = side.contextManager.get(BattleContext.Type.HAZARD)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
+        val screens = side.contextManager.get(BattleContext.Type.SCREEN)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
+        val tailwind = side.contextManager.get(BattleContext.Type.TAILWIND)?.firstOrNull()?.let { FieldEffect(it.id, it.turn) }
+        return hazards + screens + listOfNotNull(tailwind)
     }
 
     fun end() {

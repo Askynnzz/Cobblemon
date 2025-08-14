@@ -21,20 +21,11 @@ class DeltaBattleInformationPacket(val battle: UUID, val informationDTO: DeltaBa
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeUUID(battle)
         buffer.writeInt(informationDTO.turn)
-        buffer.writeNullable(informationDTO.weather) { _, value ->
-            buffer.writeString(value.id)
-            buffer.writeInt(value.turnStarted)
-        }
-        buffer.writeNullable(informationDTO.terrain) { _, value ->
-            buffer.writeString(value.id)
-            buffer.writeInt(value.turnStarted)
-        }
-        buffer.writeNullable(informationDTO.room) { _, value ->
-            buffer.writeString(value.id)
-            buffer.writeInt(value.turnStarted)
-        }
-        buffer.writeCollection(informationDTO.side1Hazards) { _, value -> buffer.writeString(value) }
-        buffer.writeCollection(informationDTO.side2Hazards) { _, value -> buffer.writeString(value) }
+        buffer.writeNullable(informationDTO.weather) { _, value -> encodeFieldEffect(buffer, value) }
+        buffer.writeNullable(informationDTO.terrain) { _, value -> encodeFieldEffect(buffer, value) }
+        buffer.writeNullable(informationDTO.room) { _, value -> encodeFieldEffect(buffer, value) }
+        buffer.writeCollection(informationDTO.side1SidedEffects) { _, value -> encodeFieldEffect(buffer, value) }
+        buffer.writeCollection(informationDTO.side2SidedEffects) { _, value -> encodeFieldEffect(buffer, value) }
     }
 
     companion object {
@@ -43,13 +34,22 @@ class DeltaBattleInformationPacket(val battle: UUID, val informationDTO: DeltaBa
             battle = buffer.readUUID(),
             informationDTO = DeltaBattleInformationDTO(
                 turn = buffer.readInt(),
-                weather = buffer.readNullable { FieldEffect(buffer.readString(), buffer.readInt()) },
-                terrain = buffer.readNullable { FieldEffect(buffer.readString(), buffer.readInt()) },
-                room = buffer.readNullable { FieldEffect(buffer.readString(), buffer.readInt()) },
-                side1Hazards = buffer.readList { buffer.readString() },
-                side2Hazards = buffer.readList { buffer.readString() }
+                weather = buffer.readNullable { decodeFieldEffect(buffer) },
+                terrain = buffer.readNullable { decodeFieldEffect(buffer) },
+                room = buffer.readNullable { decodeFieldEffect(buffer) },
+                side1SidedEffects = buffer.readList { decodeFieldEffect(buffer) },
+                side2SidedEffects = buffer.readList { decodeFieldEffect(buffer) }
             )
         )
+
+        private fun encodeFieldEffect(buffer: RegistryFriendlyByteBuf, fieldEffect: FieldEffect) {
+            buffer.writeString(fieldEffect.id)
+            buffer.writeInt(fieldEffect.turnStarted)
+        }
+
+        private fun decodeFieldEffect(buffer: RegistryFriendlyByteBuf): FieldEffect {
+            return FieldEffect(id = buffer.readString(), turnStarted = buffer.readInt())
+        }
     }
 }
 
@@ -58,8 +58,11 @@ data class DeltaBattleInformationDTO(
     val weather: FieldEffect?,
     val terrain: FieldEffect?,
     val room: FieldEffect?,
-    val side1Hazards: List<String>,
-    val side2Hazards: List<String>
+    val side1SidedEffects: List<FieldEffect>,
+    val side2SidedEffects: List<FieldEffect>
 )
 
-data class FieldEffect(val id: String, val turnStarted: Int)
+data class FieldEffect(
+    val id: String,
+    val turnStarted: Int
+)
