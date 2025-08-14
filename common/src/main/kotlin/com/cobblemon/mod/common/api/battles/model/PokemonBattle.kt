@@ -212,7 +212,7 @@ open class PokemonBattle(
     }
 
     fun startSpectating(player: ServerPlayer) {
-        if (Cobblemon.config.allowSpectating) return
+        if (!Cobblemon.config.allowSpectating) return
         spectators.add(player.uuid)
         player.sendPacket(BattleInitializePacket(this, null))
         player.sendPacket(BattleMessagePacket(chatLog))
