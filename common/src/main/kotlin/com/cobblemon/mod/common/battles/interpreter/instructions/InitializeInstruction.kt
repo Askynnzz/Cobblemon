@@ -55,7 +55,6 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
         }
 
         battle.actors.filterIsInstance<PlayerBattleActor>().forEach { actor ->
-            Cobblemon.deltaClientUsers.add(actor.uuid)
             val initializePacket = BattleInitializePacket(battle, actor.getSide())
             actor.sendUpdate(initializePacket)
             actor.sendUpdate(BattleMusicPacket(actor.battleTheme))
