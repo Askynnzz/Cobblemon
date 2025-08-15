@@ -14,10 +14,7 @@ import com.cobblemon.mod.common.api.net.ServerNetworkPacketHandler
 import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.battles.BattleRegistry
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
-import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacket
-import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
 import com.cobblemon.mod.common.net.messages.server.battle.SpectateBattlePacket
 import com.cobblemon.mod.common.util.getPlayer
 import com.cobblemon.mod.common.util.lang
@@ -49,16 +46,7 @@ object SpectateBattleHandler : ServerNetworkPacketHandler<SpectateBattlePacket> 
                 player.sendSystemMessage(lang("ui.interact.failed").yellow())
                 return
             }
-            battle.spectators.add(player.uuid)
-            player.sendPacket(BattleInitializePacket(battle, null))
-            player.sendPacket(BattleMessagePacket(battle.chatLog))
-            if (player.uuid in Cobblemon.deltaClientUsers) {
-                battle.notifyOfDeltaUpdates(listOf(player.uuid))
-                battle.actors.forEach { actor ->
-                    val team = actor.pokemonList.map { it.toBattleDTO(false) }
-                    player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
-                }
-            }
+            battle.startSpectating(player)
             target?.battleTheme?.let { player.sendPacket(BattleMusicPacket(it)) }
         }
         else {

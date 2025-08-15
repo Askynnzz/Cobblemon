@@ -83,7 +83,8 @@ class MoveInstruction(
                 userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
             }
             else {
-                userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+                val update = userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
+                userPokemon.revealedMoves[moveIndex]!!.timesUsed = update
             }
         }
         userPokemon.sendUpdate()
