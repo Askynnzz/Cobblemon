@@ -668,7 +668,6 @@ open class PokemonEntity(
         }
 
         previousRidingState = ridingController?.context?.state?.copy()
-        previousRidingState = ridingState?.copy()
         if (!this.pokemon.isWild() && this.pokemon.originalTrainerType != OriginalTrainerType.NPC && this.pokemon.getOwnerPlayer() == null) {
             this.tethering = null
             this.pokemon.recall()
