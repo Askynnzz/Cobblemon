@@ -9,6 +9,7 @@
 package com.cobblemon.mod.common.api.riding.behaviour.types.air
 
 import com.bedrockk.molang.Expression
+import com.bedrockk.molang.runtime.MoLangMath.lerp
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.OrientationControllable
 import com.cobblemon.mod.common.api.riding.RidingStyle
@@ -20,7 +21,8 @@ import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.util.*
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.RegistryFriendlyByteBuf
-import com.bedrockk.molang.runtime.MoLangMath.lerp
+import com.cobblemon.mod.common.api.riding.sound.RideSoundSettingsList
+import com.cobblemon.mod.common.api.riding.stats.RidingStat
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.SmoothDouble
 import net.minecraft.world.entity.LivingEntity
@@ -78,7 +80,7 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
 //            //Calculate stamina loss due to speed
 //            //At max speed it will tick down 0.1 a second so the stamina will last ten seconds
 //            //There has got to be a better way to express this equation. It interpolates between 0.5 and 1.0
-//            var staminaRate = (normalizeSpeed(state.rideVelocity.get().length(), minSpeed, topSpeed))
+//            var staminaRate = (RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), minSpeed, topSpeed))
 //
 //            //interpolate between 0.25 and 1.0 so that you always have at least a min of 0.25 stam loss
 //            staminaRate = 0.25 + (0.75 * staminaRate.pow(3))
@@ -91,16 +93,6 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
 //        }
 
         return state.rideVelocity.get().length().toFloat()
-    }
-
-    //TODO: Move these functions to a riding util class.
-    /*
-    *  Normalizes the current speed between minSpeed and maxSpeed.
-    *  The result is clamped between 0.0 and 1.0, where 0.0 represents minSpeed and 1.0 represents maxSpeed.
-    */
-    private fun normalizeSpeed(currSpeed: Double, minSpeed: Double, maxSpeed: Double): Double {
-        require(maxSpeed > minSpeed) { "maxSpeed must be greater than minSpeed" }
-        return ((currSpeed - minSpeed) / (maxSpeed - minSpeed)).coerceIn(0.0, 1.0)
     }
 
     override fun rotation(
@@ -136,14 +128,6 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
         //If stamina has run out then initiate forced glide down.
         upForce = if (state.stamina.get() > 0.0) upForce else -0.7
 
-        val altitudeLimit = vehicle.runtime.resolveDouble(settings.jumpExpr)
-
-        //Only limit altitude if altitude is not infinite
-        if (!vehicle.runtime.resolveBoolean(settings.infiniteAltitude)) {
-            //Provide a hard limit on altitude
-            upForce = if (vehicle.y >= altitudeLimit && upForce > 0) 0.0 else upForce
-        }
-
         val velocity = Vec3(0.0, upForce, forwardForce)
 
         return velocity
@@ -160,28 +144,40 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
     ) {
         val topSpeed = vehicle.runtime.resolveDouble(settings.speedExpr)
         val accel = vehicle.runtime.resolveDouble(settings.accelerationExpr)
-        val altitudeLimit = vehicle.runtime.resolveDouble(settings.jumpExpr)
         val minSpeed = vehicle.runtime.resolveDouble(settings.minSpeed)
         val speed = state.rideVelocity.get().length()
 
-        //Give no altitude limit if at max jump stat.
-        val pushingHeightLimit = if (vehicle.runtime.resolveBoolean(settings.infiniteStamina)) false
-        else (vehicle.y >= altitudeLimit && vehicle.xRot <= 0)
-
-
         //speed up and slow down based on input
-        if (driver.zza > 0.0 && speed < topSpeed && state.stamina.get() > 0.0f && !pushingHeightLimit) {
+        if (driver.zza > 0.0 && speed < topSpeed && state.stamina.get() > 0.0f) {
             //modify acceleration to be slower when at closer speeds to top speed
-            val accelMod = max(-(normalizeSpeed(speed, minSpeed, topSpeed)) + 1, 0.0)
-            state.rideVelocity.set(Vec3(state.rideVelocity.get().x, state.rideVelocity.get().y, min(state.rideVelocity.get().z + (accel * accelMod), topSpeed)))
-        } else if (driver.zza >= 0.0 && (state.stamina.get() == 0.0f || pushingHeightLimit)) {
-            state.rideVelocity.set(Vec3(state.rideVelocity.get().x, state.rideVelocity.get().y, max(state.rideVelocity.get().z - ((accel) / 4), minSpeed)))
+            val accelMod = max(-(RidingBehaviour.scaleToRange(speed, minSpeed, topSpeed)) + 1, 0.0)
+            state.rideVelocity.set(
+                Vec3(
+                    state.rideVelocity.get().x,
+                    state.rideVelocity.get().y,
+                    min(state.rideVelocity.get().z + (accel * accelMod), topSpeed)
+                )
+            )
+        } else if (driver.zza >= 0.0 && (state.stamina.get() == 0.0f)) {
+            state.rideVelocity.set(
+                Vec3(
+                    state.rideVelocity.get().x,
+                    state.rideVelocity.get().y,
+                    max(state.rideVelocity.get().z - ((accel) / 4), minSpeed)
+                )
+            )
         } else if (driver.zza < 0.0 && speed > minSpeed) {
             //modify deccel to be slower when at closer speeds to minimum speed
-            val deccelMod = max((normalizeSpeed(speed, minSpeed, topSpeed) - 1).pow(2) * 4, 0.1)
+            val deccelMod = max((RidingBehaviour.scaleToRange(speed, minSpeed, topSpeed) - 1).pow(2) * 4, 0.1)
 
             //Decelerate currently always a constant half of max acceleration.
-            state.rideVelocity.set(Vec3(state.rideVelocity.get().x, state.rideVelocity.get().y, max(state.rideVelocity.get().z - ((accel * deccelMod) / 2), minSpeed)))
+            state.rideVelocity.set(
+                Vec3(
+                    state.rideVelocity.get().x,
+                    state.rideVelocity.get().y,
+                    max(state.rideVelocity.get().z - ((accel * deccelMod) / 2), minSpeed)
+                )
+            )
         }
     }
 
@@ -258,14 +254,13 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
         val mouseRotation = Vec3(0.0, pitchRot, rollRot)
 
         // Have accumulated input begin decay when no input detected
-        if(abs(mouseX) == 0.0) {
+        if (abs(mouseX) == 0.0) {
             // Have decay on roll be much stronger.
-            state.currMouseXForce.set(lerp( state.currMouseXForce.get(), 0.0, 0.02 ))
+            state.currMouseXForce.set(lerp(state.currMouseXForce.get(), 0.0, 0.02))
         }
-        if(mouseY == 0.0) {
-            state.currMouseYForce.set(lerp(state.currMouseYForce.get(), 0.0, 0.005 ))
+        if (mouseY == 0.0) {
+            state.currMouseYForce.set(lerp(state.currMouseYForce.get(), 0.0, 0.005))
         }
-
 
 
         //yaw, pitch, roll
@@ -319,7 +314,7 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
         val minSpeed = vehicle.runtime.resolveDouble(settings.minSpeed)
 
         //Must I ensure that topspeed is greater than minimum?
-        val normalizedSpeed = normalizeSpeed(state.rideVelocity.get().length(), minSpeed, topSpeed)
+        val normalizedSpeed = RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), minSpeed, topSpeed)
 
         //TODO: Determine if this should be based on max possible speed instead of top speed.
         //Only ever want the fov change to be a max of 0.2 and for it to have non linear scaling.
@@ -363,15 +358,38 @@ class JetBehaviour : RidingBehaviour<JetSettings, JetState> {
         return false
     }
 
-    override fun shouldRotatePlayerHead(settings: JetSettings, state: JetState, vehicle: PokemonEntity): Boolean {
+    override fun shouldRotateRiderHead(
+        settings: JetSettings,
+        state: JetState,
+        vehicle: PokemonEntity
+    ): Boolean {
         return false
     }
 
+    override fun getRideSounds(
+        settings: JetSettings,
+        state: JetState,
+        vehicle: PokemonEntity
+    ): RideSoundSettingsList {
+        return settings.rideSounds
+    }
+
     override fun createDefaultState(settings: JetSettings) = JetState()
+
+    override fun damageOnCollision(
+        settings: JetSettings,
+        state: JetState,
+        vehicle: PokemonEntity,
+        impactVec: Vec3
+    ): Boolean {
+        val impactSpeed = impactVec.horizontalDistance().toFloat() * 10f
+        return vehicle.causeFallDamage(impactSpeed, 1f, vehicle.damageSources().flyIntoWall())
+    }
 }
 
 class JetSettings : RidingBehaviourSettings {
     override val key = JetBehaviour.KEY
+    override val stats = mutableMapOf<RidingStat, IntRange>()
 
     var gravity: Expression = "0".asExpression()
         private set
@@ -386,27 +404,28 @@ class JetSettings : RidingBehaviourSettings {
     var infiniteStamina: Expression = "false".asExpression()
         private set
 
-    var infiniteAltitude: Expression = "false".asExpression()
-        private set
-
     var jumpExpr: Expression = "q.get_ride_stats('JUMP', 'AIR', 300.0, 128.0)".asExpression()
         private set
-    var handlingExpr: Expression =  "q.get_ride_stats('SKILL', 'AIR', 140.0, 20.0)".asExpression()
+    var handlingExpr: Expression = "q.get_ride_stats('SKILL', 'AIR', 140.0, 20.0)".asExpression()
         private set
-    var speedExpr: Expression =  "q.get_ride_stats('SPEED', 'AIR', 1.8, 1.0)".asExpression()
+    var speedExpr: Expression = "q.get_ride_stats('SPEED', 'AIR', 1.8, 1.0)".asExpression()
         private set
-    var accelerationExpr: Expression = "q.get_ride_stats('ACCELERATION', 'AIR', (1.0 / (20.0 * 1.0)), (1.0 / (20.0 * 5.0)))".asExpression()
+    var accelerationExpr: Expression =
+        "q.get_ride_stats('ACCELERATION', 'AIR', (1.0 / (20.0 * 1.0)), (1.0 / (20.0 * 5.0)))".asExpression()
         private set
     var staminaExpr: Expression = "q.get_ride_stats('STAMINA', 'AIR', 60.0, 10.0)".asExpression()
         private set
 
+    var rideSounds: RideSoundSettingsList = RideSoundSettingsList()
+
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeResourceLocation(key)
+        buffer.writeRidingStats(stats)
+        rideSounds.encode(buffer)
         buffer.writeExpression(gravity)
         buffer.writeExpression(minSpeed)
         buffer.writeExpression(handlingYawExpr)
         buffer.writeExpression(infiniteStamina)
-        buffer.writeExpression(infiniteAltitude)
         buffer.writeExpression(jumpExpr)
         buffer.writeExpression(handlingExpr)
         buffer.writeExpression(speedExpr)
@@ -415,11 +434,12 @@ class JetSettings : RidingBehaviourSettings {
     }
 
     override fun decode(buffer: RegistryFriendlyByteBuf) {
+        stats.putAll(buffer.readRidingStats())
+        rideSounds = RideSoundSettingsList.decode(buffer)
         gravity = buffer.readExpression()
         minSpeed = buffer.readExpression()
         handlingYawExpr = buffer.readExpression()
         infiniteStamina = buffer.readExpression()
-        infiniteAltitude = buffer.readExpression()
         jumpExpr = buffer.readExpression()
         handlingExpr = buffer.readExpression()
         speedExpr = buffer.readExpression()
@@ -455,8 +475,6 @@ class JetState : RidingBehaviourState() {
         it.currSpeed.set(currSpeed.get(), forced = true)
         it.stamina.set(stamina.get(), forced = true)
         it.rideVelocity.set(rideVelocity.get(), forced = true)
-//        it.currMouseXForce.set(currMouseXForce.get(), forced = true)
-//        it.currMouseYForce.set(currMouseYForce.get(), forced = true)
     }
 
     override fun shouldSync(previous: RidingBehaviourState): Boolean {

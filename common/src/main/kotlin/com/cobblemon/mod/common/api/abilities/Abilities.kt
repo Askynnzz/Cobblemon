@@ -16,9 +16,12 @@ import com.cobblemon.mod.common.net.messages.client.data.AbilityRegistrySyncPack
 import com.cobblemon.mod.common.pokemon.abilities.HiddenAbilityType
 import com.cobblemon.mod.common.pokemon.abilities.SpecialAbilityType
 import com.cobblemon.mod.common.util.cobblemonResource
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.ResourceManager
+import java.io.File
+import kotlin.collections.set
 
 /**
  * Registry for all known Abilities
@@ -32,6 +35,7 @@ object Abilities : DataRegistry {
     val DUMMY = AbilityTemplate(name = "dummy")
 
     private val abilityMap = mutableMapOf<String, AbilityTemplate>()
+    internal val abilityScripts = mutableMapOf<String, String>() // abilityId to JavaScript
 
     override fun reload(manager: ResourceManager) {
         PotentialAbility.types.clear()
@@ -39,9 +43,24 @@ object Abilities : DataRegistry {
         PotentialAbility.types.add(HiddenAbilityType)
         PotentialAbility.types.add(SpecialAbilityType)
         this.abilityMap.clear()
-        val abilitiesJson = ShowdownService.service.getAbilityIds()
+        this.abilityScripts.clear()
+
+        ShowdownService.service.resetRegistryData("ability")
+        manager.listResources("abilities") { it.path.endsWith(".js") }.forEach { (identifier, resource) ->
+            resource.open().use { stream ->
+                stream.bufferedReader().use { reader ->
+                    val resolvedIdentifier = ResourceLocation.fromNamespaceAndPath(identifier.namespace, File(identifier.path).nameWithoutExtension)
+                    val js = reader.readText()
+                    abilityScripts[resolvedIdentifier.path] = js
+                }
+            }
+        }
+        ShowdownService.service.sendRegistryData(abilityScripts, "ability")
+
+        val abilitiesJson = ShowdownService.service.getRegistryData("ability")
         for (i in 0 until abilitiesJson.size()) {
-            val id = abilitiesJson[i].asString
+            val jsonAbility = abilitiesJson[i].asJsonObject
+            val id = jsonAbility.get("id").asString
             val ability = AbilityTemplate(id)
             this.register(ability)
         }

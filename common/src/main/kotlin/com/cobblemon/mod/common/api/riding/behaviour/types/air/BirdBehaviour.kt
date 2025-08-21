@@ -16,12 +16,12 @@ import com.cobblemon.mod.common.api.riding.RidingStyle
 import com.cobblemon.mod.common.api.riding.behaviour.*
 import com.cobblemon.mod.common.api.riding.posing.PoseOption
 import com.cobblemon.mod.common.api.riding.posing.PoseProvider
+import com.cobblemon.mod.common.api.riding.sound.RideSoundSettingsList
+import com.cobblemon.mod.common.api.riding.stats.RidingStat
 import com.cobblemon.mod.common.entity.PoseType
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
-import com.cobblemon.mod.common.pokemon.Pokemon
 import com.cobblemon.mod.common.util.*
 import com.cobblemon.mod.common.util.math.geometry.toRadians
-import net.minecraft.client.Minecraft
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
@@ -106,14 +106,6 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
             upForce -= 0.3
         }
 
-        val altitudeLimit = vehicle.runtime.resolveDouble(settings.jumpExpr)
-
-        //Only limit altitude if altitude is not infinite
-        if (!vehicle.runtime.resolveBoolean(settings.infiniteAltitude)) {
-            //Provide a hard limit on altitude
-            upForce = if (vehicle.y >= altitudeLimit && upForce > 0) 0.0 else upForce
-        }
-
 
         val velocity = Vec3(state.rideVelocity.get().x , upForce, forwardForce)
         return velocity
@@ -128,12 +120,7 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         val glideTopSpeed = vehicle.runtime.resolveDouble(settings.glidespeedExpr)
         val accel = vehicle.runtime.resolveDouble(settings.accelerationExpr)
         val staminaStat = vehicle.runtime.resolveDouble(settings.staminaExpr)
-
         var glideSpeedChange = 0.0
-
-        val currSpeed = state.rideVelocity.get().length()
-
-        //Flag for determining if player is actively inputting
         var activeInput = false
 
         var newVelocity = Vec3(state.rideVelocity.get().x, state.rideVelocity.get().y, state.rideVelocity.get().z)
@@ -256,7 +243,7 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         val topSpeed = vehicle.runtime.resolveDouble(settings.speedExpr)
         //This rotation limit will be used to know if the ride has exceeded it and its needs correcting.
         val rotMin = 15.0
-        val rotLimit = max(handling * sqrt(normalizeVal(state.rideVelocity.get().length(), 0.0, topSpeed)), rotMin)
+        val rotLimit = max(handling * sqrt(RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), 0.0, topSpeed)), rotMin)
 
         var yawDeltaDeg =  deltaTime * handling * sin(Math.toRadians(controller.roll.toDouble())) //sin(Math.toRadians(controller.roll.toDouble())) * abs(cos(Math.toRadians(controller.pitch.toDouble())))
         val trueYawDelt = yawDeltaDeg * abs(cos(Math.toRadians(controller.pitch.toDouble())))
@@ -312,7 +299,7 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         //modulated by speed so that when flapping idle in air you are ont wobbling around to look around
         val rotMin = 15.0
         var rollForce = xInput
-        val rotLimit = max(90 * sqrt(normalizeVal(state.rideVelocity.get().length(), 0.0, topSpeed)), rotMin)
+        val rotLimit = max(90 * sqrt(RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), 0.0, topSpeed)), rotMin)
 
         //Limit roll by non linearly decreasing inputs towards
         // a rotation limit based on the current distance from
@@ -328,7 +315,7 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         }
 
         //Give the ability to yaw with x mouse input when at low speeds.
-        val yawForce =  xInput * ( 1.0 - sqrt(normalizeVal(state.rideVelocity.get().length(), 0.0, topSpeed)))
+        val yawForce =  xInput * ( 1.0 - sqrt(RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), 0.0, topSpeed)))
 
         //Yaw locally a bit when up or down so that its more intuitive to make it out of a dive or a straight vertical
         //climb
@@ -354,16 +341,6 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
 
         //yaw, pitch, roll
         return Vec3(0.0, 0.0, rollForce)
-    }
-
-    /*
-    *  Normalizes the given value between a min and a max.
-    *  The result is clamped between 0.0 and 1.0, where 0.0 represents x is at or below min
-    *  and 1.0 represents x is at or above it.
-    */
-    private fun normalizeVal(x: Double, min: Double, max: Double): Double {
-        require(max > min) { "max must be greater than min" }
-        return ((x - min) / (max - min)).coerceIn(0.0, 1.0)
     }
 
     override fun canJump(
@@ -413,7 +390,7 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         val glideTopSpeed = vehicle.runtime.resolveDouble(settings.glidespeedExpr)
 
         //Must I ensure that topspeed is greater than minimum?
-        val normalizedGlideSpeed = normalizeVal(state.rideVelocity.get().length(), topSpeed, glideTopSpeed)
+        val normalizedGlideSpeed = RidingBehaviour.scaleToRange(state.rideVelocity.get().length(), topSpeed, glideTopSpeed)
 
         //Only ever want the fov change to be a max of 0.2 and for it to have non linear scaling.
         return 1.0f + normalizedGlideSpeed.pow(2).toFloat() * 0.2f
@@ -463,20 +440,28 @@ class BirdBehaviour : RidingBehaviour<BirdSettings, BirdState> {
         return false
     }
 
-    override fun shouldRotatePlayerHead(
+    override fun shouldRotateRiderHead(
         settings: BirdSettings,
         state: BirdState,
         vehicle: PokemonEntity
     ): Boolean {
-        return true
+        return false
+    }
+
+    override fun getRideSounds(
+        settings: BirdSettings,
+        state: BirdState,
+        vehicle: PokemonEntity
+    ): RideSoundSettingsList {
+        return settings.rideSounds
     }
 
     override fun createDefaultState(settings: BirdSettings) = BirdState()
-
 }
 
 class BirdSettings : RidingBehaviourSettings {
     override val key = BirdBehaviour.KEY
+    override val stats = mutableMapOf<RidingStat, IntRange>()
 
     var infiniteAltitude: Expression = "false".asExpression()
         private set
@@ -494,8 +479,12 @@ class BirdSettings : RidingBehaviourSettings {
     var glidespeedExpr: Expression = "q.get_ride_stats('SPEED', 'AIR', 2.0, 1.0)".asExpression()
         private set
 
+    var rideSounds: RideSoundSettingsList = RideSoundSettingsList()
+
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeResourceLocation(key)
+        buffer.writeRidingStats(stats)
+        rideSounds.encode(buffer)
         buffer.writeExpression(infiniteAltitude)
         buffer.writeExpression(infiniteStamina)
         buffer.writeExpression(glidespeedExpr)
@@ -507,6 +496,8 @@ class BirdSettings : RidingBehaviourSettings {
     }
 
     override fun decode(buffer: RegistryFriendlyByteBuf) {
+        stats.putAll(buffer.readRidingStats())
+        rideSounds = RideSoundSettingsList.decode(buffer)
         infiniteAltitude = buffer.readExpression()
         infiniteStamina = buffer.readExpression()
         glidespeedExpr = buffer.readExpression()

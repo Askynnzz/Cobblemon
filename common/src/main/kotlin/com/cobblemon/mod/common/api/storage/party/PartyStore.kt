@@ -11,7 +11,6 @@ package com.cobblemon.mod.common.api.storage.party
 import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.asMoLangValue
 import com.cobblemon.mod.common.api.reactive.Observable
-import com.cobblemon.mod.common.api.reactive.Observable.Companion.stopAfter
 import com.cobblemon.mod.common.api.reactive.SimpleObservable
 import com.cobblemon.mod.common.api.storage.InvalidSpeciesException
 import com.cobblemon.mod.common.api.storage.PokemonStore
@@ -26,7 +25,6 @@ import com.cobblemon.mod.common.pokemon.Pokemon
 import com.cobblemon.mod.common.util.DataKeys
 import com.cobblemon.mod.common.util.server
 import com.google.gson.JsonObject
-import java.util.Collections
 import java.util.UUID
 import net.minecraft.core.RegistryAccess
 import net.minecraft.nbt.CompoundTag
@@ -62,20 +60,8 @@ open class PartyStore(override val uuid: UUID) : PokemonStore<PartyPosition>() {
             throw IllegalArgumentException("Slot position is out of bounds")
         } else {
             slots[position.slot] = pokemon
-            if (pokemon != null) {
-                if (pokemon.storeCoordinates.get()?.store != this) {
-                    // It's new to this store. Attach the listener
-                    trackPokemon(pokemon)
-                }
-            }
             anyChangeObservable.emit(Unit)
         }
-    }
-
-    fun trackPokemon(pokemon: Pokemon) {
-        pokemon.changeObservable
-            .pipe(stopAfter { pokemon.storeCoordinates.get()?.store != this })
-            .subscribe { anyChangeObservable.emit(Unit) }
     }
 
     override fun getFirstAvailablePosition(): PartyPosition? {
@@ -148,8 +134,11 @@ open class PartyStore(override val uuid: UUID) : PokemonStore<PartyPosition>() {
         for (slot in slots.indices) {
             val pokemon = get(slot) ?: continue
             pokemon.storeCoordinates.set(StoreCoordinates(this, PartyPosition(slot)))
-            trackPokemon(pokemon)
         }
+    }
+
+    override fun onPokemonChanged(pokemon: Pokemon) {
+        anyChangeObservable.emit(Unit)
     }
 
     fun toGappyList() = slots.toList()
@@ -269,9 +258,15 @@ open class PartyStore(override val uuid: UUID) : PokemonStore<PartyPosition>() {
                 BattlePokemon.playerOwned(it)
             }.also { if (healPokemon) it.effectedPokemon.heal() }
         }.toMutableList()
-        if (leadingPokemon != null) {
-            Collections.rotate(result, result.size - this.indexOfFirst { it.uuid == leadingPokemon })
+
+        // reposition lead to front of the party
+        if (leadingPokemon != null && result.first().uuid != leadingPokemon) {
+            result.find { it.uuid == leadingPokemon }?.let { lead ->
+                result.remove(lead)
+                result.add(0, lead)
+            }
         }
+
         return result
     }
     fun clearParty() {

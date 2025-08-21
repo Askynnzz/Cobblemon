@@ -17,7 +17,9 @@ import com.cobblemon.mod.common.api.battles.interpreter.Effect
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.battles.BattleUseMoveEvent
+import com.cobblemon.mod.common.api.molang.MoLangFunctions.addBattleMessageFunctions
 import com.cobblemon.mod.common.api.molang.MoLangFunctions.addStandardFunctions
+import com.cobblemon.mod.common.api.molang.MoLangFunctions.asMostSpecificMoLangValue
 import com.cobblemon.mod.common.api.moves.Moves
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext
 import com.cobblemon.mod.common.api.moves.animations.TargetsProvider
@@ -30,6 +32,7 @@ import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
 import com.cobblemon.mod.common.battles.dispatch.UntilDispatch
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.pokemon.evolution.progress.UseMoveEvolutionProgress
+import com.cobblemon.mod.common.util.asArrayValue
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.cobblemonResource
 import com.cobblemon.mod.common.util.getPlayer
@@ -105,15 +108,27 @@ class MoveInstruction(
             lang?.let { battle.broadcastChatMessage(it) }
             battle.majorBattleActions[userPokemon.uuid] = message
 
-            val providers = mutableListOf<Any>(battle)
-            userPokemon.effectedPokemon.entity?.let { UsersProvider(it) }?.let(providers::add)
-            if (spreadTargetPokemon.isNotEmpty()) {
-                providers.add(TargetsProvider(spreadTargetPokemon.filter { it?.effectedPokemon?.entity != null}.mapNotNull { spreadTarget -> spreadTarget?.effectedPokemon?.entity }))
-            } else {
-                targetPokemon?.effectedPokemon?.entity?.let { TargetsProvider(it) }?.let(providers::add)
-            }
             val runtime = MoLangRuntime().also {
                 battle.addQueryFunctions(it.environment.query).addStandardFunctions()
+                it.environment.query.addBattleMessageFunctions(message)
+            }
+
+            val providers = mutableListOf<Any>(battle)
+            userPokemon.effectedPokemon.entity?.let { entity ->
+                runtime.environment.query.addFunction("user") { entity.asMostSpecificMoLangValue()}
+                UsersProvider(entity)
+            }?.let(providers::add)
+
+            if (spreadTargetPokemon.isNotEmpty()) {
+                val targetEntities = spreadTargetPokemon.mapNotNull { it?.effectedPokemon?.entity }
+                runtime.environment.query.addFunction("targets") { targetEntities.asArrayValue { it.asMostSpecificMoLangValue() } }
+                providers.add(TargetsProvider(targetEntities))
+            } else {
+                targetPokemon?.effectedPokemon?.entity?.let { entity ->
+                    runtime.environment.query.addFunction("target") { entity.asMostSpecificMoLangValue() }
+                    val provider = TargetsProvider(entity)
+                    providers.add(provider)
+                }
             }
 
             actionEffect ?: return@dispatch GO
@@ -126,6 +141,7 @@ class MoveInstruction(
 
             val subsequentInstructions = instructionSet.findInstructionsCausedBy(this)
             val missedTargets = subsequentInstructions.filterIsInstance<MissInstruction>().mapNotNull { it.target }
+            val hitCountInstruction = subsequentInstructions.filterIsInstance<HitCountInstruction>().firstOrNull()
 
             runtime.environment.query.addFunction("missed") { params ->
                 if (params.params.size == 0) {
@@ -144,6 +160,10 @@ class MoveInstruction(
                     val entityUUID = params.getString(0)
                     return@addFunction DoubleValue(hurtTargets.any { it.entity?.stringUUID == entityUUID })
                 }
+            }
+
+            if (hitCountInstruction != null && hitCountInstruction.hitCount != null) {
+                runtime.environment.query.addFunction("hit_count") { DoubleValue(hitCountInstruction.hitCount.toDouble()) }
             }
 
             runtime.environment.query.addFunction("move") { move.struct }
