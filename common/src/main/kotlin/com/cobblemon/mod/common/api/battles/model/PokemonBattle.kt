@@ -15,6 +15,8 @@ import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.Cobblemon.LOGGER
 import com.cobblemon.mod.common.CobblemonBuildDetails
 import com.cobblemon.mod.common.CobblemonNetwork
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
+import com.cobblemon.mod.common.api.battles.interpreter.BattleContext
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
@@ -48,7 +50,12 @@ import com.cobblemon.mod.common.entity.npc.NPCBattleActor
 import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.net.messages.client.battle.BattleEndPacket
+import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
+import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.FieldEffect
 import com.cobblemon.mod.common.pokemon.evolution.progress.DefeatEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.progress.LastBattleCriticalHitsEvolutionProgress
 import com.cobblemon.mod.common.pokemon.requirements.DefeatRequirement
@@ -206,6 +213,25 @@ open class PokemonBattle(
         return actor to pokemon
     }
 
+    fun startSpectating(player: ServerPlayer) {
+        if (!Cobblemon.config.allowSpectating) return
+        spectators.add(player.uuid)
+        player.sendPacket(BattleInitializePacket(this, null))
+        player.sendPacket(BattleMessagePacket(chatLog))
+        if (player.uuid in Cobblemon.deltaClientUsers) {
+            notifyOfDeltaUpdates(listOf(player.uuid))
+            actors.forEach { actor ->
+                val team = actor.pokemonList.map { it.toBattleDTO(false) }
+                player.sendPacket(DeltaBattleActorTeamPacket(actor.uuid, team))
+            }
+        }
+    }
+
+    fun stopSpectating(player: ServerPlayer) {
+        player.sendPacket(BattleEndPacket())
+        spectators.remove(player.uuid)
+    }
+
     /**
      * Gets a [BattlePokemon] from a pnx key and uuid.
      *
@@ -240,6 +266,37 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
+        notifyAllOfDeltaUpdates()
+    }
+
+    fun notifyAllOfDeltaUpdates() {
+        val uuids = this.actors.map { it.uuid } + this.spectators
+        notifyOfDeltaUpdates(uuids)
+    }
+
+    fun notifyOfDeltaUpdates(uuids: List<UUID>) {
+        val weather = this.contextManager.get(BattleContext.Type.WEATHER)?.firstOrNull()
+        val terrain = this.contextManager.get(BattleContext.Type.TERRAIN)?.firstOrNull()
+        val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
+        val side1SidedEffects = getSidedFieldEffects(side1)
+        val side2SidedEffects = getSidedFieldEffects(side2)
+
+        val updatePacket = DeltaBattleInformationPacket(this.battleId, DeltaBattleInformationDTO(
+            turn = turn,
+            weather = weather?.let { FieldEffect(it.id, it.turn) },
+            terrain = terrain?.let { FieldEffect(it.id, it.turn) },
+            room = room?.let { FieldEffect(it.id, it.turn) },
+            side1SidedEffects = side1SidedEffects,
+            side2SidedEffects = side2SidedEffects,
+        ))
+        uuids.filter { it in Cobblemon.deltaClientUsers }.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
+    }
+
+    private fun getSidedFieldEffects(side: BattleSide): List<FieldEffect> {
+        val hazards = side.contextManager.get(BattleContext.Type.HAZARD)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
+        val screens = side.contextManager.get(BattleContext.Type.SCREEN)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
+        val tailwind = side.contextManager.get(BattleContext.Type.TAILWIND)?.firstOrNull()?.let { FieldEffect(it.id, it.turn) }
+        return hazards + screens + listOfNotNull(tailwind)
     }
 
     fun end() {

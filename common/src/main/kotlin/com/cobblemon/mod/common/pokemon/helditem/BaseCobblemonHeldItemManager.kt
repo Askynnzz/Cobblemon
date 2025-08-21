@@ -28,7 +28,7 @@ import net.minecraft.world.item.ItemStack
  */
 abstract class BaseCobblemonHeldItemManager : HeldItemManager {
 
-    private val itemIds = HashBiMap.create<String, Item>()
+    val itemIds = HashBiMap.create<String, Item>()
 
     internal open fun load() {
         this.itemIds.clear()
@@ -66,11 +66,15 @@ abstract class BaseCobblemonHeldItemManager : HeldItemManager {
     override fun give(pokemon: BattlePokemon, showdownId: String) {
         val stack = this.itemIds[showdownId]?.let { ItemStack(it) } ?: ItemStack.EMPTY
         pokemon.effectedPokemon.swapHeldItem(stack, false)
+        pokemon.revealedHeldItem = stack
+        pokemon.sendUpdate()
     }
 
     // This is safe to do as any item triggers will only happen if a Pokémon has a valid held item to begin with.
     override fun take(pokemon: BattlePokemon, showdownId: String) {
         pokemon.effectedPokemon.removeHeldItem()
+        pokemon.revealedHeldItem = ItemStack.EMPTY
+        pokemon.sendUpdate()
     }
 
     /**

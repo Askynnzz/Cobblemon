@@ -158,6 +158,8 @@ object Cobblemon {
 
     val serverPlayerStructs = mutableMapOf<UUID, ObjectValue<Player>>()
 
+    val deltaClientUsers: MutableList<UUID> = mutableListOf()
+
     @JvmStatic
     val builtinPacks = listOf<CobblemonPack>(
         CobblemonPack(id = "adorncompatibility", name = "Adorn Compatibility", packType = PackType.CLIENT_RESOURCES, activationBehaviour = ResourcePackActivationBehaviour.ALWAYS_ENABLED, neededMods = setOf("adorn")),

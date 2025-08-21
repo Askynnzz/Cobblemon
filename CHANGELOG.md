@@ -252,6 +252,13 @@
 
 ### Fixes
 - Fixed game crashing when removing national pokedex using datapacks
+
+### Changes
+- Renamed `chargeGainedPerTick` config to `secondsToChargeHealingMachine`.
+- Made Blocks of Gold count as Big Nuggets when held by a Pokémon (for Fling functionality)
+- Substantially optimised spawning checks mainly by front-loading biome filtering.
+
+### Fixes
 - Fixed Particles sometimes facing the wrong direction (looking at you, Swords Dance)
 - Fixed PCs always opening at box 2 instead of box 1.
 - Fixed not being able to do complex item requirements aside from just NBT with evolution conditions, requirements and fossil items.
@@ -361,6 +368,10 @@
 - `ElementalType` now implements `ShowdownIdentifiable` to ensure the communcation with showdown stays consistent (also in regards to TeraTypes)
 - Pokemon no longer have a change observable
   
+
+### Changes
+- When using the `cobblemon` or `generation_9` capture calculators a critical capture with a single shake will always play for successful captures when you've already registered the Pokémon as caught in your Pokédex.
+
 ### MoLang & Datapacks
 - The following usages for item predicates can now use item conditions like advancements do, you can learn about them in the [Minecraft wiki](https://minecraft.wiki/w/Advancement_definition#minecraft:filled_bucket)
   - The `requiredContext` for an item interaction evolution

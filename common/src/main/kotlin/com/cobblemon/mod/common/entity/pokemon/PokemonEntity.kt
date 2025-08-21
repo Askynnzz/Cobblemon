@@ -1151,6 +1151,7 @@ open class PokemonEntity(
                                 StringSpeciesFeature(DataKeys.CAN_BE_COLORED, item.dyeColor.name.lowercase())
                             this.pokemon.features.add(newColorFeature)
                             this.pokemon.onChange()
+                            this.pokemon.onChange()
                         }
 
                         this.pokemon.updateAspects()

@@ -96,7 +96,10 @@ open class PokemonProperties {
         fun parse(string: String, delimiter: String = " ", assigner: String = "="): PokemonProperties {
             val props = PokemonProperties()
             props.originalString = string
-            val keyPairs = string.splitMap(delimiter, assigner)
+            val uneditedKeyPairs = string.splitMap(delimiter, assigner)
+            val (uncatchablePairs, otherPairs) = uneditedKeyPairs.partition { it.first == "uncatchable" }
+            val uniqueUncatchable = uncatchablePairs.lastOrNull()?.let { listOf(it) } ?: emptyList()
+            val keyPairs = (otherPairs + uniqueUncatchable).toMutableList()
             props.customProperties = CustomPokemonProperty.properties.flatMap { property ->
                 val matchedKeyPairs = keyPairs.filter { it.first.lowercase() in property.keys }
                 if (matchedKeyPairs.isEmpty()) {

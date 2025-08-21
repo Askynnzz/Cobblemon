@@ -15,8 +15,6 @@ import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.battles.BattleRegistry
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
-import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacket
-import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.net.messages.server.battle.SpectateBattlePacket
 import com.cobblemon.mod.common.util.*
@@ -75,10 +73,7 @@ object SpectateBattleHandler : ServerNetworkPacketHandler<SpectateBattlePacket> 
         }
 
         val battle = BattleRegistry.getBattleByParticipatingPlayer(target) ?: return
-
-        battle.spectators.add(player.uuid)
-        player.sendPacket(BattleInitializePacket(battle, null))
-        player.sendPacket(BattleMessagePacket(battle.chatLog))
+        battle.startSpectating(player)
     }
 
 }
