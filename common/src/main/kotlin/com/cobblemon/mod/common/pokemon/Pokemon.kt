@@ -340,7 +340,6 @@ open class Pokemon : ShowdownIdentifiable {
     var teraType: TeraType = TeraTypes.forElementalType(this.primaryType)
         set(value) {
             field = value
-            _teraType.emit(value)
         }
 
     var dmaxLevel = 0
