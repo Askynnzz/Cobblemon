@@ -14,7 +14,6 @@ import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.battles.model.actor.EntityBackedBattleActor
 import com.cobblemon.mod.common.api.events.CobblemonEvents
-import com.cobblemon.mod.common.api.events.battles.BattleSwitchEvent
 import com.cobblemon.mod.common.api.events.pokemon.PokemonSeenEvent
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.battles.ActiveBattlePokemon
@@ -137,7 +136,9 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                     oldPokemon.contextManager.clear(BattleContext.Type.VOLATILE, BattleContext.Type.BOOST, BattleContext.Type.UNBOOST)
                     battle.majorBattleActions[oldPokemon.uuid] = publicMessage
                     if (oldPokemon.transformed != null) {
-                        oldPokemon.revealedMoves.clear()
+                        for (i in 0 until 4) {
+                            oldPokemon.revealedMoves[i] = null
+                        }
                     }
                     oldPokemon.transformed = null
 
