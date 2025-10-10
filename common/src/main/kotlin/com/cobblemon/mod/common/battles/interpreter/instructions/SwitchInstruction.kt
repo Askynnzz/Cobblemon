@@ -132,7 +132,9 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                     oldPokemon.contextManager.clear(BattleContext.Type.VOLATILE, BattleContext.Type.BOOST, BattleContext.Type.UNBOOST)
                     battle.majorBattleActions[oldPokemon.uuid] = publicMessage
                     if (oldPokemon.transformed != null) {
-                        oldPokemon.revealedMoves.clear()
+                        for (i in 0 until 4) {
+                            oldPokemon.revealedMoves[i] = null
+                        }
                     }
                     oldPokemon.transformed = null
 
