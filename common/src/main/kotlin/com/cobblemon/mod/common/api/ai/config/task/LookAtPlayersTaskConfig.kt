@@ -18,10 +18,10 @@ import net.minecraft.world.entity.ai.behavior.SetEntityLookTarget
 class LookAtPlayersTaskConfig : SingleTaskConfig {
     override fun createTask(
         entity: LivingEntity,
-        brainConfigurationContext: BehaviourConfigurationContext
+        behaviourConfigurationContext: BehaviourConfigurationContext
     ): BehaviorControl<in LivingEntity>? {
         return SetEntityLookTarget.create({otherEntity -> otherEntity is ServerPlayer}, 9f)
     }
 
-    override fun getVariables(entity: LivingEntity): List<MoLangConfigVariable> = emptyList()
+    override fun getVariables(entity: LivingEntity, behaviourConfigurationContext: BehaviourConfigurationContext): List<MoLangConfigVariable> = emptyList()
 }

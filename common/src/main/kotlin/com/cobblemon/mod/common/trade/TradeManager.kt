@@ -11,7 +11,8 @@ package com.cobblemon.mod.common.trade
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.interaction.RequestManager
 import com.cobblemon.mod.common.api.events.CobblemonEvents
-import com.cobblemon.mod.common.api.events.trade.TradeEvent
+import com.cobblemon.mod.common.api.events.pokemon.TradeEvent
+import com.cobblemon.mod.common.api.events.trade.TradeEvent as DeltaTradeEvent
 import com.cobblemon.mod.common.api.interaction.ServerPlayerActionRequest
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.text.aqua
@@ -73,7 +74,7 @@ object TradeManager : RequestManager<TradeManager.TradeRequest>() {
 
     override fun canAccept(request: TradeRequest): Boolean {
         CobblemonEvents.TRADE_EVENT.postThen(
-            event = TradeEvent(request.sender),
+            event = DeltaTradeEvent(request.sender),
             ifSucceeded = {
             },
             ifCanceled = {
@@ -82,7 +83,7 @@ object TradeManager : RequestManager<TradeManager.TradeRequest>() {
         )
 
         CobblemonEvents.TRADE_EVENT.postThen(
-            event = TradeEvent(request.receiver),
+            event = DeltaTradeEvent(request.receiver),
             ifSucceeded = {
             },
             ifCanceled = {
