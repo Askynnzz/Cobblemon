@@ -11,12 +11,11 @@ package com.cobblemon.mod.common.net.messages.client.battle
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.util.cobblemonResource
 import com.cobblemon.mod.common.util.readString
-import com.cobblemon.mod.common.util.writeNullable
 import com.cobblemon.mod.common.util.writeString
 import net.minecraft.network.RegistryFriendlyByteBuf
 import java.util.UUID
 
-class DeltaBattleInformationPacket(val battle: UUID, val informationDTO: DeltaBattleInformationDTO): NetworkPacket<DeltaBattleInformationPacket> {
+class BattleInformationPacket(val battle: UUID, val informationDTO: BattleInformationDTO): NetworkPacket<BattleInformationPacket> {
     override val id = ID
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeUUID(battle)
@@ -29,10 +28,10 @@ class DeltaBattleInformationPacket(val battle: UUID, val informationDTO: DeltaBa
     }
 
     companion object {
-        val ID = cobblemonResource("delta_battle_information")
-        fun decode(buffer: RegistryFriendlyByteBuf) = DeltaBattleInformationPacket(
+        val ID = cobblemonResource("battle_information")
+        fun decode(buffer: RegistryFriendlyByteBuf) = BattleInformationPacket(
             battle = buffer.readUUID(),
-            informationDTO = DeltaBattleInformationDTO(
+            informationDTO = BattleInformationDTO(
                 turn = buffer.readInt(),
                 weather = buffer.readNullable { decodeFieldEffect(buffer) },
                 terrain = buffer.readNullable { decodeFieldEffect(buffer) },
@@ -53,7 +52,7 @@ class DeltaBattleInformationPacket(val battle: UUID, val informationDTO: DeltaBa
     }
 }
 
-data class DeltaBattleInformationDTO(
+data class BattleInformationDTO(
     val turn: Int,
     val weather: FieldEffect?,
     val terrain: FieldEffect?,

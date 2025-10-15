@@ -11,7 +11,6 @@ package com.cobblemon.mod.common.battles.interpreter.instructions
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
-import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
 import com.cobblemon.mod.common.battles.dispatch.DispatchResult
@@ -21,9 +20,7 @@ import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacke
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleQueueRequestPacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleSetTeamPokemonPacket
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattlePokemonDTO
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleActorTeamPacket
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
+import com.cobblemon.mod.common.net.messages.client.battle.BattleActorTeamPacket
 
 /**
  * Format: |start
@@ -66,13 +63,11 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             val allyTeam = actor.pokemonList.map { it.toBattleDTO(ally = true) }
             val nonallyTeam = actor.pokemonList.map { it.toBattleDTO(ally = false) }
 
-            if (actor.uuid in Cobblemon.deltaClientUsers) {
-                actor.sendUpdate(DeltaBattleActorTeamPacket(actor.uuid, allyTeam))
-            }
+            actor.sendUpdate(BattleActorTeamPacket(actor.uuid, allyTeam))
 
-            val otherActors = battle.actors.filter { it != actor && it.uuid in Cobblemon.deltaClientUsers }
+            val otherActors = battle.actors.filter { it != actor }
             otherActors.forEach { other ->
-                val packet = DeltaBattleActorTeamPacket(actor.uuid, nonallyTeam)
+                val packet = BattleActorTeamPacket(actor.uuid, nonallyTeam)
                 other.sendUpdate(packet)
             }
 
@@ -88,7 +83,7 @@ class InitializeInstruction(val instructionSet: InstructionSet, val message: Bat
             battle.started = true
             battle.side1.playCries()
             afterOnServer(seconds = 1.0F) { battle.side2.playCries() }
-            battle.notifyAllOfDeltaUpdates()
+            battle.notifyAllOfUpdates()
         }
     }
 }

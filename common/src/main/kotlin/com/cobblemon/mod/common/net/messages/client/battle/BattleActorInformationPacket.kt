@@ -22,7 +22,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.util.*
 
-class DeltaBattleActorInformationPacket(val actor: UUID, val update: DeltaBattlePokemonDTO): NetworkPacket<DeltaBattleActorInformationPacket> {
+class BattleActorInformationPacket(val actor: UUID, val update: BattlePokemonDTO): NetworkPacket<BattleActorInformationPacket> {
     override val id = ID
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeUUID(actor)
@@ -42,14 +42,14 @@ class DeltaBattleActorInformationPacket(val actor: UUID, val update: DeltaBattle
     }
 
     companion object {
-        val ID = cobblemonResource("delta_battle_actor_information")
-        fun decode(buffer: RegistryFriendlyByteBuf) = DeltaBattleActorInformationPacket(
+        val ID = cobblemonResource("battle_actor_information")
+        fun decode(buffer: RegistryFriendlyByteBuf) = BattleActorInformationPacket(
             actor = buffer.readUUID(),
-            update = DeltaBattlePokemonDTO(
+            update = BattlePokemonDTO(
                 uuid = buffer.readUUID(),
                 fainted = buffer.readBoolean(),
                 ability = buffer.readNullable { buffer.readString() },
-                moves = buffer.readList { buffer.readNullable { DeltaMoveDTO(buffer.readText(), buffer.readInt()) } },
+                moves = buffer.readList { buffer.readNullable { MoveDTO(buffer.readText(), buffer.readInt()) } },
                 heldItem = buffer.readNullable { buffer.readItemStack() },
                 buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() }),
                 speed = buffer.readNullable { buffer.readInt() },
@@ -59,18 +59,18 @@ class DeltaBattleActorInformationPacket(val actor: UUID, val update: DeltaBattle
     }
 }
 
-data class DeltaBattlePokemonDTO(
+data class BattlePokemonDTO(
     val uuid: UUID,
     val fainted: Boolean,
     val ability: String?,
-    val moves: List<DeltaMoveDTO?>,
+    val moves: List<MoveDTO?>,
     val heldItem: ItemStack?,
     val buffs: Map<Stats, Double>,
     val speed: Int?,
     val activeBattlePokemonDTO: BattleInitializePacket.ActiveBattlePokemonDTO?
 )
 
-data class DeltaMoveDTO(
+data class MoveDTO(
     val move: Component,
     var timesUsed: Int
 )

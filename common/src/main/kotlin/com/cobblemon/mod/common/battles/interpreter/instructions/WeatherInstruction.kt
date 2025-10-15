@@ -13,8 +13,6 @@ import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.battles.ShowdownInterpreter
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationDTO
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaBattleInformationPacket
 import com.cobblemon.mod.common.util.battleLang
 
 /**
@@ -47,7 +45,7 @@ class WeatherInstruction(val message: BattleMessage): InterpreterInstruction {
                     battleLang("weather.$oldWeather.end")
                 }
             }
-            battle.notifyAllOfDeltaUpdates()
+            battle.notifyAllOfUpdates()
             battle.broadcastChatMessage(lang)
         }
     }

@@ -29,7 +29,7 @@ import com.cobblemon.mod.common.battles.dispatch.InstructionSet
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
 import com.cobblemon.mod.common.battles.dispatch.UntilDispatch
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
+import com.cobblemon.mod.common.net.messages.client.battle.MoveDTO
 import com.cobblemon.mod.common.pokemon.evolution.progress.UseMoveEvolutionProgress
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.cobblemonResource
@@ -80,7 +80,7 @@ class MoveInstruction(
         }
         else {
             if (userPokemon.revealedMoves[moveIndex] == null) {
-                userPokemon.revealedMoves[moveIndex] = DeltaMoveDTO(move.displayName, 1)
+                userPokemon.revealedMoves[moveIndex] = MoveDTO(move.displayName, 1)
             }
             else {
                 val update = userPokemon.revealedMoves[moveIndex]!!.timesUsed + 1
@@ -88,7 +88,7 @@ class MoveInstruction(
             }
         }
         userPokemon.sendUpdate()
-        battle.notifyAllOfDeltaUpdates()
+        battle.notifyAllOfUpdates()
 
         val optionalEffect = message.effect()
         ShowdownInterpreter.broadcastOptionalAbility(battle, optionalEffect, userPokemon)

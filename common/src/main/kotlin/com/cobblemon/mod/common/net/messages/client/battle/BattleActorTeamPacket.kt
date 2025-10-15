@@ -20,7 +20,7 @@ import com.cobblemon.mod.common.util.writeText
 import net.minecraft.network.RegistryFriendlyByteBuf
 import java.util.UUID
 
-class DeltaBattleActorTeamPacket(val actor: UUID, val team: List<DeltaBattlePokemonDTO>): NetworkPacket<DeltaBattleActorTeamPacket> {
+class BattleActorTeamPacket(val actor: UUID, val team: List<BattlePokemonDTO>): NetworkPacket<BattleActorTeamPacket> {
     override val id = ID
     override fun encode(buffer: RegistryFriendlyByteBuf) {
         buffer.writeUUID(actor)
@@ -42,15 +42,15 @@ class DeltaBattleActorTeamPacket(val actor: UUID, val team: List<DeltaBattlePoke
     }
 
     companion object {
-        val ID = cobblemonResource("delta_battle_team")
-        fun decode(buffer: RegistryFriendlyByteBuf) = DeltaBattleActorTeamPacket(
+        val ID = cobblemonResource("battle_team")
+        fun decode(buffer: RegistryFriendlyByteBuf) = BattleActorTeamPacket(
             actor = buffer.readUUID(),
             team = buffer.readList {
-                DeltaBattlePokemonDTO(
+                BattlePokemonDTO(
                     uuid = buffer.readUUID(),
                     fainted = buffer.readBoolean(),
                     ability = buffer.readNullable { buffer.readString() },
-                    moves = buffer.readList { buffer.readNullable { DeltaMoveDTO(buffer.readText(), buffer.readInt()) } },
+                    moves = buffer.readList { buffer.readNullable { MoveDTO(buffer.readText(), buffer.readInt()) } },
                     heldItem = buffer.readNullable { buffer.readItemStack() },
                     buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() }),
                     speed = buffer.readNullable { buffer.readInt() },

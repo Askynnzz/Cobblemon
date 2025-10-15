@@ -17,7 +17,7 @@ import com.cobblemon.mod.common.battles.dispatch.UntilDispatch
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.entity.pokemon.effects.TransformEffect
 import com.cobblemon.mod.common.net.messages.client.battle.BattleTransformPokemonPacket
-import com.cobblemon.mod.common.net.messages.client.battle.DeltaMoveDTO
+import com.cobblemon.mod.common.net.messages.client.battle.MoveDTO
 import com.cobblemon.mod.common.util.battleLang
 
 /**
@@ -62,7 +62,7 @@ class TransformInstruction(val battle: PokemonBattle, val message: BattleMessage
 
             copyBoosts(pokemon, targetPokemon)
             for (i in 0 until 4) {
-                pokemon.revealedMoves[i] = targetPokemon.moveSet.get(i)?.let { DeltaMoveDTO(it.displayName, 0) }
+                pokemon.revealedMoves[i] = targetPokemon.moveSet.get(i)?.let { MoveDTO(it.displayName, 0) }
             }
             pokemon.transformed = targetPokemon
             pokemon.revealedAbility = targetPokemon.effectedPokemon.ability.name

@@ -162,8 +162,6 @@ object Cobblemon {
     var statProvider: StatProvider = CobblemonStatProvider
     var seasonResolver: SeasonResolver = TagSeasonResolver
 
-    val deltaClientUsers: MutableList<UUID> = mutableListOf()
-
     @JvmStatic
     val builtinPacks = listOf<CobblemonPack>(
         CobblemonPack(id = "adorncompatibility", name = "Adorn Compatibility", packType = PackType.CLIENT_RESOURCES, activationBehaviour = ResourcePackActivationBehaviour.ALWAYS_ENABLED, neededMods = setOf("adorn")),
