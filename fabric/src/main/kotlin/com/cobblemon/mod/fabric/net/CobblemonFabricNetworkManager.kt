@@ -24,9 +24,6 @@ import net.minecraft.server.level.ServerPlayer
 object CobblemonFabricNetworkManager : NetworkManager {
     fun registerMessages() {
         CobblemonNetwork.s2cPayloads.map { FabricPacketInfo(it) }.forEach { it.registerPacket(client = true) }
-        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(BattleActorTeamPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, BattleActorTeamPacket::decode))
-        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(BattleActorInformationPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, BattleActorInformationPacket::decode))
-        PayloadTypeRegistry.playS2C().register(CustomPacketPayload.Type(BattleInformationPacket.ID), StreamCodec.of({ buf, packet -> packet.encode(buf) }, BattleInformationPacket::decode))
         CobblemonNetwork.c2sPayloads.map { FabricPacketInfo(it) }.forEach { it.registerPacket(client = false) }
     }
 

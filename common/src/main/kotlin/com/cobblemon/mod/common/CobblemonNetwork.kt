@@ -275,6 +275,9 @@ object CobblemonNetwork {
         list.add(PacketRegisterInfo(BattleChallengeExpiredPacket.ID, BattleChallengeExpiredPacket::decode, BattleChallengeExpiredHandler))
         list.add(PacketRegisterInfo(BattleReplacePokemonPacket.ID, BattleReplacePokemonPacket::decode, BattleReplacePokemonHandler))
         list.add(PacketRegisterInfo(BattleTransformPokemonPacket.ID, BattleTransformPokemonPacket::decode, BattleTransformPokemonHandler))
+        list.add(PacketRegisterInfo(BattleActorInformationPacket.ID, BattleActorInformationPacket::decode, BattleActorInformationHandler))
+        list.add(PacketRegisterInfo(BattleActorTeamPacket.ID, BattleActorTeamPacket::decode, BattleActorTeamHandler))
+        list.add(PacketRegisterInfo(BattleInformationPacket.ID, BattleInformationPacket::decode, BattleInformationHandler))
 
         // MultiBattleTeam Packets
         list.add(PacketRegisterInfo(TeamRequestNotificationPacket.ID, TeamRequestNotificationPacket::decode, TeamRequestNotificationHandler))

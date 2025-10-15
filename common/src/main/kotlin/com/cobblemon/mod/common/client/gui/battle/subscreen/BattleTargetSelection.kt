@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.api.moves.MoveTemplate
 import com.cobblemon.mod.common.api.text.bold
 import com.cobblemon.mod.common.api.text.font
 import com.cobblemon.mod.common.api.text.text
+import com.cobblemon.mod.common.battles.InBattleGimmickMove
 import com.cobblemon.mod.common.battles.InBattleMove
 import com.cobblemon.mod.common.battles.MoveActionResponse
 import com.cobblemon.mod.common.client.CobblemonClient
@@ -22,7 +23,6 @@ import com.cobblemon.mod.common.client.battle.ActiveClientBattlePokemon
 import com.cobblemon.mod.common.client.battle.SingleActionRequest
 import com.cobblemon.mod.common.client.gui.battle.BattleGUI
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay
-import com.cobblemon.mod.common.client.gui.battle.subscreen.BattleSwitchPokemonSelection.Companion
 import com.cobblemon.mod.common.client.gui.drawProfilePokemon
 import com.cobblemon.mod.common.client.render.drawScaledText
 import com.cobblemon.mod.common.client.render.models.blockbench.FloatingState
@@ -41,15 +41,16 @@ import kotlin.math.floor
 import kotlin.math.sin
 
 class BattleTargetSelection(
-        battleGUI: BattleGUI,
-        request: SingleActionRequest,
-        val move: InBattleMove
+    battleGUI: BattleGUI,
+    val request: SingleActionRequest,
+    val move: InBattleMove,
+    val gimmickID: String?,
+    gimmickMove: InBattleGimmickMove?
 ) : BattleActionSelection(
     battleGUI = battleGUI,
-    request = request,
     x = 0,
-    y = if (Minecraft.getInstance().window.guiScaledHeight > 304) (Minecraft.getInstance().window.guiScaledHeight / 2) - (BattleSwitchPokemonSelection.BACKGROUND_HEIGHT / 2)
-        else Minecraft.getInstance().window.guiScaledHeight - (BattleSwitchPokemonSelection.BACKGROUND_HEIGHT + 78),
+    y = if (Minecraft.getInstance().window.guiScaledHeight > 304) (Minecraft.getInstance().window.guiScaledHeight / 2) - (BattleSwitchPokemonSelection.Companion.BACKGROUND_HEIGHT / 2)
+    else Minecraft.getInstance().window.guiScaledHeight - (BattleSwitchPokemonSelection.Companion.BACKGROUND_HEIGHT + 78),
     width = 100,
     height = 100,
     battleLang("ui.select_move")
@@ -81,9 +82,10 @@ class BattleTargetSelection(
 
     val targets = request.activePokemon.getAllActivePokemon()
 
+    val targetType = if (gimmickID != null && gimmickMove != null) gimmickMove.target else move.target
     val backButton = BattleBackButton(x + 9F, Minecraft.getInstance().window.guiScaledHeight - 22F)
-    val selectableTargetList = move.target.targetList(request.activePokemon)
-    val multiTargetList = if(selectableTargetList == null) request.activePokemon.getMultiTargetList(move.target) else null
+    val selectableTargetList = targetType.targetList(request.activePokemon)
+    val multiTargetList = if(selectableTargetList == null) request.activePokemon.getMultiTargetList(targetType) else null
 
     val baseTiles = targets.mapIndexed { index, target ->
         val isAlly = target.isAllied(request.activePokemon)
@@ -112,11 +114,11 @@ class BattleTargetSelection(
 
 
     open inner class TargetTile(
-            val targetSelection: BattleTargetSelection,
-            val target: ActiveClientBattlePokemon,
-            val x: Float,
-            val y: Float,
-            val arrowDirection: ArrowDirection
+        val targetSelection: BattleTargetSelection,
+        val target: ActiveClientBattlePokemon,
+        val x: Float,
+        val y: Float,
+        val arrowDirection: ArrowDirection
     ) {
         var moveTemplate = MoveTemplate.dummy(target.battlePokemon?.displayName.toString())
         private val responseTarget = selectableTargetList?.firstOrNull { it.getPNX() == target.getPNX() }?.getPNX()
@@ -130,7 +132,7 @@ class BattleTargetSelection(
         val hue = target.getHue()
         val rgb = if ((target.battlePokemon?.hpValue ?: 0F) > 0)
             Triple(((hue shr 16) and 0b11111111) / 255F, ((hue shr 8) and 0b11111111) / 255F, (hue and 0b11111111) / 255F)
-            else Triple(0.5f, 0.5f, 0.5f)
+        else Triple(0.5f, 0.5f, 0.5f)
 
         val arrowTexture = when (arrowDirection) {
             ArrowDirection.LEFT -> battleArrowLeft
