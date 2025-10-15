@@ -1,3 +1,8 @@
+# NOTE
+**THIS IS A MODIFIED FORK OF COBBLEMON AND NOT TO BE CONSIDERED OFFICIAL.**
+Please do not bug the Cobblemon team if you experience issues using this fork. 
+This can and often will lead to confusion and wasted time if they investigate an issue that does not exist on their end.
+
 # Cobblemon
 
 An open-source Pokémon mod for Minecraft Java Edition, written in Kotlin for Fabric and Forge.
