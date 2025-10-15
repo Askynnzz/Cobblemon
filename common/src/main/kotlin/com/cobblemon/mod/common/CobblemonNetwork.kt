@@ -446,6 +446,8 @@ object CobblemonNetwork {
         // NPC packets
         list.add(PacketRegisterInfo(SaveNPCPacket.ID, SaveNPCPacket::decode, SaveNPCHandler))
 
+        list.add(PacketRegisterInfo(SpectateNearestBattlePacket.ID, SpectateNearestBattlePacket::decode, SpectateNearestBattleHandler))
+
         return list
     }
 

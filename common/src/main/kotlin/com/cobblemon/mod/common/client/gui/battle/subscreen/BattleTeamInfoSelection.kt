@@ -57,7 +57,7 @@ class BattleTeamInfoSelection(
     else Minecraft.getInstance().window.guiScaledHeight - (BACKGROUND_HEIGHT + 78),
     width = Minecraft.getInstance().window.guiScaledWidth,
     height = Minecraft.getInstance().window.guiScaledHeight,
-    "cobblemon.battle.team_info".asTranslated()
+    "cobblemon.battle.ui.team_info".asTranslated()
 ) {
     companion object {
         const val SLOT_HORIZONTAL_SPACING = 4F
@@ -124,7 +124,7 @@ class BattleTeamInfoSelection(
         )
 
         // Draw Title Text
-        val text = "cobblemon.battle.team_info".asTranslated()
+        val text = "cobblemon.battle.ui.team_info".asTranslated()
         val textWidth = Minecraft.getInstance().font.width(text)
         drawScaledText(
             context = context,
@@ -424,7 +424,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.label.pokemon_form".asTranslated().bold(),
+                text = "cobblemon.battle.ui.label.pokemon_form".asTranslated().bold(),
                 x = startX + 36,
                 y = startY + 6.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -444,7 +444,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.label.buffs".asTranslated().bold(),
+                text = "cobblemon.battle.ui.label.buffs".asTranslated().bold(),
                 x = startX + 36,
                 y = startY + 23.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -498,7 +498,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.stats.special_attack".asTranslated(),
+                text = "cobblemon.battle.ui.stats.special_attack".asTranslated(),
                 x = startX + 10,
                 y = startY + 47.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -520,7 +520,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.stats.special_defence".asTranslated(),
+                text = "cobblemon.battle.ui.stats.special_defence".asTranslated(),
                 x = startX + 10,
                 y = startY + 55.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -608,7 +608,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.label.ability".asTranslated().bold(),
+                text = "cobblemon.battle.ui.label.ability".asTranslated().bold(),
                 x = startX + 100,
                 y = startY + 6.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -631,7 +631,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.label.moves".asTranslated().bold(),
+                text = "cobblemon.battle.ui.label.moves".asTranslated().bold(),
                 x = startX + 100,
                 y = startY + 23.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -706,7 +706,7 @@ class BattleTeamInfoSelection(
             else {
                 drawScaledText(
                     context = context,
-                    text = "cobblemon.battle.label.speed_tier".asTranslated(),
+                    text = "cobblemon.battle.ui.label.speed_tier".asTranslated(),
                     x = startX + 100,
                     y = startY + 65.5,
                     scale = BattleOverlay.Companion.SCALE,
@@ -730,7 +730,7 @@ class BattleTeamInfoSelection(
 
             drawScaledText(
                 context = context,
-                text = "cobblemon.battle.label.held_item".asTranslated(),
+                text = "cobblemon.battle.ui.label.held_item".asTranslated(),
                 x = startX + 40,
                 y = startY + 99.5,
                 scale = BattleOverlay.Companion.SCALE,
@@ -805,7 +805,7 @@ class BattleTeamInfoSelection(
 
             val minSpeed = getStat(base, level, 0, 0, minNatureMod) * speedBoost
             val maxSpeed = getStat(base, level, maxIV, maxEV, maxNatureMod) * speedBoost
-            return "cobblemon.battle.speed_tier".asTranslated(minSpeed.toInt(), maxSpeed.toInt())
+            return "cobblemon.battle.ui.speed_tier".asTranslated(minSpeed.toInt(), maxSpeed.toInt())
         }
 
         private fun getStat(base: Int, level: Int, iv: Int, ev: Int, natureMod: Double): Int {

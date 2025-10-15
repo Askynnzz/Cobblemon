@@ -56,7 +56,7 @@ class BattleGUI : Screen(battleLang("gui.title")), CobblemonRenderable {
         x = OPTION_ROOT_X,
         y = Minecraft.getInstance().window.guiScaledHeight - OPTION_VERTICAL_OFFSET + BattleOptionTile.OPTION_HEIGHT + OPTION_HORIZONTAL_SPACING,
         resource = BattleGeneralActionSelection.battleInfoSelection,
-        text = "CobblemonClient.ui.battle.team_info.button".asTranslated(),
+        text = "cobblemon.ui.battle.team_info.button".asTranslated(),
         onClick = {}
     )
 

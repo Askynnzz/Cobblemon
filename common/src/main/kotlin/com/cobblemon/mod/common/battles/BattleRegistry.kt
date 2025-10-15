@@ -47,6 +47,10 @@ object BattleRegistry {
         getBattleByParticipatingPlayer(player)?.stop()
     }
 
+    fun getPlayersCurrentlyBattling(): List<ServerPlayer> {
+        return battleMap.values.flatMap { it.players }
+    }
+
     /**
      * Packs a team into the showdown format
      *
