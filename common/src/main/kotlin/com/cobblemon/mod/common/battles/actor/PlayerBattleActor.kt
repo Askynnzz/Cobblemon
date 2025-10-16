@@ -10,7 +10,7 @@ package com.cobblemon.mod.common.battles.actor
 
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonNetwork
-import com.cobblemon.mod.common.api.battles.model.PokemonBattle
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.battles.model.actor.EntityBackedBattleActor
@@ -18,11 +18,15 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.battles.BattleChoiceRequestedEvent
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.pokemon.experience.BattleExperienceSource
+import com.cobblemon.mod.common.api.text.lightPurple
+import com.cobblemon.mod.common.api.text.plus
 import com.cobblemon.mod.common.api.text.red
+import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.battles.ShowdownActionResponse
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
+import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.getPlayer
@@ -75,9 +79,20 @@ class PlayerBattleActor(
         super.turn()
     }
 
+    private fun hasStreamerBattleMode(player: ServerPlayer): Boolean {
+        return Cobblemon.permissionValidator.hasPermission(player, "battle.mode.streamer", 4)
+    }
+
     override fun setActionResponses(responses: List<ShowdownActionResponse>) {
         timer.selection()
         super.setActionResponses(responses)
+        val player = uuid.getPlayer() ?: return
+        if (hasStreamerBattleMode(player)) return
+        battle.players.filter { it != uuid.getPlayer() && hasStreamerBattleMode(it) }
+            .forEach {
+                val message = "[Streamer Mode] ".lightPurple() + "${player.name.string} has ended their turn.".yellow()
+                it.sendPacket(BattleMessagePacket(listOf(message)))
+            }
     }
 
     override fun sendUpdate(packet: NetworkPacket<*>) {

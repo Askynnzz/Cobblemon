@@ -23,7 +23,7 @@ class ShowdownTimer(val battle: PokemonBattle, val actor: PlayerBattleActor) {
      */
     fun checkForStreamerIncrease() {
         val player = actor.uuid.getPlayer() ?: return
-        if (!Cobblemon.permissionValidator.hasPermission(player, "battle.timer.streamer", 4)) return
+        if (!Cobblemon.permissionValidator.hasPermission(player, "battle.mode.streamer", 4)) return
         secondsRemaining *= 2
     }
 
