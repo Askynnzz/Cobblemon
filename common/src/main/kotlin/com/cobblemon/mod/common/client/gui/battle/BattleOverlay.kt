@@ -1588,8 +1588,9 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             alpha = opacity
         )
 
-        if (ClientBattleInformationRepository.mustChooseBy != null) {
-            val totalSecondsRemaining = Duration.between(Instant.now(), ClientBattleInformationRepository.mustChooseBy).seconds
+        val now = Instant.now()
+        if (ClientBattleInformationRepository.mustChooseBy != null && !now.isAfter(ClientBattleInformationRepository.mustChooseBy)) {
+            val totalSecondsRemaining = Duration.between(now, ClientBattleInformationRepository.mustChooseBy).seconds
             val minutesRemaining = totalSecondsRemaining / 60
             val secondsRemaining = String.format("%02d", totalSecondsRemaining % 60)
             val timer = "$minutesRemaining:$secondsRemaining"
