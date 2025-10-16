@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.battles.actor
 
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonNetwork
+import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.ActorType
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor
 import com.cobblemon.mod.common.api.battles.model.actor.EntityBackedBattleActor
@@ -18,7 +19,9 @@ import com.cobblemon.mod.common.api.events.battles.BattleChoiceRequestedEvent
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.pokemon.experience.BattleExperienceSource
 import com.cobblemon.mod.common.api.text.red
+import com.cobblemon.mod.common.battles.ShowdownActionResponse
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMusicPacket
 import com.cobblemon.mod.common.util.battleLang
@@ -48,6 +51,8 @@ class PlayerBattleActor(
             field = value
         }
 
+    lateinit var timer: ShowdownTimer
+
     override fun getName(): MutableComponent = this.entity?.name?.copy() ?: "Offline Player".red()
     override fun nameOwned(name: String): MutableComponent = battleLang("owned_pokemon", this.getName(), name)
     override val type = ActorType.PLAYER
@@ -63,6 +68,16 @@ class PlayerBattleActor(
                 ?.let { battlePokemon.effectedPokemon.addExperienceWithPlayer(it, source, experience) }
                 ?: run { battlePokemon.effectedPokemon.addExperience(source, experience) }
         }
+    }
+
+    override fun turn() {
+        timer.startTurn()
+        super.turn()
+    }
+
+    override fun setActionResponses(responses: List<ShowdownActionResponse>) {
+        timer.selection()
+        super.setActionResponses(responses)
     }
 
     override fun sendUpdate(packet: NetworkPacket<*>) {

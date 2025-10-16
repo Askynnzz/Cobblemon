@@ -43,6 +43,7 @@ import com.cobblemon.mod.common.battles.dispatch.WaitDispatch
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.battles.runner.ShowdownService
+import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.cobblemon.mod.common.entity.PlatformType
 import com.cobblemon.mod.common.entity.npc.NPCBattleActor
 import com.cobblemon.mod.common.entity.npc.NPCEntity
@@ -53,6 +54,7 @@ import com.cobblemon.mod.common.net.messages.client.battle.BattleInitializePacke
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleInformationDTO
 import com.cobblemon.mod.common.net.messages.client.battle.BattleInformationPacket
+import com.cobblemon.mod.common.net.messages.client.battle.BattleTimerPacket
 import com.cobblemon.mod.common.net.messages.client.battle.FieldEffect
 import com.cobblemon.mod.common.pokemon.evolution.progress.DefeatEvolutionProgress
 import com.cobblemon.mod.common.pokemon.evolution.progress.LastBattleCriticalHitsEvolutionProgress
@@ -69,6 +71,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
+import java.time.Instant
 
 /**
  * Individual battle instance
@@ -95,6 +98,9 @@ open class PokemonBattle(
         side1.battle = this
         side2.battle = this
         this.actors.forEach { actor ->
+            if (actor is PlayerBattleActor) {
+                actor.timer = ShowdownTimer(this, actor)
+            }
             actor.battle = this
             actor.pokemonList.forEach { battlePokemon ->
                 battlePokemon.effectedPokemon.evolutionProxy.current().progress()
@@ -127,6 +133,8 @@ open class PokemonBattle(
     // TEMP battle showcase stuff
     var announcingRules = false
     var turn: Int = 0
+        private set
+    var turnStartTime: Instant = Instant.now()
         private set
 
     private var ticks: Int = 0
@@ -253,6 +261,10 @@ open class PokemonBattle(
 
     fun turn(newTurnNumber: Int) {
         actors.forEach { it.turn() }
+        actors.filterIsInstance<PlayerBattleActor>().forEach { actor ->
+            val mustChooseBy = actor.timer.mustChooseBy()
+            actor.uuid.getPlayer()?.sendPacket(BattleTimerPacket(mustChooseBy))
+        }
         // TODO: If a pokemon switches in the same turn another pokemon is KO'd it will not receive exp for the KO
         for (side in sides) {
             val opposite = side.getOppositeSide()
@@ -262,6 +274,7 @@ open class PokemonBattle(
             }
         }
         this.turn = newTurnNumber
+        this.turnStartTime = Instant.now()
         notifyAllOfUpdates()
     }
 
@@ -276,7 +289,6 @@ open class PokemonBattle(
         val room = this.contextManager.get(BattleContext.Type.ROOM)?.firstOrNull()
         val side1SidedEffects = getSidedFieldEffects(side1)
         val side2SidedEffects = getSidedFieldEffects(side2)
-
         val updatePacket = BattleInformationPacket(this.battleId, BattleInformationDTO(
             turn = turn,
             weather = weather?.let { FieldEffect(it.id, it.turn) },
@@ -285,7 +297,9 @@ open class PokemonBattle(
             side1SidedEffects = side1SidedEffects,
             side2SidedEffects = side2SidedEffects,
         ))
-        uuids.mapNotNull { it.getPlayer() }.forEach { it.sendPacket(updatePacket) }
+        uuids.mapNotNull { it.getPlayer() }.forEach {
+            it.sendPacket(updatePacket)
+        }
     }
 
     private fun getSidedFieldEffects(side: BattleSide): List<FieldEffect> {
@@ -494,6 +508,9 @@ open class PokemonBattle(
     }
 
     fun tick() {
+        if (turn >= 1) {
+            this.actors.filterIsInstance<PlayerBattleActor>().forEach { it.timer.tick() }
+        }
         try {
             while (dispatchResult.canProceed()) {
                 val dispatch = dispatches.poll() ?: break

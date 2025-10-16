@@ -13,6 +13,7 @@ import com.cobblemon.mod.common.util.cobblemonResource
 import com.cobblemon.mod.common.util.readString
 import com.cobblemon.mod.common.util.writeString
 import net.minecraft.network.RegistryFriendlyByteBuf
+import java.time.Instant
 import java.util.UUID
 
 class BattleInformationPacket(val battle: UUID, val informationDTO: BattleInformationDTO): NetworkPacket<BattleInformationPacket> {

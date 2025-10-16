@@ -64,6 +64,8 @@ import net.minecraft.resources.ResourceLocation
 import org.joml.Vector3f
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 import kotlin.collections.get
 import kotlin.math.ceil
@@ -1586,16 +1588,34 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             alpha = opacity
         )
 
-        drawScaledText(
-            context = context,
-            text = "cobblemon.battle.ui.turn".asTranslated(battleInfo.turn).bold(),
-            x = (mc.window.guiScaledWidth / 2),
-            y = 6,
-            scale = 0.75f,
-            shadow = true,
-            opacity = opacity,
-            centered = true
-        )
+        if (ClientBattleInformationRepository.mustChooseBy != null) {
+            val totalSecondsRemaining = Duration.between(Instant.now(), ClientBattleInformationRepository.mustChooseBy).seconds
+            val minutesRemaining = totalSecondsRemaining / 60
+            val secondsRemaining = String.format("%02d", totalSecondsRemaining % 60)
+            val timer = "$minutesRemaining:$secondsRemaining"
+            drawScaledText(
+                context = context,
+                text = "cobblemon.battle.ui.turn.timer".asTranslated(battleInfo.turn, timer).bold(),
+                x = (mc.window.guiScaledWidth / 2),
+                y = 6,
+                scale = 0.75f,
+                shadow = true,
+                opacity = opacity,
+                centered = true
+            )
+        }
+        else {
+            drawScaledText(
+                context = context,
+                text = "cobblemon.battle.ui.turn".asTranslated(battleInfo.turn).bold(),
+                x = (mc.window.guiScaledWidth / 2),
+                y = 6,
+                scale = 0.75f,
+                shadow = true,
+                opacity = opacity,
+                centered = true
+            )
+        }
     }
 
     private fun drawPokeBall(

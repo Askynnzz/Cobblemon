@@ -1297,6 +1297,7 @@
   "cobblemon.battle.ui.effectiveness.super_effective": "Super effective",
   "cobblemon.battle.ui.effectiveness.extremely_effective": "Extremely effective",
   "cobblemon.battle.ui.turn": "Turn %1$s",
+  "cobblemon.battle.ui.turn.timer": "Turn %1$s (%2$s)",
   "cobblemon.battle.ui.stats.special_attack": "Sp. Attack",
   "cobblemon.battle.ui.stats.special_defence": "Sp. Defense",
   "cobblemon.battle.ui.speed_tier": "%1$s to %2$s",

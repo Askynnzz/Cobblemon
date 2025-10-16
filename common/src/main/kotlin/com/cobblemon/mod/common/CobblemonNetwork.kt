@@ -278,6 +278,7 @@ object CobblemonNetwork {
         list.add(PacketRegisterInfo(BattleActorInformationPacket.ID, BattleActorInformationPacket::decode, BattleActorInformationHandler))
         list.add(PacketRegisterInfo(BattleActorTeamPacket.ID, BattleActorTeamPacket::decode, BattleActorTeamHandler))
         list.add(PacketRegisterInfo(BattleInformationPacket.ID, BattleInformationPacket::decode, BattleInformationHandler))
+        list.add(PacketRegisterInfo(BattleTimerPacket.ID, BattleTimerPacket::decode, BattleTimerHandler))
 
         // MultiBattleTeam Packets
         list.add(PacketRegisterInfo(TeamRequestNotificationPacket.ID, TeamRequestNotificationPacket::decode, TeamRequestNotificationHandler))

@@ -20,6 +20,7 @@ import com.cobblemon.mod.common.api.storage.player.client.ClientGeneralPlayerDat
 import com.cobblemon.mod.common.api.storage.player.client.ClientPokedexManager
 import com.cobblemon.mod.common.api.tags.CobblemonItemTags
 import com.cobblemon.mod.common.client.battle.ClientBattle
+import com.cobblemon.mod.common.client.battle.ClientBattleInformationRepository
 import com.cobblemon.mod.common.client.gui.PartyOverlay
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay
 import com.cobblemon.mod.common.client.particle.BedrockParticleOptionsRepository
@@ -342,6 +343,7 @@ object CobblemonClient {
     fun endBattle() {
         battle = null
         battleOverlay.lastKnownBattle = null
+        ClientBattleInformationRepository.mustChooseBy = null
         BattleMusicController.endMusic()
     }
 
