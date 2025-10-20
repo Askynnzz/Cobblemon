@@ -291,9 +291,9 @@ open class PokemonBattle(
         val side2SidedEffects = getSidedFieldEffects(side2)
         val updatePacket = BattleInformationPacket(this.battleId, BattleInformationDTO(
             turn = turn,
-            weather = weather?.let { FieldEffect(it.id, it.turn) },
-            terrain = terrain?.let { FieldEffect(it.id, it.turn) },
-            room = room?.let { FieldEffect(it.id, it.turn) },
+            weather = weather?.let { FieldEffect(it.id, it.turn, it.origin?.entity?.id) },
+            terrain = terrain?.let { FieldEffect(it.id, it.turn, it.origin?.entity?.id) },
+            room = room?.let { FieldEffect(it.id, it.turn, it.origin?.entity?.id) },
             side1SidedEffects = side1SidedEffects,
             side2SidedEffects = side2SidedEffects,
         ))
@@ -303,9 +303,9 @@ open class PokemonBattle(
     }
 
     private fun getSidedFieldEffects(side: BattleSide): List<FieldEffect> {
-        val hazards = side.contextManager.get(BattleContext.Type.HAZARD)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
-        val screens = side.contextManager.get(BattleContext.Type.SCREEN)?.map { FieldEffect(it.id, it.turn) } ?: emptyList()
-        val tailwind = side.contextManager.get(BattleContext.Type.TAILWIND)?.firstOrNull()?.let { FieldEffect(it.id, it.turn) }
+        val hazards = side.contextManager.get(BattleContext.Type.HAZARD)?.map { FieldEffect(it.id, it.turn, it.origin?.entity?.id) } ?: emptyList()
+        val screens = side.contextManager.get(BattleContext.Type.SCREEN)?.map { FieldEffect(it.id, it.turn, it.origin?.entity?.id) } ?: emptyList()
+        val tailwind = side.contextManager.get(BattleContext.Type.TAILWIND)?.firstOrNull()?.let { FieldEffect(it.id, it.turn, it.origin?.entity?.id) }
         return hazards + screens + listOfNotNull(tailwind)
     }
 
