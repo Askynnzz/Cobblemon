@@ -43,7 +43,7 @@
         "creation_event": ["event_dust", "event_obscure"]
       },
       "minecraft:emitter_shape_sphere": {
-        "offset": [10, "math.random(0,8)", 0],
+        "offset": [-10, "math.random(0,8)", 0],
         "radius": 8,
         "direction": [6, -0.2, "math.random(-1,1)"]
       },
