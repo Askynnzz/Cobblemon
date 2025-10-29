@@ -10,9 +10,12 @@ package com.cobblemon.mod.common.net.messages.client.battle
 
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.util.cobblemonResource
+import com.cobblemon.mod.common.util.readNullable
 import com.cobblemon.mod.common.util.readString
+import com.cobblemon.mod.common.util.writeNullable
 import com.cobblemon.mod.common.util.writeString
 import net.minecraft.network.RegistryFriendlyByteBuf
+import java.time.Instant
 import java.util.UUID
 
 class BattleInformationPacket(val battle: UUID, val informationDTO: BattleInformationDTO): NetworkPacket<BattleInformationPacket> {
@@ -44,10 +47,15 @@ class BattleInformationPacket(val battle: UUID, val informationDTO: BattleInform
         private fun encodeFieldEffect(buffer: RegistryFriendlyByteBuf, fieldEffect: FieldEffect) {
             buffer.writeString(fieldEffect.id)
             buffer.writeInt(fieldEffect.turnStarted)
+            buffer.writeNullable(fieldEffect.sourceEntityId) { _, value -> buffer.writeInt(value) }
         }
 
         private fun decodeFieldEffect(buffer: RegistryFriendlyByteBuf): FieldEffect {
-            return FieldEffect(id = buffer.readString(), turnStarted = buffer.readInt())
+            return FieldEffect(
+                id = buffer.readString(),
+                turnStarted = buffer.readInt(),
+                sourceEntityId = buffer.readNullable { buffer.readInt() }
+            )
         }
     }
 }
@@ -63,5 +71,6 @@ data class BattleInformationDTO(
 
 data class FieldEffect(
     val id: String,
-    val turnStarted: Int
+    val turnStarted: Int,
+    val sourceEntityId: Int?
 )

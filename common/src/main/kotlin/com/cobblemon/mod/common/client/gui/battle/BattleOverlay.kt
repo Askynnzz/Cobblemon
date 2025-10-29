@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package com.cobblemon.mod.common.client.gui.battle
 
 import com.cobblemon.mod.common.api.abilities.Abilities
@@ -64,6 +72,8 @@ import net.minecraft.resources.ResourceLocation
 import org.joml.Vector3f
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 import kotlin.collections.get
 import kotlin.math.ceil
@@ -256,6 +266,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         }
 
         drawTurnCounter(context)
+        drawPrimaryWeatherIcon(context)
         drawFieldIcons(context)
     }
 
@@ -359,7 +370,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
                 val mc = Minecraft.getInstance()
                 val textWidth = (mc.font.width(text) + 4) * 0.66f
                 val tooltipStartX = (mc.window.guiScaledWidth / 2) - (textWidth / 2)
-                renderTooltip(context, text, tooltipStartX, 28f)
+                renderTooltip(context, text, tooltipStartX, 42f)
             }
         }
         context.pose().popPose()
@@ -1508,7 +1519,6 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         val battleInfo = ClientBattleInformationRepository.battles[battle.battleId] ?: return
 
         val effects = mutableListOf<FieldEffect>()
-        battleInfo.weather?.let { effects.add(it) }
         battleInfo.terrain?.let { effects.add(it) }
         battleInfo.room?.let { effects.add(it) }
 
@@ -1519,7 +1529,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
                 matrixStack = context.pose(),
                 texture = cobblemonResource("textures/gui/battle/effects/${effect.id}.png"),
                 x = (startX + (13 * 0.9 * index)) / 0.9,
-                y = 15 / 0.9,
+                y = 32 / 0.9,
                 height = 12,
                 width = 12,
                 textureHeight = 12,
@@ -1529,15 +1539,52 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
 
             if (mouseX >= (startX + (13 * 0.9 * index))
                 && mouseX <= ((startX + (13 * 0.9 * index))) + 12 * 0.9
-                && mouseY >= 15 / 0.9
-                && mouseY <= (15 / 0.9) + 12 * 0.9)
+                && mouseY >= 31 / 0.9
+                && mouseY <= (32 / 0.9) + 12 * 0.9)
             {
                 val text = getFieldEffectText(effect, battleInfo, false)
                 val textWidth = (mc.font.width(text) + 4) * 0.66f
                 val tooltipStartX = (mc.window.guiScaledWidth / 2) - (textWidth / 2)
 
-                renderTooltip(context, text, tooltipStartX, 28f)
+                renderTooltip(context, text, tooltipStartX, 44f)
             }
+        }
+    }
+
+    private fun drawPrimaryWeatherIcon(context: GuiGraphics) {
+        // TODO: Tooltip?
+        val battle = CobblemonClient.battle ?: return
+        val battleInfo = ClientBattleInformationRepository.battles[battle.battleId] ?: return
+        val weather = battleInfo.weather ?: return
+        val supported = listOf("sunnyday", "sandstorm", "snow", "sunnyday")
+        if (weather.id !in supported) return
+
+        val mc = Minecraft.getInstance()
+        val scale = 1.3f
+        val startX = (mc.window.guiScaledWidth / 2) - ((32 * scale / 2))
+
+        blitk(
+            matrixStack = context.pose(),
+            texture = cobblemonResource("textures/gui/battle/weather/${weather.id}.png"),
+            x = startX / scale,
+            y = 15 / scale,
+            height = 12,
+            width = 32,
+            textureHeight = 12,
+            textureWidth = 32,
+            scale = scale
+        )
+
+        if (mouseX >= (startX + (13 * scale))
+            && mouseX <= ((startX + (13 * scale))) + 32 * scale
+            && mouseY >= 15 / scale
+            && mouseY <= (15 / scale) + 13 * scale)
+        {
+            val text = getFieldEffectText(weather, battleInfo, false)
+            val textWidth = (mc.font.width(text) + 4) * 0.66f
+            val tooltipStartX = (mc.window.guiScaledWidth / 2) - (textWidth / 2)
+
+            renderTooltip(context, text, tooltipStartX, 44f)
         }
     }
 
@@ -1572,7 +1619,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         val battleInfo = ClientBattleInformationRepository.battles[battle.battleId] ?: return
 
         val mc = Minecraft.getInstance()
-        val x = (mc.window.guiScaledWidth / 2) - (83 / 2)
+        val x = (mc.window.guiScaledWidth / 2) - (103 / 2)
 
         blitk(
             matrixStack = context.pose(),
@@ -1580,22 +1627,41 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             x = x,
             y = 4,
             height = 9,
-            width = 83,
+            width = 103,
             textureHeight = 9,
-            textureWidth = 83,
+            textureWidth = 103,
             alpha = opacity
         )
 
-        drawScaledText(
-            context = context,
-            text = "cobblemon.battle.ui.turn".asTranslated(battleInfo.turn).bold(),
-            x = (mc.window.guiScaledWidth / 2),
-            y = 6,
-            scale = 0.75f,
-            shadow = true,
-            opacity = opacity,
-            centered = true
-        )
+        val now = Instant.now()
+        if (ClientBattleInformationRepository.mustChooseBy != null && !now.isAfter(ClientBattleInformationRepository.mustChooseBy)) {
+            val totalSecondsRemaining = Duration.between(now, ClientBattleInformationRepository.mustChooseBy).seconds
+            val minutesRemaining = totalSecondsRemaining / 60
+            val secondsRemaining = String.format("%02d", totalSecondsRemaining % 60)
+            val timer = "$minutesRemaining:$secondsRemaining"
+            drawScaledText(
+                context = context,
+                text = "cobblemon.battle.ui.turn.timer".asTranslated(battleInfo.turn, timer).bold(),
+                x = (mc.window.guiScaledWidth / 2),
+                y = 6,
+                scale = 0.75f,
+                shadow = true,
+                opacity = opacity,
+                centered = true
+            )
+        }
+        else {
+            drawScaledText(
+                context = context,
+                text = "cobblemon.battle.ui.turn".asTranslated(battleInfo.turn).bold(),
+                x = (mc.window.guiScaledWidth / 2),
+                y = 6,
+                scale = 0.75f,
+                shadow = true,
+                opacity = opacity,
+                centered = true
+            )
+        }
     }
 
     private fun drawPokeBall(

@@ -128,7 +128,11 @@ class ParticleEvent(
                 sourceVisible = storm.sourceVisible,
                 onDespawn = {},
                 targetPos = storm.targetPos,
-                runtime = MoLangRuntime().setup(),
+                runtime = MoLangRuntime().setup().also { runtime ->
+                    storm.runtime.environment.query.functions["is_weather_active"]?.let {
+                        runtime.environment.query.addFunction("is_weather_active", it)
+                    }
+                },
                 entity = storm.entity
             )
             //The reason this doesn't use the newStorms runtime is that the parent storm can add queries AFTER
