@@ -87,7 +87,6 @@ class PlayerBattleActor(
         timer.selection()
         super.setActionResponses(responses)
         val player = uuid.getPlayer() ?: return
-        if (hasStreamerBattleMode(player)) return
         battle.players.filter { it != uuid.getPlayer() && hasStreamerBattleMode(it) }
             .forEach {
                 val message = "[Streamer Mode] ".lightPurple() + "${player.name.string} has ended their turn.".yellow()
