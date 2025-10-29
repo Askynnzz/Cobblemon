@@ -1552,7 +1552,6 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
     }
 
     private fun drawPrimaryWeatherIcon(context: GuiGraphics) {
-        // TODO: Tooltip?
         val battle = CobblemonClient.battle ?: return
         val battleInfo = ClientBattleInformationRepository.battles[battle.battleId] ?: return
         val weather = battleInfo.weather ?: return
