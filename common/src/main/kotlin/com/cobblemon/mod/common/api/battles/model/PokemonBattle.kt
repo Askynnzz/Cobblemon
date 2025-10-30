@@ -83,7 +83,7 @@ import java.time.Instant
 open class PokemonBattle(
     val format: BattleFormat,
     val side1: BattleSide,
-    val side2: BattleSide
+    val side2: BattleSide,
 ) {
     /** Whether logging will be silenced for this battle. */
     var mute = true
