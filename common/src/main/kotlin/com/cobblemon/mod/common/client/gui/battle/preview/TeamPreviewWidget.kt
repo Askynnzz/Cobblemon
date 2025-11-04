@@ -11,6 +11,7 @@ import com.cobblemon.mod.common.api.text.font
 import com.cobblemon.mod.common.api.text.green
 import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.api.text.text
+import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.client.CobblemonResources
 import com.cobblemon.mod.common.client.battle.ClientBattleInformationRepository
 import com.cobblemon.mod.common.client.battle.ClientBattlePokemon
@@ -18,6 +19,7 @@ import com.cobblemon.mod.common.client.battle.preview.ClientBattleTeamPreview
 import com.cobblemon.mod.common.client.gui.TypeIcon
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.PORTRAIT_DIAMETER
+import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.SCALE
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.questionMarkIcon
 import com.cobblemon.mod.common.client.gui.drawProfilePokemon
 import com.cobblemon.mod.common.client.render.SpriteType
@@ -54,6 +56,7 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.sounds.SoundManager
+import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
@@ -65,6 +68,7 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
 
 class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
     pX = 0,
@@ -80,6 +84,8 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
 
         const val BACKGROUND_HEIGHT = 148
         val underlayTexture = cobblemonResource("textures/gui/battle/selection_underlay.png")
+        val title = cobblemonResource("textures/gui/battle/team_preview_title.png")
+        val checkmark = cobblemonResource("textures/gui/battle/checkmark.png")
         var visible = false
     }
 
@@ -105,7 +111,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
 
     fun getSlotPosition(index: Int, side: Int): Pair<Float, Float> {
         val startX = if (side == 1) 10 else width - 10 - (41 + SLOT_HORIZONTAL_SPACING) * 2
-        val startY = y
+        val startY = y + 15
         val row = index / 2
         val column = index % 2
         val slotX = startX.toFloat() + column * (SLOT_HORIZONTAL_SPACING + 41)
@@ -120,6 +126,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
 
     override fun renderWidget(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         val matrixStack = context.pose()
+        val mc = Minecraft.getInstance()
         blitk(
             matrixStack = matrixStack,
             texture = underlayTexture,
@@ -129,44 +136,107 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             height = BACKGROUND_HEIGHT
         )
 
-        // Draw Title Text
-//        val text = "cobblemon.battle.ui.team_preview.title".asTranslated(preview.selections - preview.selection.size)
-//        val textWidth = Minecraft.getInstance().font.width(text)
-//        drawScaledText(
-//            context = context,
-//            text = text,
-//            x = (width - textWidth) / 2,
-//            y = y + 17,
-//            shadow = true
-//        )
+        blitk(
+            matrixStack = matrixStack,
+            texture = title,
+            x = (mc.window.guiScaledWidth / 2) - (103 / 2),
+            y = 4,
+            width = 103,
+            height = 22
+        )
 
-//        for (index in 0 until 6) {
-//            val (slotX, slotY) = getSlotPosition(index, 1)
-//            blitk(
-//                matrixStack = matrixStack,
-//                texture = PokemonTile.partySelectDisabledResource,
-//                x = slotX,
-//                y = slotY,
-//                width = PokemonTile.SELECT_WIDTH,
-//                height = PokemonTile.SELECT_HEIGHT - 7,
-//                vOffset = PokemonTile.SELECT_HEIGHT,
-//                textureHeight = PokemonTile.SELECT_HEIGHT * 2,
-//            )
-//        }
-//
-//        for (index in 0 until 6) {
-//            val (slotX, slotY) = getSlotPosition(index, 2)
-//            blitk(
-//                matrixStack = matrixStack,
-//                texture = PokemonTile.partySelectDisabledResource,
-//                x = slotX,
-//                y = slotY,
-//                width = PokemonTile.SELECT_WIDTH,
-//                height = PokemonTile.SELECT_HEIGHT - 7,
-//                vOffset = PokemonTile.SELECT_HEIGHT,
-//                textureHeight = PokemonTile.SELECT_HEIGHT * 2,
-//            )
-//        }
+        drawScaledText(
+            context = context,
+            text = "cobblemon.battle.ui.team_preview.title".text().bold(),
+            x = (mc.window.guiScaledWidth / 2),
+            y = 6,
+            scale = 0.75f,
+            shadow = true,
+            centered = true
+        )
+
+        val totalSecondsRemaining = Duration.between(Instant.now(), preview.mustPickBy).seconds
+        val minutesRemaining = max(0, totalSecondsRemaining / 60)
+        val secondsRemaining = max(0, totalSecondsRemaining % 60)
+        val secondsRemainingStr = String.format("%02d", secondsRemaining)
+        val timer = "$minutesRemaining:$secondsRemainingStr"
+        val text = when {
+            totalSecondsRemaining <= 15 -> timer.text().red().bold()
+            totalSecondsRemaining <= 30 -> timer.text().yellow().bold()
+            else -> timer.text().bold()
+        }
+        drawScaledText(
+            context = context,
+            text = text,
+            x = (mc.window.guiScaledWidth / 2) + 2,
+            y = 15,
+            scale = 0.75f,
+            shadow = true,
+            centered = true
+        )
+
+
+        val ellipsis = ".".repeat(3 - (secondsRemaining % 3).toInt())
+        if (preview.selection.size == preview.selections) {
+            blitk(
+                matrixStack = matrixStack,
+                texture = checkmark,
+                x = (mc.window.guiScaledWidth / 2) - 39,
+                y = 24,
+                width = 8,
+                height = 6
+            )
+            val offset = when (ellipsis.length) {
+                1 -> 0.5
+                2 -> 1.0
+                else -> 2.0
+            }
+            drawScaledText(
+                context = context,
+                text = "cobblemon.battle.ui.team_preview.waiting".asTranslated(ellipsis).bold(),
+                x = (mc.window.guiScaledWidth / 2) + 2.0 + offset,
+                y = 26,
+                scale = 0.5f,
+                shadow = true,
+                centered = true
+            )
+        }
+
+        blitk(
+            matrixStack = matrixStack,
+            texture = cobblemonResource("textures/gui/battle/name_plate.png"),
+            x = 10,
+            y = 85,
+            width = 128,
+            height = 8
+        )
+
+        drawScaledText(
+            context = context,
+            text = mc.player!!.name.string.text(),
+            y = 87,
+            x = x + 14 + 10,
+            scale = SCALE,
+            shadow = true
+        )
+
+        blitk(
+            matrixStack = matrixStack,
+            texture = cobblemonResource("textures/gui/battle/nameplate_reversed.png"),
+            x = mc.window.guiScaledWidth - 14 - 128,
+            y = 85,
+            width = 128,
+            height = 8
+        )
+
+        drawScaledTextJustifiedRight(
+            context = context,
+            text = preview.opponentName.string.text(),
+            y = 87,
+            x = mc.window.guiScaledWidth - 14 - 12,
+            scale = SCALE,
+            shadow = true
+        )
 
         teamTiles.forEachIndexed { index, tile ->
             val hoveredTile = getHoveredTile(true, mouseX, mouseY)
@@ -186,10 +256,8 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             val hoveredColumn = hoveredTile % 2
             val currentRow = currentTile / 2
             val currentColumn = currentTile % 2
-            if (!reversed && hoveredColumn == 0 && hoveredRow < currentRow) return true
-            if (!reversed && hoveredColumn == 1 && hoveredRow < currentRow && currentColumn == 1) return true
-            if (reversed && hoveredColumn == 1 && hoveredRow < currentRow) return true
-            if (reversed && hoveredColumn == 0 && hoveredRow < currentRow && currentColumn == 0) return true
+            if (!reversed && hoveredColumn < currentColumn && hoveredRow <= currentRow) return true
+            if (reversed && hoveredColumn > currentColumn && hoveredRow <= currentRow) return true
         }
         return false
     }
@@ -366,8 +434,8 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
         private fun renderExpandedInfo(context: GuiGraphics, selected: Boolean, reversed: Boolean, pokemon: ClientBattlePokemon, dto: BattlePokemonDTO) {
             context.pose().pushPose()
             context.pose().translate(0.0, 0.0, 300.0)
-            val startX = if (reversed) x - 95 else x - 1
-            val startY = y + 40
+            val startX = if (reversed) x - 136 else x + 40
+            val startY = y
             val species = pokemon.species
             val form = species.getForm(pokemon.state.currentAspects)
             val expandedInfoTexture = expandedPokemonInfo
@@ -376,26 +444,26 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
                 blitk(
                     matrixStack = context.pose(),
                     texture = hoverGapSelected,
-                    x = startX + 1,
-                    y = startY - 5,
-                    height = 5,
-                    width = 43,
-                    textureHeight = 5,
-                    textureWidth = 43,
+                    x = startX - 3,
+                    y = startY,
+                    height = 30,
+                    width = 4,
+                    textureHeight = 30,
+                    textureWidth = 4,
                 )
             }
             else {
                 val gap = if (reversed) hoverGapReversed else hoverGap
-                val xOffset = if (reversed) 136 - 43 else 1
+                val xOffset = if (reversed) 136 else -7
                 blitk(
                     matrixStack = context.pose(),
                     texture = gap,
                     x = startX + xOffset,
-                    y = startY - 12,
-                    height = 12,
-                    width = 43,
-                    textureHeight = 12,
-                    textureWidth = 43,
+                    y = startY,
+                    height = 36,
+                    width = 8,
+                    textureHeight = 36,
+                    textureWidth = 8,
                 )
             }
 

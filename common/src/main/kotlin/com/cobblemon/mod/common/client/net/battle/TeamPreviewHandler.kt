@@ -11,7 +11,9 @@ object TeamPreviewHandler : ClientNetworkPacketHandler<TeamPreviewPacket> {
         Minecraft.getInstance().setScreen(TeamPreviewGUI(ClientBattleTeamPreview(
             packet.selections,
             packet.team,
-            packet.opponent
+            packet.opponent,
+            packet.mustPickBy,
+            packet.opponentName
         )))
     }
 }

@@ -11,6 +11,7 @@ package com.cobblemon.mod.common.command
 import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.permission.CobblemonPermissions
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
+import com.cobblemon.mod.common.api.text.text
 import com.cobblemon.mod.common.command.argument.PartySlotArgumentType
 import com.cobblemon.mod.common.net.messages.client.battle.TeamPreviewPacket
 import com.cobblemon.mod.common.pokemon.Pokemon
@@ -22,6 +23,7 @@ import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.server.level.ServerPlayer
+import java.time.Instant
 
 object FriendshipCommand {
 
@@ -45,7 +47,9 @@ object FriendshipCommand {
                     PokemonProperties.parse("snivy").create(),
                     PokemonProperties.parse("wailord").create(),
                 ),
-                true
+                true,
+                Instant.now().plusSeconds(60),
+                "ItsJustChris".text()
             ))
         }
         catch (e: Exception) {

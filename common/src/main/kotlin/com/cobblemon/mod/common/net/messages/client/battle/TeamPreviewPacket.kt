@@ -13,6 +13,8 @@ import com.cobblemon.mod.common.util.writeItemStack
 import com.cobblemon.mod.common.util.writeString
 import com.cobblemon.mod.common.util.writeText
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.Component
+import java.time.Instant
 
 class TeamPreviewPacket : NetworkPacket<TeamPreviewPacket> {
     override val id = ID
@@ -20,17 +22,36 @@ class TeamPreviewPacket : NetworkPacket<TeamPreviewPacket> {
     val selections: Int
     val team: List<BattlePokemonDTO?>
     val opponent: List<BattlePokemonDTO?>
+    val mustPickBy: Instant
+    val opponentName: Component
 
-    constructor(selections: Int, team: List<BattlePokemonDTO>, opponent: List<BattlePokemonDTO>) {
+    constructor(
+        selections: Int,
+        team: List<BattlePokemonDTO>,
+        opponent: List<BattlePokemonDTO>,
+        mustPickBy: Instant,
+        opponentName: Component
+    ) {
         this.selections = selections
         this.team = team
         this.opponent = opponent
+        this.mustPickBy = mustPickBy
+        this.opponentName = opponentName
     }
 
-    constructor(selections: Int, team: List<Pokemon?>, opponent: List<Pokemon?>, openTeamSheet: Boolean) {
+    constructor(
+        selections: Int,
+        team: List<Pokemon?>,
+        opponent: List<Pokemon?>,
+        openTeamSheet: Boolean,
+        mustPickBy: Instant,
+        opponentName: Component
+    ) {
         this.selections = selections
         this.team = team.map { it?.let { BattlePokemon(it).toBattleDTO(true) } }
         this.opponent = opponent.map { it?.let { BattlePokemon(it).toBattleDTO(openTeamSheet) } }
+        this.mustPickBy = mustPickBy
+        this.opponentName = opponentName
     }
 
     override fun encode(buffer: RegistryFriendlyByteBuf) {
@@ -41,12 +62,14 @@ class TeamPreviewPacket : NetworkPacket<TeamPreviewPacket> {
         buffer.writeCollection(opponent) { _, value ->
             buffer.writeNullable(value) { _, value -> encodeBattlePokemonDTO(buffer, value) }
         }
+        buffer.writeInstant(mustPickBy)
+        buffer.writeText(opponentName)
     }
 
     private fun encodeBattlePokemonDTO(buffer: RegistryFriendlyByteBuf, dto: BattlePokemonDTO) {
         buffer.writeUUID(dto.uuid)
         buffer.writeBoolean(dto.fainted)
-        buffer.writeNullable (dto.ability) { _, v -> buffer.writeString(v) }
+        buffer.writeNullable(dto.ability) { _, v -> buffer.writeString(v) }
         buffer.writeCollection(dto.moves) { _, v ->
             buffer.writeNullable(v) { _, dto ->
                 buffer.writeText(dto.move)
@@ -66,7 +89,9 @@ class TeamPreviewPacket : NetworkPacket<TeamPreviewPacket> {
             return TeamPreviewPacket(
                 buffer.readInt(),
                 buffer.readList { buffer.readNullable { decodeBattlePokemonDTO(buffer) } },
-                buffer.readList { buffer.readNullable { decodeBattlePokemonDTO(buffer) } }
+                buffer.readList { buffer.readNullable { decodeBattlePokemonDTO(buffer) } },
+                buffer.readInstant(),
+                buffer.readText()
             )
         }
 
