@@ -8,10 +8,14 @@
 
 package com.cobblemon.mod.common.command
 
+import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.permission.CobblemonPermissions
+import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.command.argument.PartySlotArgumentType
+import com.cobblemon.mod.common.net.messages.client.battle.TeamPreviewPacket
 import com.cobblemon.mod.common.pokemon.Pokemon
 import com.cobblemon.mod.common.util.commandLang
+import com.cobblemon.mod.common.util.party
 import com.cobblemon.mod.common.util.permission
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
@@ -24,14 +28,29 @@ object FriendshipCommand {
     fun register(dispatcher : CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(Commands.literal("friendship")
             .permission(CobblemonPermissions.FRIENDSHIP)
-            .then(
-                Commands.argument("slot", PartySlotArgumentType.partySlot())
-                    .executes { execute(it.source, it.source.playerOrException, PartySlotArgumentType.getPokemon(it, "slot")) }
-            ))
+            .executes { execute(it.source) })
     }
 
-    private fun execute(source: CommandSourceStack, target: ServerPlayer, pokemon: Pokemon) : Int {
-        source.sendSuccess({ commandLang("friendship", pokemon.getDisplayName(), pokemon.friendship) }, true)
+    private fun execute(source: CommandSourceStack) : Int {
+        try {
+            val player = source.playerOrException
+            player.sendPacket(TeamPreviewPacket(
+                6,
+                player.party().toGappyList(),
+                listOf(
+                    PokemonProperties.parse("ninetales").create(),
+                    PokemonProperties.parse("slakoth").create(),
+                    PokemonProperties.parse("bulbasaur").create(),
+                    PokemonProperties.parse("togetic").create(),
+                    PokemonProperties.parse("snivy").create(),
+                    PokemonProperties.parse("wailord").create(),
+                ),
+                true
+            ))
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
         return Command.SINGLE_SUCCESS
     }
 

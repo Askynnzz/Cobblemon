@@ -250,5 +250,8 @@ open class BattlePokemon(
         }
     }
 
-    fun getIllusion(): BattlePokemon? = this.actor.activePokemon.find { it.battlePokemon == this }?.illusion
+    fun getIllusion(): BattlePokemon? {
+        if (!::actor.isInitialized) return null
+        return this.actor.activePokemon.find { it.battlePokemon == this }?.illusion
+    }
 }

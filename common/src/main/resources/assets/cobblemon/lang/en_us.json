@@ -1341,6 +1341,7 @@
   "cobblemon.battle.ui.sided_effect.tailwind": "Tailwind — %1$s turn(s) left",
   "cobblemon.battle.ui.team_info": "Team Information",
   "cobblemon.battle.ui.team_info.button": "Info",
+  "cobblemon.battle.ui.team_preview.title": "Team Preview — %1$s selection(s) left",
 
   "cobblemon.ui.evolve": "Evolve",
   "cobblemon.ui.evolution": "Evolution",
