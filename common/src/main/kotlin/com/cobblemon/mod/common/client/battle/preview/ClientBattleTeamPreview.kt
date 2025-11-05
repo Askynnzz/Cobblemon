@@ -1,6 +1,8 @@
 package com.cobblemon.mod.common.client.battle.preview
 
+import com.cobblemon.mod.common.CobblemonNetwork
 import com.cobblemon.mod.common.net.messages.client.battle.BattlePokemonDTO
+import com.cobblemon.mod.common.net.messages.server.battle.TeamPreviewSelectPokemonPacket
 import net.minecraft.network.chat.Component
 import java.time.Instant
 
@@ -13,11 +15,19 @@ class ClientBattleTeamPreview(
 ) {
     val selection = mutableListOf<BattlePokemonDTO>()
 
-    fun confirm() {
-        println("confirm")
+    fun select(pokemon: BattlePokemonDTO) {
+        selection.add(pokemon)
+        sendChangePacket()
     }
 
-    fun cancel() {
-        println("cancel")
+    fun unselect(pokemon: BattlePokemonDTO) {
+        selection.remove(pokemon)
+        sendChangePacket()
+    }
+
+    private fun sendChangePacket() {
+        val indexes = selection.map { team.indexOf(it) }
+        if (indexes.any { it == -1 }) return
+        CobblemonNetwork.sendToServer(TeamPreviewSelectPokemonPacket(indexes.toSet()))
     }
 }

@@ -12,6 +12,7 @@ import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.api.permission.CobblemonPermissions
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.api.text.text
+import com.cobblemon.mod.common.battles.TeamPreviewManager
 import com.cobblemon.mod.common.command.argument.PartySlotArgumentType
 import com.cobblemon.mod.common.net.messages.client.battle.TeamPreviewPacket
 import com.cobblemon.mod.common.pokemon.Pokemon
@@ -36,21 +37,17 @@ object FriendshipCommand {
     private fun execute(source: CommandSourceStack) : Int {
         try {
             val player = source.playerOrException
-            player.sendPacket(TeamPreviewPacket(
-                6,
-                player.party().toGappyList(),
-                listOf(
-                    PokemonProperties.parse("ninetales").create(),
-                    PokemonProperties.parse("slakoth").create(),
-                    PokemonProperties.parse("bulbasaur").create(),
-                    PokemonProperties.parse("togetic").create(),
-                    PokemonProperties.parse("snivy").create(),
-                    PokemonProperties.parse("wailord").create(),
-                ),
+            val opponent = source.server.playerList.players.first { it != player }
+            TeamPreviewManager.add(
+                player,
+                opponent,
+                4,
                 true,
-                Instant.now().plusSeconds(60),
-                "ItsJustChris".text()
-            ))
+                { println("STARTING BATTLE!") },
+                {
+                    println("CANCELLING BATTLE!")
+                }
+            )
         }
         catch (e: Exception) {
             e.printStackTrace()

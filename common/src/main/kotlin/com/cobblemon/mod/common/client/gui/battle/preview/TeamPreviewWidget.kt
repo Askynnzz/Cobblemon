@@ -266,18 +266,15 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
         val tile = teamTiles.firstOrNull { it.isHovered(pMouseX, pMouseY) }
         if (tile != null && tile.pokemonDto in preview.team) {
             if (pButton == InputConstants.MOUSE_BUTTON_LEFT) {
-                if (tile.pokemonDto !in preview.selection) {
-                    preview.selection.add(tile.pokemonDto)
+                if (tile.pokemonDto !in preview.selection && preview.selection.size < preview.selections) {
+                    preview.select(tile.pokemonDto)
                 }
             }
             else if (pButton == InputConstants.MOUSE_BUTTON_RIGHT) {
                 if (tile.pokemonDto in preview.selection) {
-                    preview.selection.remove(tile.pokemonDto)
+                    preview.unselect(tile.pokemonDto)
                 }
             }
-        }
-        if (preview.selection.size == preview.selections) {
-            preview.confirm()
         }
         playDownSound(Minecraft.getInstance().soundManager)
         return super.mouseClicked(pMouseX, pMouseY, pButton)

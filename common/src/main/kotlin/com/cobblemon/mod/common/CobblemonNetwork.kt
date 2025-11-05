@@ -280,6 +280,7 @@ object CobblemonNetwork {
         list.add(PacketRegisterInfo(BattleInformationPacket.ID, BattleInformationPacket::decode, BattleInformationHandler))
         list.add(PacketRegisterInfo(BattleTimerPacket.ID, BattleTimerPacket::decode, BattleTimerHandler))
         list.add(PacketRegisterInfo(TeamPreviewPacket.ID, TeamPreviewPacket::decode, TeamPreviewHandler))
+        list.add(PacketRegisterInfo(CloseTeamPreviewPacket.ID, CloseTeamPreviewPacket::decode, CloseTeamPreviewHandler))
 
         // MultiBattleTeam Packets
         list.add(PacketRegisterInfo(TeamRequestNotificationPacket.ID, TeamRequestNotificationPacket::decode, TeamRequestNotificationHandler))
@@ -408,6 +409,7 @@ object CobblemonNetwork {
         list.add(PacketRegisterInfo(BattleSelectActionsPacket.ID, BattleSelectActionsPacket::decode, BattleSelectActionsHandler))
         list.add(PacketRegisterInfo(SpectateBattlePacket.ID, SpectateBattlePacket::decode, SpectateBattleHandler))
         list.add(PacketRegisterInfo(RemoveSpectatorPacket.ID, RemoveSpectatorPacket::decode, RemoveSpectatorHandler))
+        list.add(PacketRegisterInfo(TeamPreviewSelectPokemonPacket.ID, TeamPreviewSelectPokemonPacket::decode, TeamPreviewSelectPokemonHandler))
 
         // Trade
         list.add(PacketRegisterInfo(AcceptTradeRequestPacket.ID, AcceptTradeRequestPacket::decode, AcceptTradeRequestHandler))

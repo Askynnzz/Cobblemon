@@ -11,14 +11,12 @@ class TeamPreviewGUI(val preview: ClientBattleTeamPreview) : Screen(battleLang("
 
     override fun init() {
         super.init()
-        addRenderableWidget(TeamPreviewWidget(preview))
-    }
-
-    override fun onClose() {
-        super.onClose()
+        widget = addRenderableWidget(TeamPreviewWidget(preview))
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.render(guiGraphics, mouseX, mouseY, partialTick)
     }
+
+    override fun shouldCloseOnEsc() = false
 }

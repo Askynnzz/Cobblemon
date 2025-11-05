@@ -5,16 +5,16 @@ import com.cobblemon.mod.common.util.cobblemonResource
 import net.minecraft.network.RegistryFriendlyByteBuf
 import java.util.UUID
 
-class TeamPreviewSelectPokemonPacket(val selected: Set<UUID>) : NetworkPacket<TeamPreviewSelectPokemonPacket> {
+class TeamPreviewSelectPokemonPacket(val selected: Set<Int>) : NetworkPacket<TeamPreviewSelectPokemonPacket> {
     override val id = ID
     override fun encode(buffer: RegistryFriendlyByteBuf) {
-        buffer.writeCollection(selected) { _, value -> buffer.writeUUID(value) }
+        buffer.writeCollection(selected) { _, value -> buffer.writeInt(value) }
     }
 
     companion object {
         val ID = cobblemonResource("team_preview_select_pokemon")
         fun decode(buffer: RegistryFriendlyByteBuf) = TeamPreviewSelectPokemonPacket(
-            buffer.readList { buffer.readUUID() }.toSet()
+            buffer.readList { buffer.readInt() }.toSet()
         )
     }
 }

@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.events
 
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.battles.BattleRegistry
+import com.cobblemon.mod.common.battles.TeamPreviewManager
 import com.cobblemon.mod.common.util.party
 import net.minecraft.server.MinecraftServer
 
@@ -18,6 +19,7 @@ object ServerTickHandler {
 
     fun onTick(server: MinecraftServer) {
         Cobblemon.bestSpawner.spawnerManagers.forEach { it.onServerTick() }
+        TeamPreviewManager.tick()
         BattleRegistry.tick()
 
         secondsTick++
