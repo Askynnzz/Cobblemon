@@ -18,6 +18,7 @@ import com.cobblemon.mod.common.CobblemonItems
 import com.cobblemon.mod.common.CobblemonMemories
 import com.cobblemon.mod.common.CobblemonNetwork.sendPacket
 import com.cobblemon.mod.common.CobblemonSounds
+import com.cobblemon.mod.common.OrientationControllable
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.drop.DropTable
 import com.cobblemon.mod.common.api.entity.Despawner
@@ -123,6 +124,7 @@ import com.cobblemon.mod.common.util.math.geometry.toRadians
 import com.cobblemon.mod.common.world.gamerules.CobblemonGameRules
 import com.mojang.serialization.Codec
 import com.mojang.serialization.Dynamic
+import net.minecraft.client.Minecraft
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -181,6 +183,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.control.MoveControl
 import net.minecraft.world.entity.ai.memory.MemoryModuleType
+import net.minecraft.world.entity.ai.memory.MemoryStatus
 import net.minecraft.world.entity.ai.sensing.Sensor
 import net.minecraft.world.entity.ai.sensing.SensorType
 import net.minecraft.world.entity.animal.Animal
@@ -1219,6 +1222,7 @@ open class PokemonEntity(
             if (!this.canRide(player)) return@ifRidingAvailableSupply false
             if (tethering != null) return@ifRidingAvailableSupply false
             if (seats.isEmpty()) return@ifRidingAvailableSupply false
+            if ((owner as? ServerPlayer)?.isInBattle() == true) return@ifRidingAvailableSupply false
             if (this.owner != player && this.passengers.isEmpty()) return@ifRidingAvailableSupply false
             return@ifRidingAvailableSupply behaviour.isActive(settings, state, this)
         }
@@ -1277,9 +1281,17 @@ open class PokemonEntity(
     }
 
     override fun checkDespawn() {
-        if (pokemon.getOwnerUUID() == null && !isPersistenceRequired && (!this.pokemon.canDropHeldItem || this.pokemon.heldItem.isEmpty) && despawner.shouldDespawn(this) ) {
+        if (pokemon.getOwnerUUID() == null && !isPersistenceRequired && despawner.shouldDespawn(this) ) {
             discard()
         }
+    }
+
+    override fun isPersistenceRequired(): Boolean {
+        return super.isPersistenceRequired()
+                || (this.pokemon.canDropHeldItem && !this.pokemon.heldItem.isEmpty)
+                || this.brain.checkMemory(CobblemonMemories.HIVE_LOCATION, MemoryStatus.VALUE_PRESENT)
+                || this.brain.checkMemory(CobblemonMemories.HIVE_COOLDOWN, MemoryStatus.VALUE_PRESENT)
+                || this.brain.checkMemory(CobblemonMemories.NEARBY_SACC_LEAVES, MemoryStatus.VALUE_PRESENT)
     }
 
     fun setBehaviourFlag(flag: PokemonBehaviourFlag, on: Boolean) {
@@ -2118,7 +2130,7 @@ open class PokemonEntity(
     private fun createSidedPokemon(): Pokemon = Pokemon().apply { isClient = this@PokemonEntity.level().isClientSide }
 
     override fun canRide(entity: Entity): Boolean {
-        return platform == PlatformType.NONE && super.canRide(entity)
+        return platform == PlatformType.NONE && super.canRide(entity) && seats.isNotEmpty()
     }
 
     // Takes in a requested stat type with a base minimum and base maximum and returns the interpolated
@@ -2132,6 +2144,10 @@ open class PokemonEntity(
         // Cap the minimum value at a very small value to prevent control inversions and other unexpected behaviour in
         // the ride controllers when using negative values
         return max(statVal, 1e-6)
+    }
+
+    override fun couldAcceptPassenger(): Boolean {
+        return seats.isNotEmpty() && super.couldAcceptPassenger()
     }
 
     fun getRawRideStat(stat: RidingStat, style: RidingStyle): Double {
@@ -2226,9 +2242,19 @@ open class PokemonEntity(
             }
 
             this.yRotO = this.yRot
-            val rotation = behaviour.rotation(settings, state, this, driver)
 
-            setRot(rotation.y, rotation.x)
+            if (this is OrientationControllable) {
+                val controller = this.orientationController
+                if (!controller.isActive()) {
+                    val rotation = behaviour.rotation(settings, state, this, driver)
+                    // TODO: Find a better solution than setting the vehicle xrot to zero.
+                    // The problem is that nothing actually effects the vehicle/pokemon xrot so when it gets set to
+                    // -45 degrees by a rollable ride controller it gets saved off and not modified until you try
+                    // and takeoff again. And at that point you snap to -45 pitch in the orientationControllers matrix
+                    setRot(rotation.y, 0.0f)
+                }
+            }
+
             this.yHeadRot = this.yRot
             this.yBodyRot = this.yRot
             this.passengers.filterIsInstance<LivingEntity>()
@@ -2446,8 +2472,12 @@ open class PokemonEntity(
 
     fun rideFovMult(): Float {
         val driver = this.controllingPassenger as? Player ?: return 1.0f
+        val fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().toFloat()
+
         return ifRidingAvailableSupply(fallback = 1.0f) { behaviour, settings, state ->
-            behaviour.rideFovMultiplier(settings, state, this, driver)
+            val rideFov = behaviour.rideFovMultiplier(settings, state, this, driver)
+
+            1f + (rideFov - 1f) * fovEffectScale
         }
     }
 
@@ -2479,6 +2509,7 @@ open class PokemonEntity(
     override fun canWalkOnWater() = exposedForm.behaviour.moving.swim.canWalkOnWater
     override fun canFly() = exposedForm.behaviour.moving.fly.canFly
     override fun canSwimInLava() = exposedForm.behaviour.moving.swim.canSwimInLava
+    override fun canPathThroughSaccLeaves() = this.config.getMap().getOrDefault("can_path_through_sacc_leaves", DoubleValue.ZERO).asDouble() == 1.0
     override fun canWalkOnLava() = exposedForm.behaviour.moving.swim.canWalkOnLava
     override fun entityOnGround() = onGround()
 

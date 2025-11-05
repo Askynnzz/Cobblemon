@@ -455,6 +455,11 @@
       "battleOnly": true
     }
   ],
+  "behaviour": {
+    "resting": {
+      "willSleepOnBed": true
+    }
+  },
   "aspects": [],
   "cannotDynamax": false
 }
