@@ -51,20 +51,27 @@
   },
   "behaviour": {
     "moving": {
-      "walk": {
-        "canWalk": false
-      },
       "fly": {
         "canFly": true
       },
       "swim": {
-        "canWalkOnWater": true
+        "canWalkOnWater": true,
+        "avoidsWater": true
       }
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 1,
+    "amount": 2,
     "entries": [
+      {
+        "item": "cobblemon:wide_lens",
+        "percentage": 2.5
+      },
       {
         "item": "cobblemon:charti_berry",
         "percentage": 2.5

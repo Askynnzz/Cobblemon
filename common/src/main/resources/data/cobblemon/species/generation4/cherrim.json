@@ -50,8 +50,12 @@
     "fixed": false
   },
   "drops": {
-    "amount": 2,
+    "amount": 6,
     "entries": [
+      {
+        "item": "minecraft:sweet_berries",
+        "quantityRange": "2-4"
+      },
       {
         "item": "cobblemon:miracle_seed",
         "percentage": 5.0
@@ -251,12 +255,7 @@
         "tutor:worryseed"
       ],
       "evolutions": [],
-      "battleOnly": true,
-      "behaviour": {
-        "resting": {
-          "willSleepOnBed": true
-        }
-      }
+      "battleOnly": true
     }
   ],
   "behaviour": {
@@ -265,6 +264,16 @@
     },
     "resting": {
       "willSleepOnBed": true
-    }
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   }
 }

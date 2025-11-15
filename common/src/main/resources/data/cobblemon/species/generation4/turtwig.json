@@ -59,6 +59,9 @@
     "moving": {
       "walk": {
         "walkSpeed": 0.35
+      },
+      "swim": {
+        "avoidsWater": true
       }
     },
     "herd": {
@@ -77,11 +80,19 @@
           "tier": 3
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 1,
+    "amount": 2,
     "entries": [
+      {
+        "item": "minecraft:oak_sapling"
+      },
       {
         "item": "cobblemon:miracle_seed",
         "percentage": 5.0

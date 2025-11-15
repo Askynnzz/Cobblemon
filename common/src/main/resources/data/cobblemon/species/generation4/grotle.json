@@ -56,6 +56,9 @@
     "moving": {
       "walk": {
         "walkSpeed": 0.2
+      },
+      "swim": {
+        "avoidsWater": true
       }
     },
     "herd": {
@@ -70,11 +73,20 @@
           "tier": 2
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 1,
+    "amount": 5,
     "entries": [
+      {
+        "item": "minecraft:sweet_berries",
+        "quantityRange": "2-4"
+      },
       {
         "item": "cobblemon:miracle_seed",
         "percentage": 10.0

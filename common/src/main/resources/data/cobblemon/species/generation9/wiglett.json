@@ -52,7 +52,7 @@
     "moving": {
       "swim": {
         "canSwimInWater": false,
-        "canBreatheUnderwater": false,
+        "canBreatheUnderwater": true,
         "canSwimInLava": false,
         "swimSpeed": "0.2"
       }
@@ -69,7 +69,12 @@
           "tier": 2
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "moves": [
     "1:sandattack",

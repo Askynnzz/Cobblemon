@@ -45,7 +45,7 @@
   "eggCycles": 40,
   "baseFriendship": 50,
   "shoulderMountable": true,
-  "baseScale": 0.7,
+  "baseScale": 0.55,
   "hitbox": {
     "width": 0.75,
     "height": 0.5,
@@ -60,15 +60,15 @@
       },
       "fly": {
         "canFly": true
-      },
-      "walk": {
-        "canWalk": false
       }
     },
     "resting": {
       "canSleep": true,
       "light": "0-4",
-      "willSleepOnBed": true
+      "willSleepOnBed": true,
+      "times": [
+        "167-11833,13702-22299"
+      ]
     },
     "herd": {
       "maxSize": "4",
@@ -86,7 +86,12 @@
           "tier": 3
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 2,

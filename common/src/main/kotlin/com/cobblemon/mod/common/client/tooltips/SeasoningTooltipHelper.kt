@@ -44,6 +44,7 @@ val foodInfoSubHeader by lazy { lang("seasoning_food_info_header").blue() }
 val mobEffectSeasoningHeader by lazy { lang("item_class.mob_effect_seasoning").blue() }
 val mobEffectHeader by lazy { lang("seasoning_mob_effect_header").gray() }
 val mobEffectInfoSubHeader by lazy { lang("seasoning_mob_effect_info_header").blue() }
+val rideBoostSeasoningHeader by lazy { lang("seasoning_ride_boosts_info_header").blue() }
 
 private fun recipeUsesProcessor(stack: ItemStack, processorType: String): Boolean {
     val level = Minecraft.getInstance().level ?: return false
@@ -185,17 +186,15 @@ fun generateAdditionalBaitEffectTooltip(stack: ItemStack): MutableList<Component
     val resultLines = mutableListOf<Component>()
 
     val rawEffects = mutableListOf<SpawnBait.Effect>().apply {
-        if (stack.item is PokerodItem) {
-            addAll(SpawnBaitEffects.getEffectsFromRodItemStack(stack))
-        } else {
-            addAll(SpawnBaitEffects.getEffectsFromItemStack(stack))
-        }
-
         if (Seasonings.isSeasoning(stack)) {
             val seasoningEffects = Seasonings.getBaitEffectsFromItemStack(stack)
             if (seasoningEffects.isNotEmpty()) {
                 addAll(seasoningEffects)
             }
+        } else if (stack.item is PokerodItem) {
+            addAll(SpawnBaitEffects.getEffectsFromRodItemStack(stack))
+        } else {
+            addAll(SpawnBaitEffects.getEffectsFromItemStack(stack))
         }
     }
 
@@ -218,6 +217,7 @@ fun generateAdditionalBaitEffectTooltip(stack: ItemStack): MutableList<Component
             val effectChance = effect.chance * 100
             var effectValue = when (effectType) {
                 "bite_time" -> (effect.value * 100).toInt()
+                "shiny_reroll" -> (effect.value + 1).toInt()
                 else -> effect.value.toInt()
             }
 
@@ -243,19 +243,34 @@ fun generateAdditionalBaitEffectTooltip(stack: ItemStack): MutableList<Component
                 } ?: Component.literal("cursed").obfuscate()
             } else Component.literal("cursed").obfuscate()
 
-            if (effectType == "shiny_reroll") {
-                effectValue++
-            }
-
-            resultLines.add(
-                    lang(
-                            "fishing_bait_effects.$effectType.tooltip",
-                            Component.literal(formatter.format(effectChance)).yellow(),
-                            subcategoryString.copy().gold(),
-                            Component.literal(formatter.format(effectValue)).green()
-                    )
-            )
+            resultLines.add(lang(
+                "fishing_bait_effects.$effectType.tooltip",
+                Component.literal(formatter.format(effectChance)).yellow(),
+                subcategoryString.copy().gold(),
+                Component.literal(formatter.format(effectValue)).green()
+            ))
         }
+    }
+
+    return resultLines
+}
+
+fun generateAdditionalRideBoostsTooltip(stack: ItemStack): MutableList<Component> {
+    val boosts = stack.get(CobblemonItemComponents.RIDE_BOOST)?.boosts
+        ?: return mutableListOf()
+
+    val resultLines = mutableListOf<Component>()
+    resultLines.add(rideBoostSeasoningHeader)
+
+    for ((stat, value) in boosts) {
+        val statName = stat.displayName.also { it.style = it.style.withColor(stat.flavour.colour) }
+        val valueText = if (value < 0) {
+            Component.literal("$value").red()
+        } else {
+            Component.literal("+$value").green()
+        }
+
+        resultLines.add(lang("seasoning_ride_boost_entry", statName, valueText))
     }
 
     return resultLines

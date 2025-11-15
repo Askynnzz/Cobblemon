@@ -50,7 +50,20 @@
     "fixed": false
   },
   "behaviour": {
-    "fireImmune": true
+    "fireImmune": true,
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      },
+      "fly": {
+        "canFly": true
+      }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    }
   },
   "moves": [
     "1:thunderfang",
@@ -199,5 +212,14 @@
     "legacy:swagger",
     "legacy:toxic"
   ],
-  "evolutions": []
+  "evolutions": [],
+  "drops": {
+    "amount": 3,
+    "entries": [
+      {
+        "item": "minecraft:dragon_breath",
+        "quantityRange": "2-3"
+      }
+    ]
+  }
 }

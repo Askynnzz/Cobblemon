@@ -44,22 +44,20 @@
   "catchRate": 75,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "baseScale": 0.35,
+  "baseScale": 0.6,
   "hitbox": {
     "width": 0.85,
-    "height": 2.6,
+    "height": 1.5,
     "fixed": false
   },
   "behaviour": {
     "moving": {
       "swim": {
-        "canWalkOnWater": true
+        "canWalkOnWater": true,
+        "avoidsWater": true
       },
       "fly": {
         "canFly": true
-      },
-      "walk": {
-        "canWalk": false
       }
     },
     "resting": {
@@ -75,7 +73,12 @@
           "tier": 1
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 3,

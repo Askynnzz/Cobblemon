@@ -70,8 +70,7 @@
       "swim": {
         "swimSpeed": 0.2,
         "canSwimInWater": false,
-        "canBreatheUnderwater": true,
-        "canSwimInLava": false
+        "canBreatheUnderwater": true
       }
     },
     "herd": {
@@ -82,11 +81,20 @@
           "tier": 1
         }
       ]
-    }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 1,
+    "amount": 2,
     "entries": [
+      {
+        "item": "cobblemon:luminous_moss",
+        "percentage": 5.0
+      },
       {
         "item": "cobblemon:rindo_berry",
         "percentage": 5.0
@@ -266,19 +274,21 @@
       "behaviour": {
         "moving": {
           "walk": {
-            "walkSpeed": 0.125
+            "walkSpeed": 0.125,
+            "avoidsLand": true
           },
           "swim": {
             "swimSpeed": 0.125,
-            "canSwimInWater": true,
-            "canBreatheUnderwater": true,
-            "canSwimInLava": false
+            "canSwimInWater": false,
+            "canBreatheUnderwater": true
           }
         },
         "resting": {
           "canSleep": true,
-          "willSleepOnBed": false,
-          "light": "0-15"
+          "light": "0-15",
+          "times": [
+            "day"
+          ]
         },
         "herd": {
           "maxSize": "9",
@@ -292,7 +302,12 @@
               "tier": 2
             }
           ]
-        }
+        },
+        "combat": {
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "fireImmune": true
       },
       "drops": {
         "amount": 1,

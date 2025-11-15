@@ -58,6 +58,9 @@ class CobblemonConfig {
     @LastChangedVersion("1.4.0")
     var ambientPokemonCryTicks = 1080
 
+    @CobblemonConfigField(Category.Storage, lang = "default_key_items", SERVER)
+    var defaultKeyItems = mutableSetOf<ResourceLocation>()
+
     @CobblemonConfigField(Category.Storage, lang = "default_box_count", SERVER)
     @IntConstraint(min = 1, max = 1000)
     @LastChangedVersion("1.7.0")
@@ -315,7 +318,7 @@ class CobblemonConfig {
     var disableRoll = false
 
     @CobblemonConfigField(Category.Riding, lang = "display_controls_duration_seconds", CLIENT)
-    var displayControlSeconds = 3
+    var displayControlSeconds = 0
 
     @CobblemonConfigField(Category.Riding, lang = "infinite_ride_stamina", SERVER)
     var infiniteRideStamina = false
@@ -328,13 +331,13 @@ class CobblemonConfig {
 
     @CobblemonConfigField(Category.Spawning, lang = "despawner_near_distance", SERVER)
     var despawnerNearDistance = 32f
-    
+
     @CobblemonConfigField(Category.Spawning, lang = "despawner_far_distance", SERVER)
     var despawnerFarDistance = 96f
-    
+
     @CobblemonConfigField(Category.Spawning, lang = "despawner_min_age_ticks", SERVER)
     var despawnerMinAgeTicks = 600
-    
+
     @CobblemonConfigField(Category.Spawning, lang = "despawner_max_age_ticks", SERVER)
     var despawnerMaxAgeTicks = 3600
 

@@ -58,20 +58,37 @@
     "moving": {
       "swim": {
         "swimSpeed": 0.08,
-        "canBreatheUnderwater": true,
-        "canSwimInWater": true,
-        "canSwimInLava": false
+        "canBreatheUnderwater": true
       },
       "walk": {
         "walkSpeed": 0.15
       }
-    }
+    },
+    "resting": {
+      "depth": "comatose",
+      "times": [
+        "any"
+      ]
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 2,
+    "amount": 4,
     "entries": [
       {
+        "item": "cobblemon:tasty_tail",
+        "quantityRange": "0-1"
+      },
+      {
         "item": "cobblemon:kings_rock",
+        "percentage": 5.0
+      },
+      {
+        "item": "cobblemon:lagging_tail",
         "percentage": 5.0
       },
       {
@@ -362,27 +379,23 @@
         "moving": {
           "swim": {
             "swimSpeed": "0.2",
-            "canBreatheUnderwater": true,
-            "canSwimInWater": true,
-            "canSwimInLava": false
+            "canBreatheUnderwater": true
           },
           "walk": {
             "walkSpeed": 0.15
           }
-        }
-      },
-      "drops": {
-        "amount": 3,
-        "entries": [
-          {
-            "item": "cobblemon:galarica_nuts",
-            "quantityRange": "0-2"
-          },
-          {
-            "item": "cobblemon:chesto_berry",
-            "percentage": 5.0
-          }
-        ]
+        },
+        "resting": {
+          "times": [
+            "any"
+          ]
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "fireImmune": true
       },
       "moves": [
         "1:shellsidearm",
@@ -541,7 +554,28 @@
       ],
       "preEvolution": "slowpoke galarian",
       "evolutions": [],
-      "battleOnly": false
+      "battleOnly": false,
+      "drops": {
+        "amount": 5,
+        "entries": [
+          {
+            "item": "cobblemon:tasty_tail",
+            "quantityRange": "0-1"
+          },
+          {
+            "item": "cobblemon:galarica_nuts",
+            "quantityRange": "0-2"
+          },
+          {
+            "item": "cobblemon:lagging_tail",
+            "percentage": 5.0
+          },
+          {
+            "item": "cobblemon:chesto_berry",
+            "percentage": 5.0
+          }
+        ]
+      }
     }
   ]
 }

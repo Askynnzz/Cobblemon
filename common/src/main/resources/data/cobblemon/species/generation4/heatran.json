@@ -172,9 +172,33 @@
     "special:eruption"
   ],
   "evolutions": [],
-  "behaviour": {},
+  "behaviour": {
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    }
+  },
   "lightingData": {
-    "lightLevel": 8,
+    "lightLevel": 12,
     "liquidGlowMode": "LAND"
+  },
+  "drops": {
+    "amount": 8,
+    "entries": [
+      {
+        "item": "minecraft:magma_cream",
+        "quantityRange": "2-4"
+      },
+      {
+        "item": "minecraft:blaze_powder",
+        "quantityRange": "2-4"
+      }
+    ]
   }
 }

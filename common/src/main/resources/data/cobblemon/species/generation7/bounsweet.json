@@ -49,8 +49,12 @@
     "fixed": false
   },
   "drops": {
-    "amount": 1,
+    "amount": 2,
     "entries": [
+      {
+        "item": "cobblemon:grassy_seed",
+        "percentage": 2.5
+      },
       {
         "item": "cobblemon:persim_berry",
         "percentage": 2.5
@@ -174,6 +178,16 @@
     },
     "resting": {
       "willSleepOnBed": true
-    }
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   }
 }

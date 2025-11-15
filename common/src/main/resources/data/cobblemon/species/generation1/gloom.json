@@ -54,15 +54,33 @@
   "behaviour": {
     "resting": {
       "canSleep": true,
-      "light": "0-4"
+      "light": "0-4",
+      "depth": "comatose",
+      "times": [
+        "day"
+      ]
     },
     "herd": {
       "maxSize": "3"
-    }
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
-    "amount": 2,
+    "amount": 4,
     "entries": [
+      {
+        "item": "minecraft:honey_bottle",
+        "quantityRange": "0-2"
+      },
       {
         "item": "cobblemon:absorb_bulb",
         "percentage": 5.0

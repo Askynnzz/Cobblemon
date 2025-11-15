@@ -44,25 +44,113 @@
   "catchRate": 60,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "features": [
-    "galarian",
-    "zen_mode"
-  ],
   "baseScale": 1,
   "hitbox": {
-    "width": 1.8,
     "height": 1.8,
-    "fixed": false
+    "fixed": false,
+    "width": 1.8
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "45-65",
+          "JUMP": "35-45",
+          "SKILL": "15-25",
+          "SPEED": "40-50",
+          "STAMINA": "35-60"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.0,
+              "y": -1.0283693,
+              "z": 0.81891286
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.015338191,
+              "y": -1.0352079,
+              "z": 0.86715484
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.009587893,
+              "y": -0.98346996,
+              "z": 0.82437676
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.009587893,
+              "y": -0.98346996,
+              "z": 0.82437676
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.015338191,
+              "y": -1.0352079,
+              "z": 0.86715484
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.015338191,
+              "y": -1.0352079,
+              "z": 0.86715484
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.009587893,
+              "y": -0.98346996,
+              "z": 0.82437676
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "behaviour": {
-    "resting": {
-      "canSleep": true,
-      "light": "0-4"
-    },
-    "moving": {
-      "walk": {
-        "walkSpeed": 0.3
-      }
+    "combat": {
+      "willDefendOwner": true,
+      "willDefendSelf": true,
+      "willFlee": false
     },
     "herd": {
       "maxSize": "5",
@@ -72,6 +160,18 @@
           "tier": 1
         }
       ]
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      },
+      "walk": {
+        "walkSpeed": 0.3
+      }
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4"
     }
   },
   "drops": {
@@ -259,9 +359,36 @@
       },
       "baseExperienceYield": 189,
       "hitbox": {
-        "width": 1.3,
         "height": 1.5,
-        "fixed": false
+        "fixed": false,
+        "width": 1.3
+      },
+      "behaviour": {
+        "combat": {
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "herd": {
+          "maxSize": "5",
+          "toleratedLeaders": [
+            {
+              "pokemon": "darmanitan",
+              "tier": 1
+            }
+          ]
+        },
+        "moving": {
+          "canLook": false,
+          "swim": {
+            "avoidsWater": true
+          },
+          "walk": {
+            "canWalk": false
+          }
+        },
+        "resting": {
+          "depth": "comatose"
+        }
       },
       "moves": [
         "1:tackle",
@@ -390,18 +517,7 @@
         "tutor:zenheadbutt"
       ],
       "evolutions": [],
-      "battleOnly": true,
-      "behaviour": {
-        "herd": {
-          "maxSize": "5",
-          "toleratedLeaders": [
-            {
-              "pokemon": "darmanitan",
-              "tier": 1
-            }
-          ]
-        }
-      }
+      "battleOnly": true
     },
     {
       "name": "Galar",
@@ -424,6 +540,28 @@
         "gorillatactics",
         "h:zenmode"
       ],
+      "behaviour": {
+        "combat": {
+          "willDefendOwner": true,
+          "willDefendSelf": true,
+          "willFlee": false
+        },
+        "fireImmune": true,
+        "herd": {
+          "maxSize": "5",
+          "toleratedLeaders": [
+            {
+              "pokemon": "darmanitan",
+              "tier": 1
+            }
+          ]
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true
+          }
+        }
+      },
       "drops": {
         "amount": 2,
         "entries": [
@@ -554,18 +692,7 @@
       ],
       "preEvolution": "darumaka galarian",
       "evolutions": [],
-      "battleOnly": false,
-      "behaviour": {
-        "herd": {
-          "maxSize": "5",
-          "toleratedLeaders": [
-            {
-              "pokemon": "darmanitan",
-              "tier": 1
-            }
-          ]
-        }
-      }
+      "battleOnly": false
     },
     {
       "name": "Galar-Zen",
@@ -606,6 +733,40 @@
         "speed": 0
       },
       "baseExperienceYield": 189,
+      "behaviour": {
+        "combat": {
+          "willDefendOwner": true,
+          "willDefendSelf": true,
+          "willFlee": false
+        },
+        "herd": {
+          "maxSize": "5",
+          "toleratedLeaders": [
+            {
+              "pokemon": "darmanitan",
+              "tier": 1
+            }
+          ]
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true
+          }
+        }
+      },
+      "drops": {
+        "amount": 2,
+        "entries": [
+          {
+            "item": "cobblemon:ice_stone",
+            "percentage": 5.0
+          },
+          {
+            "item": "cobblemon:occa_berry",
+            "percentage": 5.0
+          }
+        ]
+      },
       "moves": [
         "1:iciclecrash",
         "1:powdersnow",
@@ -716,38 +877,18 @@
       ],
       "evolutions": [],
       "battleOnly": true,
-      "drops": {
-        "amount": 2,
-        "entries": [
-          {
-            "item": "cobblemon:ice_stone",
-            "percentage": 5.0
-          },
-          {
-            "item": "cobblemon:occa_berry",
-            "percentage": 5.0
-          }
-        ]
-      },
-      "behaviour": {
-        "herd": {
-          "maxSize": "5",
-          "toleratedLeaders": [
-            {
-              "pokemon": "darmanitan",
-              "tier": 1
-            }
-          ]
-        }
-      },
       "lightingData": {
-        "lightLevel": 6,
+        "lightLevel": 15,
         "liquidGlowMode": "LAND"
       }
     }
   ],
+  "features": [
+    "galarian",
+    "zen_mode"
+  ],
   "lightingData": {
-    "lightLevel": 6,
+    "lightLevel": 14,
     "liquidGlowMode": "LAND"
   }
 }
