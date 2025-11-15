@@ -56,8 +56,8 @@
         "rideSounds": [],
         "stats": {
           "ACCELERATION": "15-50",
-          "JUMP": "25-35",
-          "SKILL": "10-30",
+          "JUMP": "20-40",
+          "SKILL": "0-25",
           "SPEED": "55-75",
           "STAMINA": "35-55"
         }
@@ -146,12 +146,6 @@
     ]
   },
   "behaviour": {
-    "combat": {
-      "willDefendOwner": true,
-      "willDefendSelf": true,
-      "willFlee": false
-    },
-    "fireImmune": true,
     "herd": {
       "maxSize": "9",
       "toleratedLeaders": [
@@ -183,9 +177,18 @@
     },
     "moving": {
       "swim": {
-        "avoidsWater": true,
-        "swimSpeed": "0.25"
+        "swimSpeed": "0.25",
+        "avoidsWater": true
       }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
     }
   },
   "drops": {
@@ -383,8 +386,8 @@
             "rideSounds": [],
             "stats": {
               "ACCELERATION": "15-50",
-              "JUMP": "25-35",
-              "SKILL": "15-30",
+              "JUMP": "20-40",
+              "SKILL": "0-25",
               "SPEED": "55-75",
               "STAMINA": "35-55"
             }
@@ -473,12 +476,16 @@
         ]
       },
       "behaviour": {
+        "moving": {
+          "swim": {
+            "avoidsWater": true
+          }
+        },
         "combat": {
-          "willDefendOwner": true,
           "willDefendSelf": true,
+          "willDefendOwner": true,
           "willFlee": false
         },
-        "fireImmune": true,
         "herd": {
           "maxSize": "9",
           "toleratedLeaders": [
@@ -508,10 +515,9 @@
             }
           ]
         },
-        "moving": {
-          "swim": {
-            "avoidsWater": true
-          }
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
         }
       },
       "moves": [
@@ -644,8 +650,8 @@
             "rideSounds": [],
             "stats": {
               "ACCELERATION": "20-55",
-              "JUMP": "25-40",
-              "SKILL": "10-30",
+              "JUMP": "25-45",
+              "SKILL": "0-25",
               "SPEED": "55-75",
               "STAMINA": "30-50"
             }
@@ -734,11 +740,6 @@
         ]
       },
       "behaviour": {
-        "combat": {
-          "willDefendOwner": true,
-          "willDefendSelf": true,
-          "willFlee": false
-        },
         "herd": {
           "maxSize": "9",
           "toleratedLeaders": [
@@ -752,7 +753,17 @@
           "swim": {
             "avoidsWater": true
           }
-        }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "fireImmune": true
       },
       "moves": [
         "1:tackle",
@@ -889,8 +900,8 @@
             "rideSounds": [],
             "stats": {
               "ACCELERATION": "15-50",
-              "JUMP": "25-30",
-              "SKILL": "10-30",
+              "JUMP": "15-35",
+              "SKILL": "0-25",
               "SPEED": "50-70",
               "STAMINA": "40-60"
             }
@@ -907,11 +918,11 @@
               }
             ],
             "stats": {
-              "ACCELERATION": "55-65",
-              "JUMP": "20-30",
+              "ACCELERATION": "55-70",
+              "JUMP": "25-35",
               "SKILL": "40-55",
-              "SPEED": "30-40",
-              "STAMINA": "30-65"
+              "SPEED": "40-55",
+              "STAMINA": "40-60"
             }
           }
         },
@@ -998,12 +1009,6 @@
         ]
       },
       "behaviour": {
-        "combat": {
-          "willDefendOwner": true,
-          "willDefendSelf": true,
-          "willFlee": false
-        },
-        "fireImmune": true,
         "herd": {
           "maxSize": "9",
           "toleratedLeaders": [
@@ -1012,6 +1017,15 @@
               "tier": 1
             }
           ]
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
         }
       },
       "moves": [

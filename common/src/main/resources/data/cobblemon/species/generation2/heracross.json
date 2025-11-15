@@ -67,7 +67,7 @@
           "JUMP": "0-5",
           "SKILL": "55-85",
           "SPEED": "35-50",
-          "STAMINA": "15-40"
+          "STAMINA": "20-45"
         }
       },
       "LAND": {
@@ -75,7 +75,7 @@
         "rideSounds": [],
         "stats": {
           "ACCELERATION": "55-70",
-          "JUMP": "35-50",
+          "JUMP": "20-30",
           "SKILL": "40-65",
           "SPEED": "15-30",
           "STAMINA": "35-50"
@@ -165,12 +165,6 @@
     ]
   },
   "behaviour": {
-    "combat": {
-      "willDefendOwner": true,
-      "willDefendSelf": true,
-      "willFlee": false
-    },
-    "fireImmune": true,
     "moving": {
       "fly": {
         "canFly": true
@@ -182,7 +176,14 @@
     "resting": {
       "times": [
         "167-11833,13702-22299"
-      ]
+      ],
+      "drowsyChance": 0.0021,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
     }
   },
   "drops": {
@@ -365,21 +366,22 @@
       },
       "baseExperienceYield": 210,
       "behaviour": {
-        "combat": {
-          "willDefendOwner": true,
-          "willDefendSelf": true,
-          "willFlee": false
+        "resting": {
+          "times": [
+            "167-11833,13702-22299"
+          ],
+          "drowsyChance": 0.0021,
+          "rouseChance": 0.0042
         },
-        "fireImmune": true,
         "moving": {
           "swim": {
             "avoidsWater": true
           }
         },
-        "resting": {
-          "times": [
-            "167-11833,13702-22299"
-          ]
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
         }
       },
       "evolutions": [],
