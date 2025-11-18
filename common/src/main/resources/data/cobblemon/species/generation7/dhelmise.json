@@ -65,6 +65,7 @@
       },
       "LIQUID": {
         "key": "cobblemon:liquid/submarine",
+        "hitboxBreachPercentage": 0.75,
         "rideSounds": [],
         "stats": {
           "ACCELERATION": "50-80",
@@ -164,7 +165,11 @@
         "swimSpeed": 0.2
       },
       "walk": {
-        "avoidsLand": true
+        "avoidsLand": true,
+        "canWalk": false
+      },
+      "fly": {
+        "canFly": true
       }
     },
     "resting": {

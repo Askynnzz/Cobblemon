@@ -47,6 +47,7 @@ import com.cobblemon.mod.common.api.pokemon.evolution.EvolutionProxy
 import com.cobblemon.mod.common.api.pokemon.evolution.PreEvolution
 import com.cobblemon.mod.common.api.pokemon.experience.ExperienceGroup
 import com.cobblemon.mod.common.api.pokemon.experience.ExperienceSource
+import com.cobblemon.mod.common.api.pokemon.feature.IntSpeciesFeature
 import com.cobblemon.mod.common.api.pokemon.feature.SpeciesFeature
 import com.cobblemon.mod.common.api.pokemon.feature.SpeciesFeatures
 import com.cobblemon.mod.common.api.pokemon.feature.SynchronizedSpeciesFeature
@@ -99,16 +100,20 @@ import com.cobblemon.mod.common.pokemon.feature.SeasonFeatureHandler
 import com.cobblemon.mod.common.pokemon.feature.StashHandler
 import com.cobblemon.mod.common.pokemon.properties.BattleCloneProperty
 import com.cobblemon.mod.common.pokemon.properties.UncatchableProperty
+import com.cobblemon.mod.common.pokemon.requirements.BlocksTraveledRequirement
 import com.cobblemon.mod.common.pokemon.status.PersistentStatus
 import com.cobblemon.mod.common.pokemon.status.PersistentStatusContainer
 import com.cobblemon.mod.common.util.cobblemonResource
-import com.cobblemon.mod.common.util.*
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP1
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP2
 import com.cobblemon.mod.common.util.codec.internal.ClientPokemonP3
 import com.cobblemon.mod.common.util.codec.internal.PokemonP1
 import com.cobblemon.mod.common.util.codec.internal.PokemonP2
 import com.cobblemon.mod.common.util.codec.internal.PokemonP3
+import com.cobblemon.mod.common.util.playSoundServer
+import com.cobblemon.mod.common.util.server
+import com.cobblemon.mod.common.util.setPositionSafely
+import com.cobblemon.mod.common.util.toBlockPos
 import com.google.gson.JsonObject
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
@@ -722,6 +727,7 @@ open class Pokemon : ShowdownIdentifiable {
         illusion: IllusionEffect? = null,
         mutation: (PokemonEntity) -> Unit = {},
     ): CompletableFuture<PokemonEntity> {
+
         // Handle special case of shouldered Cobblemon
         if (this.state is ShoulderedState) {
             return sendOutFromShoulder(source as ServerPlayer, level, position, battleId, doCry, illusion, mutation)
@@ -1177,24 +1183,30 @@ open class Pokemon : ShowdownIdentifiable {
      *
      * @param stack The new [ItemStack] being set as the held item.
      * @param decrement If the given [stack] should have [ItemStack.decrement] invoked with the parameter of 1. Default is true.
-     * @return The existing [ItemStack] being held or [ItemStack.EMPTY] if [HeldItemEvent.Pre] is canceled.
+     * @return The existing [ItemStack] being held or the [stack] if [HeldItemEvent.Pre] is canceled.
      *
      * @see [HeldItemEvent]
      */
     fun swapHeldItem(stack: ItemStack, decrement: Boolean = true, aiCanDrop: Boolean = true): ItemStack {
-        val returning = this.heldItem.copy()
-        val giving = stack.copy().apply { count = 1 }
-        if (decrement) {
-            stack.shrink(1)
+        val existing = this.heldItem()
+        val event = HeldItemEvent.Pre(this, stack, existing, decrement)
+        if (!isClient) {
+            CobblemonEvents.HELD_ITEM_PRE.post(event)
         }
-        this.heldItem = giving
-        this.canDropHeldItem = giving.isEmpty || aiCanDrop
-        onChange(HeldItemUpdatePacket({ this }, giving))
-        val shouldRemoveHeldItem = StashHandler.handleItem(this, giving.item)
-        if (shouldRemoveHeldItem) {
-            removeHeldItem()
+        if (!event.isCanceled) {
+            val giving = event.receiving.copy().apply { count = 1 }
+            if (event.decrement) {
+                event.receiving.shrink(1)
+            }
+            this.heldItem = giving
+            this.canDropHeldItem = giving.isEmpty || aiCanDrop
+            onChange(HeldItemUpdatePacket({ this }, giving))
+            CobblemonEvents.HELD_ITEM_POST.post(HeldItemEvent.Post(this, this.heldItem(), event.returning.copy(), event.decrement)) {
+                StashHandler.giveHeldItem(it)
+            }
+            return event.returning
         }
-        return returning
+        return stack
     }
 
     /**
@@ -1218,13 +1230,21 @@ open class Pokemon : ShowdownIdentifiable {
      * @see [HeldItemEvent]
      */
     fun swapCosmeticItem(stack: ItemStack, decrement: Boolean = true): ItemStack {
-        val returning = this.cosmeticItem.copy()
-        val giving = stack.copy().apply { count = 1 }
-        if (decrement) {
-            stack.shrink(1)
+        val existing = this.cosmeticItem.copy()
+        val event = HeldItemEvent.Pre(this, stack, existing, decrement)
+        if (!isClient) {
+            CobblemonEvents.COSMETIC_ITEM_PRE.post(event)
         }
-        this.cosmeticItem = giving
-        return returning
+        if (!event.isCanceled) {
+            val giving = event.receiving.copy().apply { count = 1 }
+            if (event.decrement) {
+                event.receiving.shrink(1)
+            }
+            this.cosmeticItem = giving
+            CobblemonEvents.COSMETIC_ITEM_POST.post(HeldItemEvent.Post(this, this.cosmeticItem.copy(), event.returning.copy(), event.decrement))
+            return event.returning
+        }
+        return stack
     }
 
     /**
@@ -1412,11 +1432,7 @@ open class Pokemon : ShowdownIdentifiable {
     fun getOwnerEntity(): LivingEntity? {
         return storeCoordinates.get()?.let {
             if (isPlayerOwned()) {
-                if (it.store is PlayerPartyStore) {
-                    return it.store.playerUUID.getPlayer()
-                } else {
-                    return server()?.playerList?.getPlayer(it.store.uuid)
-                }
+                server()?.playerList?.getPlayer(it.store.uuid)
             } else if (isNPCOwned()) {
                 (it.store as NPCPartyStore).npc
             } else {
@@ -1448,7 +1464,7 @@ open class Pokemon : ShowdownIdentifiable {
     fun belongsTo(player: Player) = storeCoordinates.get()?.let { it.store.uuid == player.uuid } == true
     fun isPlayerOwned() = storeCoordinates.get()?.let { it.store is PlayerPartyStore || it.store is PCStore } == true
     fun isNPCOwned() = storeCoordinates.get()?.let { it.store is NPCPartyStore } == true
-    fun isWild() = this.originalTrainerType != OriginalTrainerType.NPC && storeCoordinates.get() == null
+    fun isWild() = storeCoordinates.get() == null
 
     /**
      * Set the [friendship] to the given value.
@@ -1832,6 +1848,11 @@ open class Pokemon : ShowdownIdentifiable {
         moveSet.update()
     }
 
+    fun getBaseRideStat(stat: RidingStat): Float {
+        val behaviours = form.riding.behaviours ?: return 0F
+        return behaviours.values.maxOf { behaviour -> behaviour.stats[stat]?.first?.toFloat() ?: 0F }
+    }
+
     fun getMaxRideBoost(stat: RidingStat): Float {
         val behaviours = form.riding.behaviours ?: return 0F
         // Get the widest range for this stat, max - min, since that's how far it can be boosted in theory.
@@ -1898,6 +1919,23 @@ open class Pokemon : ShowdownIdentifiable {
         rideBoosts.clear()
         rideBoosts.putAll(boosts.mapValues { it.value.coerceIn(0F, getMaxRideBoost(it.key)) })
         onChange(RideBoostsUpdatePacket({ this }, getRideBoosts()))
+    }
+
+    fun getBlocksTraveled(): Int {
+        return getFeature<IntSpeciesFeature>("blocks_traveled")?.value ?: 0
+    }
+
+    fun addBlocksTraveled(value: Int) {
+        val blocksTraveledFeature = getFeature<IntSpeciesFeature>("blocks_traveled") ?: return
+        blocksTraveledFeature.value += value
+        markFeatureDirty(blocksTraveledFeature)
+    }
+
+    fun hasBlocksTraveledRequirement(): Boolean {
+        return evolutions
+            .flatMap { it.requirements }
+            .filterIsInstance<BlocksTraveledRequirement>()
+            .isNotEmpty()
     }
 
     fun getExperienceToNextLevel() = getExperienceToLevel(level + 1)

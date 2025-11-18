@@ -337,7 +337,7 @@ open class PokemonEntity(
             .withQueryValue("entity", struct)
             .also {
                 it.environment.query.addFunction("passenger_count") { DoubleValue(passengers.size.toDouble()) }
-                it.environment.query.addFunction("ride_velocity") { DoubleValue(deltaMovement.length()) }
+                it.environment.query.addFunction("ride_velocity") { DoubleValue(min(ridingAnimationData.velocitySpring.value.length() * 1.5,1.5)) }
                 it.environment.query.addFunction("driver_input") { DoubleValue(min(ridingAnimationData.driverInputSpring.value.length(),1.0)) }
                 it.environment.query.addFunction("get_ride_stats") { params ->
                     val rideStat = RidingStat.valueOf(params.getString(0).uppercase())
@@ -360,7 +360,6 @@ open class PokemonEntity(
     /**
      * The amount of steps this entity has traveled.
      */
-    var blocksTraveled: Double = 0.0
     var countsTowardsSpawnCap = true
 
     /**
@@ -1915,7 +1914,9 @@ open class PokemonEntity(
                 }
             }
 
-            this.updateBlocksTraveled(prevBlockPos)
+            if (this.pokemon.hasBlocksTraveledRequirement()) {
+                this.updateBlocksTraveled(prevBlockPos)
+            }
         }
         if (isBattling && this.isInWater) {
             // Prevent swimmers from sinking in battle
@@ -1930,7 +1931,7 @@ open class PokemonEntity(
         }
         val blocksTaken = this.blockPosition().distSqr(fromBp)
         if (blocksTaken > 0) {
-            this.blocksTraveled += blocksTaken
+            this.pokemon.addBlocksTraveled(blocksTaken.toInt())
         }
     }
 
@@ -2144,7 +2145,7 @@ open class PokemonEntity(
         } else if (slowpokeRegrowthFeature != null) {
             true
         } else {
-            this.pokemon.getFeature<FlagSpeciesFeature>(DataKeys.HAS_BEEN_SHEARED)?.enabled == true
+            this.pokemon.getFeature<FlagSpeciesFeature>(DataKeys.HAS_BEEN_SHEARED)?.enabled == false
         }
     }
 
@@ -2463,22 +2464,6 @@ open class PokemonEntity(
         return ifRidingAvailableSupply(fallback = 0.05f) { behaviour, settings, state ->
             behaviour.speed(settings, state,this, controller)
         }
-    }
-
-    fun getAltPose(): String {
-        val driver = this.controllingPassenger as? Player ?: return "cobblemon:no_pose"
-        val str =  ifRidingAvailableSupply(fallback = "cobblemon:no_pose") { behaviour, settings, state ->
-            behaviour.useRidingAltPose(settings, state, this, driver).toString()
-        }
-        return str
-    }
-
-    fun isUsingAltPose(resourceLocation: ResourceLocation): Boolean {
-        val driver = this.controllingPassenger as? Player ?: return false
-        val loc =  ifRidingAvailableSupply(fallback = cobblemonResource("no_pose")) { behaviour, settings, state ->
-            behaviour.useRidingAltPose(settings, state, this, driver)
-        }
-        return loc.compareTo(resourceLocation) == 0
     }
 
     var jumpInputStrength: Int = 0 // move this
