@@ -1252,8 +1252,8 @@ open class PokemonEntity(
     }
 
     private fun showInteractionWheel(player: ServerPlayer, itemStack: ItemStack) {
-        val canRide = ifRidingAvailableSupply(false) { behaviour, settings, state ->;
-            if (!this.canRide(player)) return@ifRidingAvailableSupply false;
+         val canRide = ifRidingAvailableSupply(false) { behaviour, settings, state ->
+            if (platform != PlatformType.NONE) return@ifRidingAvailableSupply false
             if (tethering != null) return@ifRidingAvailableSupply false;
             if (seats.isEmpty()) return@ifRidingAvailableSupply false;
             if ((owner as? ServerPlayer)?.isInBattle() == true) return@ifRidingAvailableSupply false;
@@ -2185,8 +2185,8 @@ open class PokemonEntity(
      */
     private fun createSidedPokemon(): Pokemon = Pokemon().apply { isClient = this@PokemonEntity.level().isClientSide }
 
-    override fun canRide(entity: Entity): Boolean {
-        return platform == PlatformType.NONE && super.canRide(entity) && seats.isNotEmpty()
+    override fun canRide(vehicle: Entity): Boolean {
+        return platform == PlatformType.NONE && super.canRide(vehicle) && occupiedSeats.isEmpty()
     }
 
     // Takes in a requested stat type with a base minimum and base maximum and returns the interpolated

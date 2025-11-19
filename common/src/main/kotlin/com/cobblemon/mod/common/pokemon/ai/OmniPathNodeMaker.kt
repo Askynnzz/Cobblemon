@@ -277,7 +277,9 @@ class OmniPathNodeMaker : NodeEvaluator() {
     // Borrowed from WalkNodeEvaluator, specifically here for things that don't use the
     // PokemonMoveControl such as NPCs, to prevent them from being caught on upward diagonals
     private fun isDiagonalValidForNonPokemon(root: Node, xNode: Node?, zNode: Node?): Boolean {
-        if (this.mob.moveControl == PokemonMoveControl) return true
+        if (this.mob.moveControl is PokemonMoveControl) {
+            return true
+        }
         if (zNode != null && xNode != null && zNode.y <= root.y && xNode.y <= root.y) {
             if (xNode.type != PathType.WALKABLE_DOOR && zNode.type != PathType.WALKABLE_DOOR) {
                 val bl = zNode.type == PathType.FENCE && xNode.type == PathType.FENCE && this.mob.bbWidth
@@ -310,10 +312,14 @@ class OmniPathNodeMaker : NodeEvaluator() {
         val upIsOpen = mob.canFit(node.asBlockPos().above())
         val d = getFloorLevel(BlockPos(node.x, node.y, node.z))
 
+        // Hitbox thing looks confusing but if the hitbox volume is more than like, 5, it starts getting pretty
+        // fucking slow to use the findAcceptedNodeWalk function
+        val strictlyWalkPathing = !canFly() && !mob.isInWater && mob.boundingBox.size < 1.6F
+
         // Non-diagonal surroundings in 3d space
         for (direction in Direction.entries) {
             var pathNode: Node?
-            if (mob.isInWater || canFly()) {
+            if (!strictlyWalkPathing) {
                 pathNode = this.getNode(node.x + direction.stepX, node.y + direction.stepY, node.z + direction.stepZ)
                     ?: continue
             } else {
@@ -340,7 +346,7 @@ class OmniPathNodeMaker : NodeEvaluator() {
             val x = node.x + direction.stepX + direction2.stepX
             val z = node.z + direction.stepZ + direction2.stepZ
             var pathNode2: Node?
-            if (mob.isInWater || canFly()) {
+            if (!strictlyWalkPathing) {
                 pathNode2 = this.getNode(x, node.y, z) ?: continue
             } else {
                 pathNode2 = findAcceptedNodeWalk(
@@ -365,7 +371,7 @@ class OmniPathNodeMaker : NodeEvaluator() {
                 successors[i++] = pathNode2
             }
         }
-        if (canFly() || mob.isInWater) {
+        if (!strictlyWalkPathing) {
             // Upward non-diagonals
             for (direction in Direction.Plane.HORIZONTAL.iterator()) {
                 var pathNode2: Node? = null

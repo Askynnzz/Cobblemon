@@ -216,7 +216,7 @@ object ShowdownInterpreter {
     }
 
     fun broadcastOptionalAbility(battle: PokemonBattle, effect: Effect?, pokemon: BattlePokemon) {
-        if (effect == null) return
+        if (effect == null || effect.type != Effect.Type.ABILITY) return
         broadcastAbility(battle, effect, pokemon)
     }
 
