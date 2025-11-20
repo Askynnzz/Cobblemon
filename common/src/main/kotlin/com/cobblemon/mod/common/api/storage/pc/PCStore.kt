@@ -226,7 +226,7 @@ open class PCStore(
 
         removeDuplicates()
 
-        if (json.has(DataKeys.STORE_UNSEEN_WALLPAPERS)) {
+        if (json.has(DataKeys.STORE_UNLOCKED_WALLPAPERS)) {
             unlockedWallpapers.addAll(json.getAsJsonArray(DataKeys.STORE_UNLOCKED_WALLPAPERS).map { ResourceLocation.parse(it.asString) })
         }
         if (json.has(DataKeys.STORE_UNSEEN_WALLPAPERS)) {
