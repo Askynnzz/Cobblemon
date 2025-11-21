@@ -32,7 +32,7 @@ class SaccharineLogSlatheredInfluence(val pos: BlockPos? = null) : SpawningInflu
     companion object {
         const val HONEY_DRENCHED_ASPECT = "honey_drenched"
         const val SACCHARINE_LOG_SLATHERED_MARKER = "saccharine_log_slathered"
-        const val HIDDEN_ABILITY_CHANCE = 0.05
+        const val HIDDEN_ABILITY_CHANCE = 0.01
         const val SAFE_BLOCK_SEARCH_DISTANCE = 10
     }
 
