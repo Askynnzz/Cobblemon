@@ -50,6 +50,7 @@ class PokemonSpawnAction(
             entity.pokemon.swapHeldItem(heldItem)
         }
         entity.drops = drops
+        entity.pokemon.setFriendship(pokemon.form.baseFriendship)
         // Useful debug code in situations where you want to find spawns
 //        val fireworkRocketEntity = FireworkRocketEntity(spawnablePosition.world, spawnablePosition.position.x.toDouble(), spawnablePosition.position.y.toDouble() + 2, spawnablePosition.position.z.toDouble(), ItemStack(Items.FIREWORK_ROCKET))
 //        spawnablePosition.world.spawnEntity(fireworkRocketEntity)
