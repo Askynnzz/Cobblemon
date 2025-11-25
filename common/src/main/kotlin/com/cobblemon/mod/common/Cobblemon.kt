@@ -421,7 +421,9 @@ object Cobblemon {
             bestSpawner.onServerStarted(event.server)
             battleRegistry.onServerStarted()
         }
-        PlatformEvents.SERVER_TICK_POST.subscribe { ServerTickHandler.onTick(it.server) }
+        PlatformEvents.SERVER_TICK_POST.subscribe {
+            ServerTickHandler.onTick(it.server)
+        }
 
         BagItems.observable.subscribe {
             LOGGER.info("Starting dummy Showdown battle to force it to pre-load data.")

@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.events
 
 import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.battles.BattleRegistry
+import com.cobblemon.mod.common.battles.TeamPreviewManager
 import com.cobblemon.mod.common.util.party
 import net.minecraft.server.MinecraftServer
 
@@ -17,6 +18,7 @@ object ServerTickHandler {
     private var secondsTick = 0
 
     fun onTick(server: MinecraftServer) {
+        TeamPreviewManager.tick()
         BattleRegistry.tick()
 
         secondsTick++
