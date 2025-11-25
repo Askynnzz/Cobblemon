@@ -42,7 +42,7 @@ import kotlin.math.sin
 
 class BattleTargetSelection(
         battleGUI: BattleGUI,
-        request: SingleActionRequest,
+        val request: SingleActionRequest,
         val move: InBattleMove,
         val gimmickID: String?,
         gimmickMove: InBattleGimmickMove?

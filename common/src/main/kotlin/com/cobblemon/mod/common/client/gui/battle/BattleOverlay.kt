@@ -38,7 +38,6 @@ import com.cobblemon.mod.common.client.render.drawScaledText
 import com.cobblemon.mod.common.client.render.drawScaledTextJustifiedRight
 import com.cobblemon.mod.common.client.render.getDepletableRedGreen
 import com.cobblemon.mod.common.client.render.models.blockbench.PosableState
-import com.cobblemon.mod.common.client.render.models.blockbench.repository.PokemonModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.RenderContext
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.VaryingModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.wavefunction.sineFunction
@@ -567,7 +566,6 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
                 matrixStack = matrixStack,
                 scale = 18F * (ballState?.scale ?: 1F) * if (isCompact) 0.65F else 1.0f,
                 contextScale = speciesToDisplay.getForm(stateToDisplay.currentAspects).baseScale,
-                repository = PokemonModelRepository,
                 reversed = reversed,
                 doQuirks = false,
                 state = stateToDisplay,
@@ -843,7 +841,6 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         contextScale: Float = 1F,
         reversed: Boolean = false,
         state: PosableState,
-        repository: VaryingModelRepository<*>,
         partialTicks: Float,
         limbSwing: Float = 0F,
         limbSwingAmount: Float = 0F,
@@ -853,7 +850,8 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         r: Float = 1F,
         g: Float = 1F,
         b: Float = 1F,
-        a: Float = 1F
+        a: Float = 1F,
+        doQuirks: Boolean = true
     ) {
         RenderSystem.applyModelViewMatrix()
         matrixStack.pushPose()
@@ -861,20 +859,21 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         matrixStack.scale(scale, scale, -scale)
         matrixStack.translate(0.0, -PORTRAIT_DIAMETER / 18.0, 0.0)
 
-        val sprite = repository.getSprite(identifier, state, SpriteType.PORTRAIT);
+        val sprite = VaryingModelRepository.getSprite(identifier, state, SpriteType.PORTRAIT);
 
         if (sprite == null) {
-            val model = repository.getPoser(identifier, state)
+            val model = VaryingModelRepository.getPoser(identifier, state)
             state.currentModel = model
-            val texture = repository.getTexture(identifier, state)
+            val texture = VaryingModelRepository.getTexture(identifier, state)
 
             val context = RenderContext()
             model.context = context
-            repository.getTextureNoSubstitute(identifier, state).let { context.put(RenderContext.TEXTURE, it) }
+            VaryingModelRepository.getTextureNoSubstitute(identifier, state).let { context.put(RenderContext.TEXTURE, it) }
             context.put(RenderContext.SCALE, contextScale)
             context.put(RenderContext.SPECIES, identifier)
             context.put(RenderContext.ASPECTS, state.currentAspects)
             context.put(RenderContext.POSABLE_STATE, state)
+            context.put(RenderContext.DO_QUIRKS, doQuirks)
 
             val renderType = RenderType.entityCutout(texture)
 
@@ -906,7 +905,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             val packedLight = LightTexture.pack(11, 7)
 
             val colour = toHex(r, g, b, a)
-            model.withLayerContext(immediate, state, repository.getLayers(identifier, state)) {
+            model.withLayerContext(immediate, state, VaryingModelRepository.getLayers(identifier, state)) {
                 model.render(context, matrixStack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colour)
                 immediate.endBatch()
             }

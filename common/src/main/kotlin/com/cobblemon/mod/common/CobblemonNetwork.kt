@@ -153,6 +153,7 @@ import com.cobblemon.mod.common.net.messages.server.battle.BattleTeamRequestPack
 import com.cobblemon.mod.common.net.messages.server.battle.BattleTeamResponsePacket
 import com.cobblemon.mod.common.net.messages.server.battle.RemoveSpectatorPacket
 import com.cobblemon.mod.common.net.messages.server.battle.SpectateBattlePacket
+import com.cobblemon.mod.common.net.messages.server.battle.SpectateNearestBattlePacket
 import com.cobblemon.mod.common.net.messages.server.behaviour.DamageOnCollisionPacket
 import com.cobblemon.mod.common.net.messages.server.behaviour.SetEntityBehaviourPacket
 import com.cobblemon.mod.common.net.messages.server.block.AdjustBlockEntityViewerCountPacket
@@ -204,6 +205,7 @@ import com.cobblemon.mod.common.net.serverhandling.RequestInteractionsHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.BattleSelectActionsHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.RemoveSpectatorHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.SpectateBattleHandler
+import com.cobblemon.mod.common.net.serverhandling.battle.SpectateNearestBattleHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamLeaveHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamRequestHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamRequestResponseHandler
