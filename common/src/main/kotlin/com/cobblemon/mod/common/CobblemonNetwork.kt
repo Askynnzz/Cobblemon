@@ -154,6 +154,7 @@ import com.cobblemon.mod.common.net.messages.server.battle.BattleTeamResponsePac
 import com.cobblemon.mod.common.net.messages.server.battle.RemoveSpectatorPacket
 import com.cobblemon.mod.common.net.messages.server.battle.SpectateBattlePacket
 import com.cobblemon.mod.common.net.messages.server.battle.SpectateNearestBattlePacket
+import com.cobblemon.mod.common.net.messages.server.battle.TeamPreviewSelectPokemonPacket
 import com.cobblemon.mod.common.net.messages.server.behaviour.DamageOnCollisionPacket
 import com.cobblemon.mod.common.net.messages.server.behaviour.SetEntityBehaviourPacket
 import com.cobblemon.mod.common.net.messages.server.block.AdjustBlockEntityViewerCountPacket
@@ -207,6 +208,7 @@ import com.cobblemon.mod.common.net.serverhandling.battle.RemoveSpectatorHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.SpectateBattleHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.SpectateNearestBattleHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamLeaveHandler
+import com.cobblemon.mod.common.net.serverhandling.battle.TeamPreviewSelectPokemonHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamRequestHandler
 import com.cobblemon.mod.common.net.serverhandling.battle.TeamRequestResponseHandler
 import com.cobblemon.mod.common.net.serverhandling.behaviour.DamageOnCollisionPacketHandler

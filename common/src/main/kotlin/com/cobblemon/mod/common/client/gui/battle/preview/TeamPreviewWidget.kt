@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.client.gui.battle.preview
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.abilities.Abilities
 import com.cobblemon.mod.common.api.gui.ParentWidget
@@ -29,26 +30,19 @@ import com.cobblemon.mod.common.client.gui.battle.BattleOverlay
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.PORTRAIT_DIAMETER
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.SCALE
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.questionMarkIcon
-import com.cobblemon.mod.common.client.gui.drawProfilePokemon
 import com.cobblemon.mod.common.client.render.SpriteType
 import com.cobblemon.mod.common.client.render.drawScaledText
 import com.cobblemon.mod.common.client.render.drawScaledTextJustifiedRight
-import com.cobblemon.mod.common.client.render.getDepletableRedGreen
 import com.cobblemon.mod.common.client.render.models.blockbench.FloatingState
 import com.cobblemon.mod.common.client.render.models.blockbench.PosableState
-import com.cobblemon.mod.common.client.render.models.blockbench.repository.PokemonModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.RenderContext
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.VaryingModelRepository
-import com.cobblemon.mod.common.client.render.renderScaledGuiItemIcon
 import com.cobblemon.mod.common.entity.PoseType
 import com.cobblemon.mod.common.net.messages.client.battle.BattlePokemonDTO
 import com.cobblemon.mod.common.pokemon.FormData
-import com.cobblemon.mod.common.pokemon.Gender
 import com.cobblemon.mod.common.pokemon.Species
 import com.cobblemon.mod.common.util.asTranslated
 import com.cobblemon.mod.common.util.cobblemonResource
-import com.cobblemon.mod.common.util.lang
-import com.cobblemon.mod.common.util.math.fromEulerXYZDegrees
 import com.cobblemon.mod.common.util.toHex
 import com.mojang.blaze3d.platform.InputConstants
 import com.mojang.blaze3d.platform.Lighting
@@ -375,10 +369,10 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
                 matrixStack = matrixStack,
                 scale = 18f,
                 contextScale = speciesToDisplay.getForm(stateToDisplay.currentAspects).baseScale,
-                repository = PokemonModelRepository,
                 reversed = reversed,
+                doQuirks = false,
                 state = stateToDisplay,
-                partialTicks = deltaTicks
+                partialTicks = if (Cobblemon.config.animateBattleTiles) deltaTicks else 0F
             )
             matrixStack.popPose()
             context.disableScissor()
@@ -865,7 +859,6 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             contextScale: Float = 1F,
             reversed: Boolean = false,
             state: PosableState,
-            repository: VaryingModelRepository<*>,
             partialTicks: Float,
             limbSwing: Float = 0F,
             limbSwingAmount: Float = 0F,
@@ -875,7 +868,8 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             r: Float = 1F,
             g: Float = 1F,
             b: Float = 1F,
-            a: Float = 1F
+            a: Float = 1F,
+            doQuirks: Boolean = true
         ) {
             RenderSystem.applyModelViewMatrix()
             matrixStack.pushPose()
@@ -883,20 +877,21 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             matrixStack.scale(scale, scale, -scale)
             matrixStack.translate(0.0, -PORTRAIT_DIAMETER / 18.0, 0.0)
 
-            val sprite = repository.getSprite(identifier, state, SpriteType.PORTRAIT);
+            val sprite = VaryingModelRepository.getSprite(identifier, state, SpriteType.PORTRAIT);
 
             if (sprite == null) {
-                val model = repository.getPoser(identifier, state)
+                val model = VaryingModelRepository.getPoser(identifier, state)
                 state.currentModel = model
-                val texture = repository.getTexture(identifier, state)
+                val texture = VaryingModelRepository.getTexture(identifier, state)
 
                 val context = RenderContext()
                 model.context = context
-                repository.getTextureNoSubstitute(identifier, state).let { context.put(RenderContext.TEXTURE, it) }
+                VaryingModelRepository.getTextureNoSubstitute(identifier, state).let { context.put(RenderContext.TEXTURE, it) }
                 context.put(RenderContext.SCALE, contextScale)
                 context.put(RenderContext.SPECIES, identifier)
                 context.put(RenderContext.ASPECTS, state.currentAspects)
                 context.put(RenderContext.POSABLE_STATE, state)
+                context.put(RenderContext.DO_QUIRKS, doQuirks)
 
                 val renderType = RenderType.entityCutout(texture)
 
@@ -911,7 +906,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
 
                 matrixStack.translate(
                     model.portraitTranslation.x * if (reversed) -1F else 1F,
-                    model.portraitTranslation.y,
+                    model.portraitTranslation.y + 1.5 * model.portraitScale,
                     model.portraitTranslation.z - 4
                 )
                 matrixStack.scale(model.portraitScale, model.portraitScale, 1 / model.portraitScale)
@@ -928,7 +923,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
                 val packedLight = LightTexture.pack(11, 7)
 
                 val colour = toHex(r, g, b, a)
-                model.withLayerContext(immediate, state, repository.getLayers(identifier, state)) {
+                model.withLayerContext(immediate, state, VaryingModelRepository.getLayers(identifier, state)) {
                     model.render(context, matrixStack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colour)
                     immediate.endBatch()
                 }
