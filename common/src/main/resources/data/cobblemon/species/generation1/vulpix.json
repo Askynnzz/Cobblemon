@@ -97,14 +97,7 @@
     },
     "fireImmune": true
   },
-  "ai": [
-    {
-      "type": "apply_behaviours",
-      "behaviours": [
-        "cobblemon:pokemon_fox"
-      ]
-    }
-  ],
+  "ai": [],
   "drops": {
     "amount": 5,
     "entries": [
