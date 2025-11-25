@@ -45,26 +45,149 @@
   "baseFriendship": 50,
   "baseScale": 1,
   "hitbox": {
-    "width": 1.5,
     "height": 1.6,
-    "fixed": false
+    "fixed": false,
+    "width": 1.5
+  },
+  "riding": {
+    "behaviours": {
+      "AIR": {
+        "key": "cobblemon:air/hover",
+        "rideSounds": [
+          {
+            "muffleEnabled": true,
+            "pitchExpr": "math.max(1.0 ,0.2 + math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2))",
+            "playForNonPassengers": true,
+            "soundLocation": "cobblemon:ride.loop.wind",
+            "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+          },
+          {
+            "muffleEnabled": true,
+            "pitchExpr": "math.pow(math.min(math.max(0.5,(q.ride_velocity()*0.5 / 1.5) + 0.5), 1.0),2)",
+            "playForNonPassengers": true,
+            "soundLocation": "cobblemon:ride.loop.saucer",
+            "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+          }
+        ],
+        "stats": {
+          "ACCELERATION": "30-45",
+          "JUMP": "40-77",
+          "SKILL": "35-50",
+          "SPEED": "15-25",
+          "STAMINA": "10-20"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.019022975,
+              "y": -1.2183496,
+              "z": 0.24997671
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.023236014,
+              "y": -1.2679962,
+              "z": 0.12823626
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019022975,
+              "y": -1.2183496,
+              "z": 0.24997671
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.023236014,
+              "y": -1.2679962,
+              "z": 0.12823626
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019022975,
+              "y": -1.2183496,
+              "z": 0.24997671
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.023236014,
+              "y": -1.2679962,
+              "z": 0.12823626
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019022975,
+              "y": -1.2183496,
+              "z": 0.24997671
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "behaviour": {
+    "herd": {
+      "maxSize": "9"
+    },
     "moving": {
       "fly": {
         "canFly": true
       },
+      "swim": {
+        "avoidsWater": true
+      },
       "walk": {
         "canWalk": false
-      },
-      "swim": {
-        "avoidsWater": true,
-        "canSwimInWater": false
       }
     },
     "resting": {
       "canSleep": true,
-      "light": "0-4"
+      "light": "0-4",
+      "times": [
+        "any"
+      ],
+      "drowsyChance": 0.0014,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
     }
   },
   "drops": {
@@ -176,7 +299,6 @@
     "tutor:chargebeam",
     "tutor:electroweb",
     "tutor:flashcannon",
-    "tutor:gigaimpact",
     "tutor:gravity",
     "tutor:helpinghand",
     "tutor:hyperbeam",
@@ -195,7 +317,26 @@
     "tutor:steelroller",
     "tutor:swift",
     "tutor:thunderbolt",
-    "tutor:wildcharge"
+    "tutor:wildcharge",
+    "legacy:bide",
+    "legacy:confide",
+    "legacy:curse",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:headbutt",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:psychup",
+    "legacy:rage",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:teleport",
+    "legacy:toxic",
+    "special:refresh"
   ],
   "preEvolution": "magneton",
   "evolutions": []

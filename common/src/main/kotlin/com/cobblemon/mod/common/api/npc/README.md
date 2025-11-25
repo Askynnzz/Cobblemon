@@ -320,7 +320,7 @@ a single battle challenge and this is a dynamic party, there will also be a `q.p
             "pokemon": "weedle",
             "weight": "10",
             "selectableTimes": "2",
-            "levelVariation": "2"
+            "levelVariation": "2",
             "npcLevels": "1-8"
           },
           {
@@ -410,9 +410,9 @@ Whether the NPC's party order will be randomized between battles. When true, thi
 whether it was dynamic or static) will choose its initial send-out Pokémon randomly instead of always choosing the first
 Pokémon in the party.
 
-### ai
-The AI property is an array of brain configurations. This is used to configure the behaviours of the NPC. See
-the documentation for brain configurations at [AI Configuration](../ai/config/README.md).
+### behaviours
+The behaviours (AKA ai, behaviors) property is an array of behaviour configurations. This is used to configure the behaviours of the NPC. See
+the documentation for brain configurations at [Behaviour Configuration](../ai/config/README.md).
 
 ### hideNameTag
 Whether the NPC's nametag should be hidden or not. Defaults to false.

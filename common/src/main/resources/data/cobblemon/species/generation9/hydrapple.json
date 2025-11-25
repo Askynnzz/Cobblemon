@@ -116,13 +116,11 @@
     "tm:terablast",
     "tm:uproar",
     "tutor:bugbite",
-    "tutor:dracometeor",
     "tutor:dragonpulse",
     "tutor:earthpower",
     "tutor:energyball",
     "tutor:gigadrain",
     "tutor:gigaimpact",
-    "tutor:grassyglide",
     "tutor:hyperbeam",
     "tutor:magicalleaf",
     "tutor:outrage",
@@ -132,8 +130,25 @@
     "tutor:seedbomb",
     "tutor:sleeptalk",
     "tutor:suckerpunch",
-    "tutor:uproar"
+    "tutor:uproar",
+    "legacy:attract"
   ],
   "preEvolution": "dipplin",
-  "evolutions": []
+  "evolutions": [],
+  "behaviour": {
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    }
+  }
 }

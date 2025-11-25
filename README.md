@@ -5,7 +5,7 @@ This can and often will lead to confusion and wasted time if they investigate an
 
 # Cobblemon
 
-An open-source Pokémon mod for Minecraft Java Edition, written in Kotlin for Fabric and Forge.
+An open-source Pokémon mod for Minecraft Java Edition, written in Kotlin for Fabric and NeoForge.
 
 ## Getting started
 

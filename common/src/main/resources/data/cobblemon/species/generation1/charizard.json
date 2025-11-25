@@ -45,29 +45,161 @@
   "baseFriendship": 50,
   "baseScale": 1,
   "hitbox": {
-    "width": 1.5,
     "height": 2.65,
-    "fixed": false
+    "fixed": false,
+    "width": 1.5
+  },
+  "riding": {
+    "behaviours": {
+      "AIR": {
+        "key": "cobblemon:air/bird",
+        "rideSounds": [
+          {
+            "muffleEnabled": true,
+            "pitchExpr": "math.max(1.0 ,0.2 + math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2))",
+            "playForNonPassengers": true,
+            "soundLocation": "cobblemon:ride.loop.wind",
+            "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+          },
+          {
+            "muffleEnabled": true,
+            "pitchExpr": "math.max(1.0 ,0.2 + math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2))",
+            "playForNonPassengers": true,
+            "soundLocation": "cobblemon:ride.loop.leather",
+            "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+          }
+        ],
+        "stats": {
+          "ACCELERATION": "45-75",
+          "JUMP": "30-65",
+          "SKILL": "55-85",
+          "SPEED": "30-65",
+          "STAMINA": "30-65"
+        }
+      },
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "55-65",
+          "JUMP": "15-25",
+          "SKILL": "10-25",
+          "SPEED": "25-40",
+          "STAMINA": "20-30"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.0047415113,
+              "y": -1.6152971,
+              "z": 0.35461712
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.003806442,
+              "y": -1.7203209,
+              "z": 0.12983066
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.039005388,
+              "y": -2.4511793,
+              "z": 0.10381147
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.056267936,
+              "y": -2.0914204,
+              "z": -0.45272845
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0,
+              "y": -0.7674751,
+              "z": -0.27694723
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.003806442,
+              "y": -1.7203209,
+              "z": 0.12983066
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0047415113,
+              "y": -1.6152971,
+              "z": 0.35461712
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "behaviour": {
-    "resting": {
-      "canSleep": true,
-      "light": "0-4"
+    "combat": {
+      "willDefendOwner": true,
+      "willDefendSelf": true,
+      "willFlee": false
+    },
+    "herd": {
+      "maxSize": "5"
     },
     "moving": {
-      "walk": {
-        "walkSpeed": 0.147
-      },
       "fly": {
-        "canFly": true,
-        "flySpeedHorizontal": 0.6
+        "canFly": true
       },
       "swim": {
         "swimSpeed": 0.1,
-        "canWalkOnWater": true,
+        "avoidsWater": true,
         "canSwimInLava": true
+      },
+      "walk": {
+        "walkSpeed": 0.147
       }
-    }
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 4,
@@ -196,10 +328,9 @@
     "tm:weatherball",
     "tm:willowisp",
     "tm:workup",
-    "tutor:aerialace",
-    "tutor:aircutter",
     "tutor:ancientpower",
     "tutor:blastburn",
+    "tutor:block",
     "tutor:bulldoze",
     "tutor:dragonpulse",
     "tutor:firefang",
@@ -225,7 +356,45 @@
     "tutor:sleeptalk",
     "tutor:swift",
     "tutor:thunderpunch",
-    "tutor:twister"
+    "tutor:twister",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:curse",
+    "legacy:defensecurl",
+    "legacy:defog",
+    "legacy:doubleteam",
+    "legacy:dualwingbeat",
+    "legacy:dynamicpunch",
+    "legacy:falseswipe",
+    "legacy:fissure",
+    "legacy:frustration",
+    "legacy:furyswipes",
+    "legacy:hiddenpower",
+    "legacy:leer",
+    "legacy:mimic",
+    "legacy:mudslap",
+    "legacy:naturalgift",
+    "legacy:rage",
+    "legacy:reflect",
+    "legacy:return",
+    "legacy:round",
+    "legacy:scaleshot",
+    "legacy:secretpower",
+    "legacy:seismictoss",
+    "legacy:skullbash",
+    "legacy:snore",
+    "legacy:submission",
+    "legacy:swagger",
+    "legacy:tailwind",
+    "legacy:toxic",
+    "special:blastburn",
+    "special:block",
+    "special:celebrate",
+    "special:holdhands",
+    "special:howl",
+    "special:quickattack"
   ],
   "preEvolution": "charmeleon",
   "evolutions": [],
@@ -260,9 +429,96 @@
         "speed": 100
       },
       "baseExperienceYield": 317,
-      "dynamaxBlocked": true,
+      "riding": {
+        "behaviour": {
+          "key": "cobblemon:composite",
+          "alternateBehaviour": {
+            "speed": "Math.clamp(q.entity.velocity.horizontal_magnitude + 0.33, 0, 1)",
+            "key": "cobblemon:air/bird",
+            "gravity": "q.gravity * (0.1 + (q.passenger_count - 1) * 0.1)",
+            "jumpVector": [
+              0,
+              "0.3*q.jump_strength/50",
+              0
+            ]
+          },
+          "defaultBehaviour": {
+            "speed": "Math.clamp(q.entity.velocity.horizontal_magnitude + 0.33, 0, 1)",
+            "key": "cobblemon:land/horse",
+            "gravity": "q.gravity * (0.1 + (q.passenger_count - 1) * 0.1)",
+            "jumpVector": [
+              0,
+              "0.3*q.jump_strength/50",
+              "-1 * 0.5*q.jump_strength/50"
+            ]
+          },
+          "transitionStrategy": "cobblemon:strategy/jump"
+        },
+        "seats": [],
+        "stats": {
+          "ACCELERATION": {
+            "ranges": {
+              "AIR": "20-50",
+              "LAND": "90-100"
+            }
+          },
+          "JUMP": {
+            "ranges": {
+              "AIR": "25-50",
+              "LAND": "10-20"
+            }
+          },
+          "SKILL": {
+            "ranges": {
+              "AIR": "50-100",
+              "LAND": "15-30"
+            }
+          },
+          "SPEED": {
+            "ranges": {
+              "AIR": "25-60",
+              "LAND": "10-20"
+            }
+          },
+          "STAMINA": {
+            "ranges": {
+              "AIR": "35-70",
+              "LAND": "15-30"
+            }
+          }
+        }
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "6"
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true,
+            "canSwimInLava": true
+          },
+          "fly": {
+            "canFly": true
+          }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "fireImmune": true
+      },
       "evolutions": [],
-      "battleOnly": true
+      "battleOnly": true,
+      "dynamaxBlocked": true,
+      "lightingData": {
+        "lightLevel": 14,
+        "liquidGlowMode": "LAND"
+      }
     },
     {
       "name": "Mega-Y",
@@ -294,9 +550,96 @@
         "speed": 100
       },
       "baseExperienceYield": 317,
-      "dynamaxBlocked": true,
+      "riding": {
+        "behaviour": {
+          "key": "cobblemon:composite",
+          "alternateBehaviour": {
+            "speed": "Math.clamp(q.entity.velocity.horizontal_magnitude + 0.33, 0, 1)",
+            "key": "cobblemon:air/bird",
+            "gravity": "q.gravity * (0.1 + (q.passenger_count - 1) * 0.1)",
+            "jumpVector": [
+              0,
+              "0.3*q.jump_strength/50",
+              0
+            ]
+          },
+          "defaultBehaviour": {
+            "speed": "Math.clamp(q.entity.velocity.horizontal_magnitude + 0.33, 0, 1)",
+            "key": "cobblemon:land/horse",
+            "gravity": "q.gravity * (0.1 + (q.passenger_count - 1) * 0.1)",
+            "jumpVector": [
+              0,
+              "0.3*q.jump_strength/50",
+              "-1 * 0.5*q.jump_strength/50"
+            ]
+          },
+          "transitionStrategy": "cobblemon:strategy/jump"
+        },
+        "seats": [],
+        "stats": {
+          "ACCELERATION": {
+            "ranges": {
+              "AIR": "20-50",
+              "LAND": "90-100"
+            }
+          },
+          "JUMP": {
+            "ranges": {
+              "AIR": "25-50",
+              "LAND": "10-20"
+            }
+          },
+          "SKILL": {
+            "ranges": {
+              "AIR": "50-100",
+              "LAND": "15-30"
+            }
+          },
+          "SPEED": {
+            "ranges": {
+              "AIR": "25-60",
+              "LAND": "10-20"
+            }
+          },
+          "STAMINA": {
+            "ranges": {
+              "AIR": "35-70",
+              "LAND": "15-30"
+            }
+          }
+        }
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "6"
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true,
+            "canSwimInLava": true
+          },
+          "fly": {
+            "canFly": true
+          }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "fireImmune": true
+      },
       "evolutions": [],
-      "battleOnly": true
+      "battleOnly": true,
+      "dynamaxBlocked": true,
+      "lightingData": {
+        "lightLevel": 14,
+        "liquidGlowMode": "LAND"
+      }
     },
     {
       "name": "Gmax",
@@ -315,9 +658,13 @@
       "aspects": [
         "gmax"
       ],
-      "dynamaxBlocked": true,
       "evolutions": [],
-      "battleOnly": true
+      "battleOnly": true,
+      "dynamaxBlocked": true
     }
-  ]
+  ],
+  "lightingData": {
+    "lightLevel": 14,
+    "liquidGlowMode": "LAND"
+  }
 }

@@ -51,8 +51,12 @@
     "fixed": false
   },
   "drops": {
-    "amount": 1,
+    "amount": 2,
     "entries": [
+      {
+        "item": "cobblemon:room_service",
+        "percentage": 5.0
+      },
       {
         "item": "cobblemon:bluk_berry",
         "percentage": 5.0
@@ -148,7 +152,11 @@
     "tutor:terrainpulse",
     "tutor:trick",
     "tutor:wonderroom",
-    "tutor:zenheadbutt"
+    "tutor:zenheadbutt",
+    "legacy:attract",
+    "legacy:futuresight",
+    "legacy:round",
+    "legacy:snore"
   ],
   "evolutions": [],
   "forms": [
@@ -269,10 +277,37 @@
         "tutor:swift",
         "tutor:terrainpulse",
         "tutor:trick",
-        "tutor:zenheadbutt"
+        "tutor:zenheadbutt",
+        "legacy:attract",
+        "legacy:expandingforce",
+        "legacy:futuresight",
+        "legacy:round",
+        "legacy:snore"
       ],
       "evolutions": [],
       "battleOnly": false
     }
-  ]
+  ],
+  "behaviour": {
+    "herd": {
+      "toleratedLeaders": [
+        {
+          "pokemon": "indeedee",
+          "tier": 1
+        }
+      ]
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    }
+  }
 }

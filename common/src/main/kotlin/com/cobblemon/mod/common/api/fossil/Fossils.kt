@@ -13,15 +13,15 @@ import com.cobblemon.mod.common.api.conditional.RegistryLikeCondition
 import com.cobblemon.mod.common.api.data.JsonDataRegistry
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.api.reactive.SimpleObservable
-import com.cobblemon.mod.common.net.messages.client.fossil.FossilRegistrySyncPacket
-import com.cobblemon.mod.common.pokemon.evolution.adapters.NbtItemPredicateAdapter
-import com.cobblemon.mod.common.pokemon.evolution.predicate.NbtItemPredicate
+import com.cobblemon.mod.common.net.messages.client.data.FossilRegistrySyncPacket
+import com.cobblemon.mod.common.pokemon.evolution.adapters.LegacyItemConditionWrapperAdapter
 import com.cobblemon.mod.common.util.adapters.IdentifierAdapter
 import com.cobblemon.mod.common.util.adapters.ItemLikeConditionAdapter
 import com.cobblemon.mod.common.util.adapters.pokemonPropertiesShortAdapter
 import com.cobblemon.mod.common.util.cobblemonResource
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import net.minecraft.advancements.critereon.ItemPredicate
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.packs.PackType
@@ -40,7 +40,7 @@ object Fossils: JsonDataRegistry<Fossil> {
         .registerTypeAdapter(ResourceLocation::class.java, IdentifierAdapter)
         .registerTypeAdapter(PokemonProperties::class.java, pokemonPropertiesShortAdapter)
         .registerTypeAdapter(TypeToken.getParameterized(RegistryLikeCondition::class.java, Item::class.java).type, ItemLikeConditionAdapter)
-        .registerTypeAdapter(NbtItemPredicate::class.java, NbtItemPredicateAdapter)
+        .registerTypeAdapter(ItemPredicate::class.java, LegacyItemConditionWrapperAdapter)
         .create()
 
     override val typeToken: TypeToken<Fossil> = TypeToken.get(Fossil::class.java)
@@ -69,6 +69,7 @@ object Fossils: JsonDataRegistry<Fossil> {
     /**
      * Gets all loaded [Fossil]s.
      */
+    @JvmStatic
     fun all() = this.fossils.values.toList()
 
     /**
@@ -76,6 +77,7 @@ object Fossils: JsonDataRegistry<Fossil> {
      * @param identifier The identifier of the fossil.
      * @return The [Fossil] if loaded, otherwise null.
      */
+    @JvmStatic
     fun getByIdentifier(identifier: ResourceLocation): Fossil? = this.fossils[identifier]
 
     /**
@@ -83,6 +85,7 @@ object Fossils: JsonDataRegistry<Fossil> {
      * @param fossilStacks The fossil [ItemStack]'s.
      * @return The [Fossil] if found, otherwise null.
      */
+    @JvmStatic
     fun getFossilByItemStacks(fossilStacks: List<ItemStack>): Fossil? {
         return this.all().firstOrNull { it.matchesIngredients(fossilStacks) }
     }
@@ -92,6 +95,7 @@ object Fossils: JsonDataRegistry<Fossil> {
      * @param fossilStacks The fossil [ItemStack]'s.
      * @return The [Fossil] if found to be a superset, otherwise null.
      */
+    @JvmStatic
     fun getSubFossilByItemStacks(fossilStacks: List<ItemStack>): Fossil? {
         return this.all().firstOrNull { it.matchesIngredientsSubSet(fossilStacks) }
     }
@@ -100,6 +104,7 @@ object Fossils: JsonDataRegistry<Fossil> {
      * @param itemStack The ingredient [ItemStack].
      * @return true if it's a fossil ingredient, otherwise false.
      */
+    @JvmStatic
     fun isFossilIngredient(itemStack: ItemStack): Boolean {
         return this.all().any { it.isIngredient(itemStack) }
     }

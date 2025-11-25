@@ -1,4 +1,5 @@
 {
+  "implemented": true,
   "nationalPokedexNumber": 514,
   "name": "Simisear",
   "primaryType": "fire",
@@ -40,12 +41,13 @@
   "catchRate": 75,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "baseScale": 1,
+  "baseScale": 0.85,
   "hitbox": {
-    "width": 1,
-    "height": 1,
+    "width": 0.94,
+    "height": 1.83,
     "fixed": false
   },
+  "standingEyeHeight": 0.74,
   "drops": {
     "amount": 3,
     "entries": [
@@ -176,8 +178,60 @@
     "tutor:superpower",
     "tutor:swift",
     "tutor:throatchop",
-    "tutor:uproar"
+    "tutor:uproar",
+    "legacy:attract",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic"
   ],
   "preEvolution": "pansear",
-  "evolutions": []
+  "evolutions": [],
+  "behaviour": {
+    "herd": {
+      "maxSize": "5",
+      "toleratedLeaders": [
+        {
+          "pokemon": "monferno",
+          "tier": 1
+        },
+        {
+          "pokemon": "simisage",
+          "tier": 1
+        },
+        {
+          "pokemon": "simisear",
+          "tier": 1
+        },
+        {
+          "pokemon": "simipour",
+          "tier": 1
+        },
+        {
+          "pokemon": "infernape",
+          "tier": 2
+        }
+      ]
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true,
+        "canSwimInLava": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "fireImmune": true
+  }
 }

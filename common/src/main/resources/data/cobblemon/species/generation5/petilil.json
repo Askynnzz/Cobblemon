@@ -57,12 +57,37 @@
     "moving": {
       "walk": {
         "walkSpeed": 0.14
+      },
+      "swim": {
+        "avoidsWater": true
       }
     },
     "resting": {
       "canSleep": true,
       "willSleepOnBed": true,
-      "light": "0-4"
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "herd": {
+      "maxSize": "4",
+      "toleratedLeaders": [
+        {
+          "pokemon": "petilil",
+          "tier": 1
+        },
+        {
+          "pokemon": "lilligant hisuian",
+          "tier": 2
+        },
+        {
+          "pokemon": "lilligant hisuian=false",
+          "tier": 3
+        }
+      ]
+    },
+    "combat": {
+      "willDefendOwner": true
     }
   },
   "drops": {
@@ -156,30 +181,25 @@
     "tutor:seedbomb",
     "tutor:sleeptalk",
     "tutor:synthesis",
-    "tutor:worryseed"
+    "tutor:worryseed",
+    "legacy:attract",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic"
   ],
   "evolutions": [
-    {
-      "id": "petilil_lilligant",
-      "variant": "item_interact",
-      "result": "lilligant",
-      "consumeHeldItem": true,
-      "learnableMoves": [
-        "petaldance"
-      ],
-      "requirements": [
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/petilil_hisuibiome"
-        }
-      ],
-      "requiredContext": "cobblemon:sun_stone"
-    },
     {
       "id": "petilil_lilliganthisui",
       "variant": "item_interact",
       "result": "lilligant hisuian",
-      "consumeHeldItem": true,
+      "consumeHeldItem": false,
       "learnableMoves": [
         "victorydance"
       ],
@@ -187,11 +207,17 @@
         {
           "variant": "biome",
           "biomeCondition": "#cobblemon:evolution/regional/petilil_hisuibiome"
-        },
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/petilil_unovabiome"
         }
+      ],
+      "requiredContext": "cobblemon:sun_stone"
+    },
+    {
+      "id": "petilil_lilligant",
+      "variant": "item_interact",
+      "result": "lilligant",
+      "consumeHeldItem": false,
+      "learnableMoves": [
+        "petaldance"
       ],
       "requiredContext": "cobblemon:sun_stone"
     }
@@ -220,15 +246,11 @@
           "id": "petilil_lilligant",
           "variant": "item_interact",
           "result": "lilligant",
-          "consumeHeldItem": true,
+          "consumeHeldItem": false,
           "learnableMoves": [
             "petaldance"
           ],
           "requirements": [
-            {
-              "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/petilil_hisuibiome"
-            },
             {
               "variant": "biome",
               "biomeCondition": "#cobblemon:evolution/regional/petilil_unovabiome"
@@ -240,15 +262,9 @@
           "id": "petilil_lilliganthisui",
           "variant": "item_interact",
           "result": "lilligant hisuian",
-          "consumeHeldItem": true,
+          "consumeHeldItem": false,
           "learnableMoves": [
             "victorydance"
-          ],
-          "requirements": [
-            {
-              "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/petilil_unovabiome"
-            }
           ],
           "requiredContext": "cobblemon:sun_stone"
         }

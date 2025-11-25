@@ -43,8 +43,8 @@
   "baseFriendship": 50,
   "baseScale": 0.8,
   "hitbox": {
-    "width": 0.9,
-    "height": 1.1,
+    "width": 1,
+    "height": 1.15,
     "fixed": false
   },
   "drops": {
@@ -187,8 +187,47 @@
     "tutor:shadowball",
     "tutor:sleeptalk",
     "tutor:superpower",
-    "tutor:swift"
+    "tutor:swift",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:leer",
+    "legacy:mimic",
+    "legacy:rage",
+    "legacy:reflect",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:skullbash",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic",
+    "legacy:zapcannon",
+    "special:celebrate",
+    "special:sing"
   ],
   "preEvolution": "eevee",
-  "evolutions": []
+  "evolutions": [],
+  "behaviour": {
+    "herd": {
+      "maxSize": "3"
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true,
+        "canSwimInLava": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "fireImmune": true
+  }
 }

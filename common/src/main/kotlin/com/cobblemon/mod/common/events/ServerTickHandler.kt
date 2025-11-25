@@ -17,7 +17,6 @@ object ServerTickHandler {
     private var secondsTick = 0
 
     fun onTick(server: MinecraftServer) {
-        Cobblemon.bestSpawner.spawnerManagers.forEach { it.onServerTick() }
         BattleRegistry.tick()
 
         secondsTick++

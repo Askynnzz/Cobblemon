@@ -8,7 +8,9 @@
 
 package com.cobblemon.mod.common.api.events.pokemon
 
+import com.bedrockk.molang.runtime.value.DoubleValue
 import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.molang.MoLangFunctions.moLangFunctionMap
 import com.cobblemon.mod.common.pokemon.Pokemon
 
 /**
@@ -20,10 +22,21 @@ import com.cobblemon.mod.common.pokemon.Pokemon
 data class FriendshipUpdatedEvent(
     val pokemon: Pokemon,
     val newFriendshipInitial: Int
-)
-{
+) {
     var newFriendship: Int = newFriendshipInitial
         set(value) {
             field = value.coerceIn(0, Cobblemon.config.maxPokemonFriendship)
         }
+
+    val context = mutableMapOf(
+        "pokemon" to pokemon.struct,
+        "new_friendship" to DoubleValue(newFriendship.toDouble())
+    )
+
+    val functions = moLangFunctionMap(
+        "set_new_friendship" to {
+            newFriendship = it.getInt(0)
+            DoubleValue.ONE
+        }
+    )
 }

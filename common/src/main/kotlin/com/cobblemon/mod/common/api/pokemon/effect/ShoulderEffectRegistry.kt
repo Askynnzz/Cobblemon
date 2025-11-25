@@ -9,10 +9,8 @@
 package com.cobblemon.mod.common.api.pokemon.effect
 
 import com.cobblemon.mod.common.api.scheduling.ServerTaskTracker
-import com.cobblemon.mod.common.platform.events.PlatformEvents
 import com.cobblemon.mod.common.pokemon.activestate.ShoulderedState
 import com.cobblemon.mod.common.pokemon.effects.PotionBaseEffect
-import com.cobblemon.mod.common.util.party
 import com.cobblemon.mod.common.util.safeParty
 import net.minecraft.server.level.ServerPlayer
 import org.jetbrains.annotations.ApiStatus
@@ -37,12 +35,16 @@ object ShoulderEffectRegistry {
         //PlatformEvents.SERVER_PLAYER_LOGIN.subscribe { this.refreshEffects(it.player) }
     }
 
+    @JvmStatic
     fun register(name: String, effect: Class<out ShoulderEffect>) = effect.also { effects[name] = it }
 
+    @JvmStatic
     fun unregister(name: String) = effects.remove(name)
 
+    @JvmStatic
     fun getName(clazz: Class<out ShoulderEffect>) = effects.firstNotNullOf { if (it.value == clazz) it.key else null }
 
+    @JvmStatic
     fun get(name: String): Class<out ShoulderEffect>? = effects[name]
 
     // It was removed by a source such as milk, reapply

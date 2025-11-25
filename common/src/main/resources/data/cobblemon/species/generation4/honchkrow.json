@@ -43,21 +43,45 @@
   "catchRate": 30,
   "eggCycles": 20,
   "baseFriendship": 35,
-  "baseScale": 1.3,
+  "baseScale": 1,
   "hitbox": {
-    "width": 1,
-    "height": 1.2,
-    "fixed": false
+    "height": 1.55,
+    "fixed": false,
+    "width": 1.1
   },
   "behaviour": {
+    "herd": {
+      "maxSize": "9",
+      "toleratedLeaders": [
+        {
+          "pokemon": "honchkrow",
+          "tier": 1
+        }
+      ]
+    },
     "moving": {
       "fly": {
         "canFly": true
+      },
+      "walk": {
+        "walkSpeed": 0.17
+      },
+      "swim": {
+        "avoidsWater": true
       }
     },
     "resting": {
       "canSleep": true,
-      "times": "day"
+      "times": [
+        "day"
+      ],
+      "drowsyChance": 0.0033,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
     }
   },
   "drops": {
@@ -206,7 +230,25 @@
     "tutor:superpower",
     "tutor:tailwind",
     "tutor:twister",
-    "tutor:uproar"
+    "tutor:uproar",
+    "legacy:attract",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:curse",
+    "legacy:detect",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:nightmare",
+    "legacy:quickattack",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swift",
+    "legacy:toxic"
   ],
   "preEvolution": "murkrow",
   "evolutions": []

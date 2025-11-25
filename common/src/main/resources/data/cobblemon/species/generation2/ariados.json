@@ -43,11 +43,134 @@
   "catchRate": 90,
   "eggCycles": 15,
   "baseFriendship": 50,
-  "baseScale": 0.8,
+  "baseScale": 1,
   "hitbox": {
-    "width": 1,
     "height": 1,
-    "fixed": false
+    "fixed": false,
+    "width": 1
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "55-85",
+          "JUMP": "25-45",
+          "SKILL": "45-65",
+          "SPEED": "30-45",
+          "STAMINA": "30-50"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.0009895586,
+              "y": -0.6805381,
+              "z": 0.0058082193
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.008947004,
+              "y": -0.6557218,
+              "z": 0.0005530901
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.002574316,
+              "y": -0.6861138,
+              "z": -0.17605162
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.002574316,
+              "y": -0.6861138,
+              "z": -0.17605162
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.002574316,
+              "y": -0.6861138,
+              "z": -0.17605162
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.002574316,
+              "y": -0.6861138,
+              "z": -0.17605162
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.002574316,
+              "y": -0.6861138,
+              "z": -0.17605162
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "behaviour": {
+    "herd": {
+      "maxSize": "5"
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4",
+      "times": [
+        "any"
+      ],
+      "drowsyChance": 0.0014,
+      "rouseChance": 0.0042
+    },
+    "walking": {
+      "walkSpeed": 0.18
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    }
   },
   "drops": {
     "amount": 7,
@@ -177,12 +300,30 @@
     "tutor:skittersmack",
     "tutor:sleeptalk",
     "tutor:sludgebomb",
-    "tutor:spikes",
     "tutor:spite",
     "tutor:stringshot",
     "tutor:suckerpunch",
     "tutor:throatchop",
-    "tutor:xscissor"
+    "tutor:xscissor",
+    "legacy:attract",
+    "legacy:bodyslam",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:curse",
+    "legacy:doubleedge",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:psybeam",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:stompingtantrum",
+    "legacy:swagger",
+    "special:refresh"
   ],
   "preEvolution": "spinarak",
   "evolutions": []

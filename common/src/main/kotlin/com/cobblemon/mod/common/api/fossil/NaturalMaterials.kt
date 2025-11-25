@@ -10,7 +10,7 @@ package com.cobblemon.mod.common.api.fossil
 
 import com.cobblemon.mod.common.api.data.JsonDataRegistry
 import com.cobblemon.mod.common.api.reactive.SimpleObservable
-import com.cobblemon.mod.common.net.messages.client.fossil.NaturalMaterialRegistrySyncPacket
+import com.cobblemon.mod.common.net.messages.client.data.NaturalMaterialRegistrySyncPacket
 import com.cobblemon.mod.common.registry.ItemTagCondition
 import com.cobblemon.mod.common.util.adapters.IdentifierAdapter
 import com.cobblemon.mod.common.util.adapters.ItemLikeConditionAdapter
@@ -57,6 +57,7 @@ object NaturalMaterials : JsonDataRegistry<List<NaturalMaterial>>{
         }
     }
 
+    @JvmStatic
     fun isNaturalMaterial(item: ItemStack): Boolean {
         val itemId = BuiltInRegistries.ITEM.getKey(item.item)
         return itemId in itemMap.keys || tagMap.keys.any {
@@ -64,6 +65,7 @@ object NaturalMaterials : JsonDataRegistry<List<NaturalMaterial>>{
         }
     }
 
+    @JvmStatic
     fun getContent(item: ItemStack): Int? {
         val itemId = BuiltInRegistries.ITEM.getKey(item.item)
         if (itemId in itemMap.keys) {
@@ -76,6 +78,7 @@ object NaturalMaterials : JsonDataRegistry<List<NaturalMaterial>>{
         return null
     }
 
+    @JvmStatic
     fun getReturnItem(item: ItemStack): ResourceLocation? {
         val itemId = BuiltInRegistries.ITEM.getKey(item.item)
         if (itemId in itemMap.keys) {

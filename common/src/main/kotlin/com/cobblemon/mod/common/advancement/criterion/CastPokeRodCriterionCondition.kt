@@ -20,8 +20,8 @@ import net.minecraft.resources.ResourceLocation
 class CastPokeRodContext(val baitId: ResourceLocation)
 
 class CastPokeRodCriterionCondition(
-        playerCtx: Optional<ContextAwarePredicate>,
-        val baitId: String
+    playerCtx: Optional<ContextAwarePredicate>,
+    val baitId: String
 ): SimpleCriterionCondition<CastPokeRodContext>(playerCtx) {
 
     companion object {
@@ -32,6 +32,6 @@ class CastPokeRodCriterionCondition(
     }
 
     override fun matches(player: ServerPlayer, context: CastPokeRodContext): Boolean {
-        return (context.baitId == this.baitId.asIdentifierDefaultingNamespace() || this.baitId.equals("empty_bait"))
+        return (context.baitId == this.baitId.asIdentifierDefaultingNamespace() || this.baitId == "empty_bait")
     }
 }

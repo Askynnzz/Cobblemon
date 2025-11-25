@@ -44,25 +44,239 @@
   "baseFriendship": 50,
   "baseScale": 0.9,
   "hitbox": {
-    "width": 1.8,
     "height": 3,
-    "fixed": false
+    "fixed": false,
+    "width": 1.8
+  },
+  "riding": {
+    "behaviours": {
+      "AIR": {
+        "key": "cobblemon:air/rocket",
+        "rideSounds": [
+          {
+            "muffleEnabled": true,
+            "pitchExpr": "math.max(1.0 ,0.2 + math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2))",
+            "playForNonPassengers": true,
+            "soundLocation": "cobblemon:ride.loop.wind",
+            "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+          }
+        ],
+        "stats": {
+          "ACCELERATION": "5-40",
+          "JUMP": "10-20",
+          "SKILL": "30-60",
+          "SPEED": "5-15",
+          "STAMINA": "2-20"
+        }
+      },
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "30-50",
+          "JUMP": "15-30",
+          "SKILL": "10-35",
+          "SPEED": "30-45",
+          "STAMINA": "15-35"
+        }
+      },
+      "LIQUID": {
+        "key": "cobblemon:liquid/submarine",
+        "hitboxBreachPercentage": 0.75,
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "45-65",
+          "JUMP": "40-65",
+          "SKILL": "50-75",
+          "SPEED": "35-60",
+          "STAMINA": "35-70"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": -0.000759989,
+              "y": -2.7762213,
+              "z": -0.08708589
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.000713408,
+              "y": -2.888495,
+              "z": -0.031018771
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.031250015,
+              "y": -2.8524113,
+              "z": 0.27662846
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.031250015,
+              "y": -2.8524113,
+              "z": 0.27662846
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.021855652,
+              "y": -1.4104469,
+              "z": -0.49374536
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.030396074,
+              "y": -1.1050735,
+              "z": -0.6272919
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.003324896,
+              "y": -2.741436,
+              "z": -0.37943092
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      },
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.0065662265,
+              "y": -1.938705,
+              "z": 0.75241566
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.1671896,
+              "y": -2.013784,
+              "z": 0.75219035
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.031250015,
+              "y": -1.9133127,
+              "z": 1.0007445
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.031250015,
+              "y": -1.9133127,
+              "z": 1.0007445
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.01992935,
+              "y": -1.0380715,
+              "z": 0.24457838
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.062409163,
+              "y": -1.0400126,
+              "z": 0.044064052
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0050011426,
+              "y": -2.03721,
+              "z": 0.5746374
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "behaviour": {
-    "resting": {
-      "canSleep": true,
-      "light": "0-4"
+    "herd": {
+      "maxSize": "5"
     },
     "moving": {
-      "walk": {
-        "walkSpeed": 0.17
-      },
       "swim": {
         "canBreatheUnderwater": true,
-        "canSwimInWater": true,
-        "canSwimInLava": false,
         "swimSpeed": "0.2"
+      },
+      "walk": {
+        "walkSpeed": 0.17
       }
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
     }
   },
   "drops": {
@@ -179,9 +393,9 @@
     "tm:workup",
     "tm:zenheadbutt",
     "tutor:aquatail",
+    "tutor:block",
     "tutor:darkpulse",
     "tutor:dive",
-    "tutor:dragonpulse",
     "tutor:flashcannon",
     "tutor:flipturn",
     "tutor:focuspunch",
@@ -196,7 +410,6 @@
     "tutor:irontail",
     "tutor:liquidation",
     "tutor:rest",
-    "tutor:rockslide",
     "tutor:rocksmash",
     "tutor:rollout",
     "tutor:signalbeam",
@@ -204,7 +417,44 @@
     "tutor:terrainpulse",
     "tutor:waterpledge",
     "tutor:waterpulse",
-    "tutor:zenheadbutt"
+    "tutor:zenheadbutt",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:bubblebeam",
+    "legacy:bulldoze",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:confusion",
+    "legacy:counter",
+    "legacy:curse",
+    "legacy:defensecurl",
+    "legacy:doubleteam",
+    "legacy:dragontail",
+    "legacy:dynamicpunch",
+    "legacy:falseswipe",
+    "legacy:fissure",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:mudslap",
+    "legacy:naturalgift",
+    "legacy:outrage",
+    "legacy:rage",
+    "legacy:reflect",
+    "legacy:return",
+    "legacy:round",
+    "legacy:scald",
+    "legacy:secretpower",
+    "legacy:seismictoss",
+    "legacy:snore",
+    "legacy:submission",
+    "legacy:swagger",
+    "legacy:toxic",
+    "legacy:waterfall",
+    "special:block",
+    "special:celebrate",
+    "special:followme",
+    "special:hydrocannon"
   ],
   "preEvolution": "wartortle",
   "evolutions": [],
@@ -238,9 +488,66 @@
         "speed": 78
       },
       "baseExperienceYield": 315,
-      "dynamaxBlocked": true,
+      "riding": {
+        "behaviour": {
+          "key": "cobblemon:land/horse"
+        },
+        "seats": [],
+        "stats": {
+          "ACCELERATION": {
+            "ranges": {
+              "LAND": "5-100",
+              "LIQUID": "15-35"
+            }
+          },
+          "JUMP": {
+            "ranges": {
+              "LAND": "5-10",
+              "LIQUID": "10-20"
+            }
+          },
+          "SKILL": {
+            "ranges": {
+              "LAND": "15-40",
+              "LIQUID": "30-65"
+            }
+          },
+          "SPEED": {
+            "ranges": {
+              "LAND": "10-20",
+              "LIQUID": "35-70"
+            }
+          },
+          "STAMINA": {
+            "ranges": {
+              "LAND": "20-50",
+              "LIQUID": "45-95"
+            }
+          }
+        }
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "6"
+        },
+        "moving": {
+          "swim": {
+            "canBreatheUnderwater": true
+          }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        }
+      },
       "evolutions": [],
-      "battleOnly": true
+      "battleOnly": true,
+      "dynamaxBlocked": true
     },
     {
       "name": "Gmax",
@@ -258,9 +565,9 @@
       "aspects": [
         "gmax"
       ],
-      "dynamaxBlocked": true,
       "evolutions": [],
-      "battleOnly": true
+      "battleOnly": true,
+      "dynamaxBlocked": true
     }
   ]
 }

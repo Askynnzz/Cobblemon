@@ -62,11 +62,6 @@ internal object SpeciesAdditions : JsonDataRegistry<SpeciesAdditions.AdditionPar
                     Cobblemon.LOGGER.error("Caught exception applying addition {} to {}", identifier.toString(), parameter.targetIdentifier.toString(), e)
                 }
             }
-
-            // If the species was previously implemented and is no longer implemented, remove it from the implemented list
-            if (previouslyImplemented && !species.implemented) {
-                PokemonSpecies.implemented.remove(species)
-            }
         }
         Cobblemon.LOGGER.info("Finished additions")
         this.observable.emit(this)

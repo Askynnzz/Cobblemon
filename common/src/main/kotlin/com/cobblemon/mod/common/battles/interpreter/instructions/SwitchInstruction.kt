@@ -17,7 +17,6 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.pokemon.PokemonSeenEvent
 import com.cobblemon.mod.common.api.scheduling.afterOnServer
 import com.cobblemon.mod.common.battles.ActiveBattlePokemon
-import com.cobblemon.mod.common.battles.ShowdownInterpreter
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.dispatch.*
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
@@ -56,9 +55,8 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
         val illusion = publicMessage.battlePokemonFromOptional(battle, "is")
         val pokemon = publicMessage.battlePokemon(0, battle) ?: return
 
-//        println("SWITCH STARTING")
         if (!battle.started) {  // battle 'starts' at beginning of dispatches; see InitializeInstruction
-//            println("BATTLE NOT STARTED")
+
             battle.dispatchToFront {    // this needs to happen before InitializeInstruction dispatches
 
                 val pokemonEntity = pokemon.entity
@@ -69,24 +67,22 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                     WaitDispatch(0.5F)
                 }
                 else if (pokemonEntity == null && entity != null) {
-//                    println("ENTITIES NOT NULL")
                     activePokemon.battlePokemon = pokemon
                     activePokemon.illusion = illusion
-                    val targetPos = ShowdownInterpreter.getSendoutPosition(battle, activePokemon, battleActor)
+                    val targetPos = activePokemon.getSendOutPosition()
                     if (targetPos != null) {
-//                        println("TARGET POS IS NOT NULL ${pokemon.effectedPokemon.species.name}")
                         val battleSendoutCount = activePokemon.getActorShowdownId()[1].digitToInt() - 1 + actor.stillSendingOutCount
                         actor.stillSendingOutCount++
                         battle.sendSidedUpdate(actor, BattleSwitchPokemonPacket(pnx, pokemon, true, illusion), BattleSwitchPokemonPacket(pnx, pokemon, false, illusion))
                         broadcastSwitch(battle, actor, pokemon, illusion)
                         afterOnServer(seconds = battleSendoutCount * SEND_OUT_STAGGER_BASE_DURATION + if (battleSendoutCount > 0) Random.nextFloat() * SEND_OUT_STAGGER_RANDOM_MAX_DURATION else 0F ) {
                             pokemon.effectedPokemon.sendOutWithAnimation(
-                                source = entity,
-                                battleId = battle.battleId,
-                                level = entity.level() as ServerLevel,
-                                doCry = false,
-                                position = targetPos,
-                                illusion = illusion?.let { IllusionEffect(it.effectedPokemon) }
+                                    source = entity,
+                                    battleId = battle.battleId,
+                                    level = entity.level() as ServerLevel,
+                                    doCry = false,
+                                    position = targetPos,
+                                    illusion = illusion?.let { IllusionEffect(it.effectedPokemon) }
                             ).thenApply {
                                 actor.stillSendingOutCount--
                             }
@@ -192,7 +188,7 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                     }
                 } else {
                     // For Singles, we modify the sendout position based on the pokemon's hitbox size
-                    val pos = (if (battle.format.battleType.pokemonPerSide == 1) ShowdownInterpreter.getSendoutPosition(battle, activePokemon, actor)
+                    val pos = (if (battle.format.battleType.pokemonPerSide == 1) activePokemon.getSendOutPosition()
                         else  activePokemon.position?.second) ?: entity.position()
                     // Send out at previous Pokémon's location if it is known, otherwise actor location
                     val world = entity.level() as ServerLevel
@@ -225,8 +221,8 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
             val publicPokemon = (illusion ?: newPokemon).effectedPokemon
             val publicLang = publicPokemon.nickname?.let { nickname ->
                 battleLang("switch.other.nickname", actor.getName(), nickname, publicPokemon.species.translatedName)
-            } ?: battleLang("switch.other", actor.getName(), publicPokemon.getDisplayName())
-            actor.sendMessage(battleLang("switch.self", publicPokemon.getDisplayName()))
+            } ?: battleLang("switch.other", actor.getName(), publicPokemon.getDisplayName(true))
+            actor.sendMessage(battleLang("switch.self", publicPokemon.getDisplayName(true)))
             battle.actors.filter { it != actor }.forEach {
                 it.sendMessage(publicLang)
             }

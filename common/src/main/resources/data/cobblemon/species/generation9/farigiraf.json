@@ -43,11 +43,136 @@
   "catchRate": 45,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "baseScale": 1.5,
+  "baseScale": 1,
   "hitbox": {
-    "width": 1.4,
     "height": 4.23,
-    "fixed": false
+    "fixed": false,
+    "width": 1.4
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "40-65",
+          "JUMP": "30-40",
+          "SKILL": "25-45",
+          "SPEED": "45-65",
+          "STAMINA": "50-75"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 0.019325797,
+              "y": -2.7409186,
+              "z": -0.035812236
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.010157736,
+              "y": -2.7402267,
+              "z": -0.04133668
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019325797,
+              "y": -2.7409186,
+              "z": -0.035812236
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.010157736,
+              "y": -2.7402267,
+              "z": -0.04133668
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019325797,
+              "y": -2.7409186,
+              "z": -0.035812236
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.010157736,
+              "y": -2.7402267,
+              "z": -0.04133668
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.019325797,
+              "y": -2.7409186,
+              "z": -0.035812236
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "behaviour": {
+    "herd": {
+      "maxSize": "9",
+      "toleratedLeaders": [
+        {
+          "pokemon": "farigiraf",
+          "tier": 1
+        }
+      ]
+    },
+    "moving": {
+      "canWalk": true,
+      "walkSpeed": "0.35",
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    }
   },
   "drops": {
     "amount": 4,
@@ -193,7 +318,23 @@
     "tutor:thunderbolt",
     "tutor:trick",
     "tutor:uproar",
-    "tutor:zenheadbutt"
+    "tutor:zenheadbutt",
+    "legacy:attract",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:mudslap",
+    "legacy:naturalgift",
+    "legacy:nightmare",
+    "legacy:return",
+    "legacy:round",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic",
+    "legacy:zapcannon"
   ],
   "preEvolution": "girafarig",
   "evolutions": []

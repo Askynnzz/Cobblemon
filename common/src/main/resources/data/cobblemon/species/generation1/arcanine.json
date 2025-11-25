@@ -43,14 +43,133 @@
   "catchRate": 75,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "features": [
-    "hisuian"
-  ],
   "baseScale": 1.1,
   "hitbox": {
-    "width": 1.2,
     "height": 1.7,
-    "fixed": false
+    "fixed": false,
+    "width": 1.2
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "70-90",
+          "JUMP": "45-65",
+          "SKILL": "40-80",
+          "SPEED": "45-70",
+          "STAMINA": "35-80"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": 1.8626451e-09,
+              "y": -1.2779657,
+              "z": 0.059787232
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.01673784,
+              "y": -1.3045704,
+              "z": 0.06801101
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.008335706,
+              "y": -1.3077765,
+              "z": 0.15360254
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.008335706,
+              "y": -1.3077765,
+              "z": 0.15360254
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": 1.8626451e-09,
+              "y": -1.2779657,
+              "z": 0.059787232
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.01673784,
+              "y": -1.3045704,
+              "z": 0.06801101
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.008335706,
+              "y": -1.3077765,
+              "z": 0.15360254
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "behaviour": {
+    "entityInteract": {
+      "avoidedBySkeleton": true
+    },
+    "moving": {
+      "walk": {
+        "walkSpeed": "0.25"
+      },
+      "swim": {
+        "avoidsWater": true,
+        "canSwimInLava": true
+      }
+    },
+    "resting": {
+      "canSleep": true,
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 3,
@@ -152,7 +271,6 @@
     "tm:thunderfang",
     "tm:wildcharge",
     "tm:willowisp",
-    "tutor:aerialace",
     "tutor:bulldoze",
     "tutor:covet",
     "tutor:dragonpulse",
@@ -168,7 +286,6 @@
     "tutor:laserfocus",
     "tutor:outrage",
     "tutor:playrough",
-    "tutor:psychic",
     "tutor:rest",
     "tutor:rocksmash",
     "tutor:scorchingsands",
@@ -176,7 +293,30 @@
     "tutor:snarl",
     "tutor:swift",
     "tutor:thunderfang",
-    "tutor:wildcharge"
+    "tutor:wildcharge",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:dragonbreath",
+    "legacy:dragonrage",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:mudslap",
+    "legacy:naturalgift",
+    "legacy:rage",
+    "legacy:reflect",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:skullbash",
+    "legacy:snore",
+    "legacy:superpower",
+    "legacy:swagger",
+    "legacy:teleport",
+    "legacy:toxic"
   ],
   "preEvolution": "growlithe",
   "evolutions": [],
@@ -210,6 +350,50 @@
         "special_attack": 95,
         "special_defence": 80,
         "speed": 90
+      },
+      "riding": {
+        "behaviour": {
+          "key": "cobblemon:land/horse"
+        },
+        "seats": [],
+        "stats": {
+          "ACCELERATION": {
+            "ranges": "30-60"
+          },
+          "JUMP": {
+            "ranges": "25-50"
+          },
+          "SKILL": {
+            "ranges": "35-70"
+          },
+          "SPEED": {
+            "ranges": "35-65"
+          },
+          "STAMINA": {
+            "ranges": "40-80"
+          }
+        }
+      },
+      "behaviour": {
+        "moving": {
+          "swim": {
+            "avoidsWater": true,
+            "canSwimInLava": true
+          }
+        },
+        "entityInteract": {
+          "avoidedBySkeleton": true
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "fireImmune": true
       },
       "moves": [
         "1:rockslide",
@@ -309,7 +493,6 @@
         "tutor:ironhead",
         "tutor:irontail",
         "tutor:outrage",
-        "tutor:psychic",
         "tutor:rest",
         "tutor:rockslide",
         "tutor:rocksmash",
@@ -325,5 +508,8 @@
       "evolutions": [],
       "battleOnly": false
     }
+  ],
+  "features": [
+    "hisuian"
   ]
 }

@@ -46,16 +46,129 @@
   "baseFriendship": 50,
   "baseScale": 1.1,
   "hitbox": {
-    "width": 1.1,
     "height": 2,
-    "fixed": false
+    "fixed": false,
+    "width": 1.1
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "55-75",
+          "JUMP": "10-20",
+          "SKILL": "30-60",
+          "SPEED": "2-10",
+          "STAMINA": "55-90"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": -0.0014235907,
+              "y": -1.7580168,
+              "z": 0.18322733
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.06559907,
+              "y": -1.8229002,
+              "z": 0.23897748
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.04793154,
+              "y": -1.7881656,
+              "z": 0.15857956
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.04793154,
+              "y": -1.7881656,
+              "z": 0.15857956
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.06559907,
+              "y": -1.8229002,
+              "z": 0.23897748
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.06559907,
+              "y": -1.8229002,
+              "z": 0.23897748
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.04793154,
+              "y": -1.7881656,
+              "z": 0.15857956
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "behaviour": {
+    "herd": {
+      "maxSize": "4"
+    },
     "moving": {
       "swim": {
+        "avoidsWater": true,
         "canSwimInLava": true
+      },
+      "walk": {
+        "walkSpeed": 0.15
       }
-    }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 2,
@@ -237,22 +350,53 @@
     "tutor:thunderbolt",
     "tutor:thunderfang",
     "tutor:thunderpunch",
-    "tutor:uproar"
+    "tutor:uproar",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:bubblebeam",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:dragontail",
+    "legacy:dynamicpunch",
+    "legacy:fissure",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:leer",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:pursuit",
+    "legacy:rage",
+    "legacy:return",
+    "legacy:rockthrow",
+    "legacy:round",
+    "legacy:sandattack",
+    "legacy:secretpower",
+    "legacy:seismictoss",
+    "legacy:snore",
+    "legacy:spite",
+    "legacy:submission",
+    "legacy:swagger",
+    "legacy:thrash",
+    "legacy:toxic",
+    "legacy:watergun",
+    "legacy:whirlpool",
+    "legacy:zapcannon"
   ],
   "preEvolution": "rhyhorn",
   "evolutions": [
     {
-      "id": "rhydon_rhyperior",
-      "variant": "trade",
-      "result": "rhyperior",
       "consumeHeldItem": true,
+      "id": "rhydon_rhyperior",
       "learnableMoves": [],
       "requirements": [
         {
-          "variant": "held_item",
-          "itemCondition": "cobblemon:protector"
+          "itemCondition": "cobblemon:protector",
+          "variant": "held_item"
         }
-      ]
+      ],
+      "result": "rhyperior",
+      "variant": "trade"
     }
   ]
 }

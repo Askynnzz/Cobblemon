@@ -43,15 +43,153 @@
   "catchRate": 45,
   "eggCycles": 20,
   "baseFriendship": 50,
-  "features": [
-    "paldean",
-    "bull_breed"
-  ],
   "baseScale": 1.3,
   "hitbox": {
-    "width": 1.3,
     "height": 1.4,
-    "fixed": false
+    "fixed": false,
+    "width": 1.3
+  },
+  "riding": {
+    "behaviours": {
+      "LAND": {
+        "key": "cobblemon:land/horse",
+        "rideSounds": [],
+        "stats": {
+          "ACCELERATION": "15-50",
+          "JUMP": "25-35",
+          "SKILL": "15-30",
+          "SPEED": "55-75",
+          "STAMINA": "35-55"
+        }
+      }
+    },
+    "seats": [
+      {
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "poseOffsets": [
+          {
+            "offset": {
+              "x": -0.004955834,
+              "y": -1.5021043,
+              "z": -0.13071083
+            },
+            "poseTypes": [
+              "STAND"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.00920631,
+              "y": -1.4530607,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "WALK"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0,
+              "y": -1.625,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "HOVER"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0,
+              "y": -1.625,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "FLY"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.00920631,
+              "y": -1.4530607,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "FLOAT"
+            ]
+          },
+          {
+            "offset": {
+              "x": -0.00920631,
+              "y": -1.4530607,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "SWIM"
+            ]
+          },
+          {
+            "offset": {
+              "x": 0.0,
+              "y": -1.625,
+              "z": -0.125
+            },
+            "poseTypes": [
+              "GLIDE"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "behaviour": {
+    "herd": {
+      "maxSize": "9",
+      "toleratedLeaders": [
+        {
+          "pokemon": "bouffalant",
+          "tier": 1
+        },
+        {
+          "pokemon": "miltank",
+          "tier": 2
+        },
+        {
+          "pokemon": "tauros",
+          "tier": 3
+        },
+        {
+          "pokemon": "tauros bull_breed=combat",
+          "tier": 3
+        },
+        {
+          "pokemon": "tauros bull_breed=aqua",
+          "tier": 4
+        },
+        {
+          "pokemon": "tauros bull_breed=blaze",
+          "tier": 4
+        }
+      ]
+    },
+    "moving": {
+      "swim": {
+        "swimSpeed": "0.25",
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendSelf": true,
+      "willDefendOwner": true,
+      "willFlee": false
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    }
   },
   "drops": {
     "amount": 5,
@@ -174,7 +312,33 @@
     "tutor:throatchop",
     "tutor:thunderbolt",
     "tutor:wildcharge",
-    "tutor:zenheadbutt"
+    "tutor:zenheadbutt",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:fissure",
+    "legacy:focusenergy",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:horndrill",
+    "legacy:leer",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:skullbash",
+    "legacy:snore",
+    "legacy:spite",
+    "legacy:stomp",
+    "legacy:toxic",
+    "legacy:uproar",
+    "legacy:waterpulse",
+    "legacy:whirlpool",
+    "legacy:zapcannon",
+    "special:refresh"
   ],
   "evolutions": [],
   "forms": [
@@ -214,6 +378,147 @@
         "special_attack": 0,
         "special_defence": 0,
         "speed": 0
+      },
+      "riding": {
+        "behaviours": {
+          "LAND": {
+            "key": "cobblemon:land/horse",
+            "rideSounds": [],
+            "stats": {
+              "ACCELERATION": "15-50",
+              "JUMP": "25-35",
+              "SKILL": "15-30",
+              "SPEED": "55-75",
+              "STAMINA": "35-55"
+            }
+          }
+        },
+        "seats": [
+          {
+            "offset": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "poseOffsets": [
+              {
+                "offset": {
+                  "x": -0.004955834,
+                  "y": -1.5021043,
+                  "z": -0.13071083
+                },
+                "poseTypes": [
+                  "STAND"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "WALK"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "HOVER"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLY"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLOAT"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "SWIM"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "GLIDE"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "behaviour": {
+        "moving": {
+          "swim": {
+            "avoidsWater": true
+          }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "herd": {
+          "maxSize": "9",
+          "toleratedLeaders": [
+            {
+              "pokemon": "bouffalant",
+              "tier": 1
+            },
+            {
+              "pokemon": "miltank",
+              "tier": 2
+            },
+            {
+              "pokemon": "tauros",
+              "tier": 3
+            },
+            {
+              "pokemon": "tauros bull_breed=combat",
+              "tier": 3
+            },
+            {
+              "pokemon": "tauros bull_breed=aqua",
+              "tier": 4
+            },
+            {
+              "pokemon": "tauros bull_breed=blaze",
+              "tier": 4
+            }
+          ]
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        }
       },
       "moves": [
         "1:tackle",
@@ -337,6 +642,129 @@
         "special_attack": 0,
         "special_defence": 0,
         "speed": 0
+      },
+      "riding": {
+        "behaviours": {
+          "LAND": {
+            "key": "cobblemon:land/horse",
+            "rideSounds": [],
+            "stats": {
+              "ACCELERATION": "20-55",
+              "JUMP": "25-40",
+              "SKILL": "15-30",
+              "SPEED": "55-75",
+              "STAMINA": "30-50"
+            }
+          }
+        },
+        "seats": [
+          {
+            "offset": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "poseOffsets": [
+              {
+                "offset": {
+                  "x": -0.004955834,
+                  "y": -1.5021043,
+                  "z": -0.13071083
+                },
+                "poseTypes": [
+                  "STAND"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "WALK"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "HOVER"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLY"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLOAT"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "SWIM"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "GLIDE"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "9",
+          "toleratedLeaders": [
+            {
+              "pokemon": "tauros bull_breed=blaze",
+              "tier": 1
+            }
+          ]
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true,
+            "canSwimInLava": true
+          }
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "fireImmune": true
       },
       "moves": [
         "1:tackle",
@@ -466,6 +894,147 @@
         "special_defence": 0,
         "speed": 0
       },
+      "riding": {
+        "behaviours": {
+          "LAND": {
+            "key": "cobblemon:land/horse",
+            "rideSounds": [],
+            "stats": {
+              "ACCELERATION": "15-50",
+              "JUMP": "25-30",
+              "SKILL": "15-30",
+              "SPEED": "50-70",
+              "STAMINA": "40-60"
+            }
+          },
+          "LIQUID": {
+            "key": "cobblemon:liquid/boat",
+            "surfaceLevelOffset": -0.9,
+            "rideSounds": [
+              {
+                "muffleEnabled": true,
+                "pitchExpr": "math.max(1.0 ,0.2 + math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2))",
+                "playForNonPassengers": true,
+                "soundLocation": "cobblemon:ride.loop.water_surface",
+                "volumeExpr": "math.pow(math.min(q.ride_velocity() / 1.5, 1.0),2)"
+              }
+            ],
+            "stats": {
+              "ACCELERATION": "55-65",
+              "JUMP": "20-30",
+              "SKILL": "40-55",
+              "SPEED": "30-40",
+              "STAMINA": "30-65"
+            }
+          }
+        },
+        "seats": [
+          {
+            "offset": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "poseOffsets": [
+              {
+                "offset": {
+                  "x": -0.004955834,
+                  "y": -1.5021043,
+                  "z": -0.13071083
+                },
+                "poseTypes": [
+                  "STAND"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "WALK"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "HOVER"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLY"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "FLOAT"
+                ]
+              },
+              {
+                "offset": {
+                  "x": -0.00920631,
+                  "y": -1.4530607,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "SWIM"
+                ]
+              },
+              {
+                "offset": {
+                  "x": 0.0,
+                  "y": -1.625,
+                  "z": -0.125
+                },
+                "poseTypes": [
+                  "GLIDE"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "9",
+          "toleratedLeaders": [
+            {
+              "pokemon": "tauros bull_breed=aqua",
+              "tier": 1
+            }
+          ]
+        },
+        "combat": {
+          "willDefendSelf": true,
+          "willDefendOwner": true,
+          "willFlee": false
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        },
+        "moving": {
+          "swim": {
+            "canWalkOnWater": true
+          }
+        }
+      },
       "moves": [
         "1:tackle",
         "1:tailwhip",
@@ -553,5 +1122,9 @@
       "evolutions": [],
       "battleOnly": false
     }
+  ],
+  "features": [
+    "paldean",
+    "bull_breed"
   ]
 }

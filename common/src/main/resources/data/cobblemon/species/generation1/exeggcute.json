@@ -57,11 +57,30 @@
     "resting": {
       "canSleep": true,
       "willSleepOnBed": true,
-      "light": "0-4"
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "herd": {
+      "maxSize": "9",
+      "toleratedLeaders": [
+        {
+          "pokemon": "exeggcute",
+          "tier": 1
+        }
+      ]
+    },
+    "moving": {
+      "swim": {
+        "avoidsWater": true
+      }
+    },
+    "combat": {
+      "willDefendOwner": true
     }
   },
   "drops": {
-    "amount": 5,
+    "amount": 6,
     "entries": [
       {
         "item": "minecraft:egg",
@@ -69,6 +88,10 @@
       },
       {
         "item": "cobblemon:oval_stone",
+        "percentage": 2.5
+      },
+      {
+        "item": "cobblemon:psychic_seed",
         "percentage": 2.5
       },
       {
@@ -170,22 +193,42 @@
     "tutor:trick",
     "tutor:uproar",
     "tutor:worryseed",
-    "tutor:zenheadbutt"
+    "tutor:zenheadbutt",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:captivate",
+    "legacy:confide",
+    "legacy:doubleedge",
+    "legacy:doubleteam",
+    "legacy:eggbomb",
+    "legacy:frustration",
+    "legacy:gravity",
+    "legacy:headbutt",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:nightmare",
+    "legacy:psywave",
+    "legacy:rage",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:takedown",
+    "legacy:teleport",
+    "legacy:toxic",
+    "legacy:trickroom",
+    "special:sweetscent",
+    "special:wish"
   ],
   "evolutions": [
     {
       "id": "exeggcute_exeggutor",
       "variant": "item_interact",
       "result": "exeggutor",
-      "consumeHeldItem": true,
+      "consumeHeldItem": false,
       "learnableMoves": [
         "stomp"
-      ],
-      "requirements": [
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/exeggcute_alolabiome"
-        }
       ],
       "requiredContext": "cobblemon:leaf_stone"
     },
@@ -193,7 +236,7 @@
       "id": "exeggcute_exeggutoralola",
       "variant": "item_interact",
       "result": "exeggutor alolan",
-      "consumeHeldItem": true,
+      "consumeHeldItem": false,
       "learnableMoves": [
         "dragonhammer"
       ],
@@ -201,10 +244,6 @@
         {
           "variant": "biome",
           "biomeCondition": "#cobblemon:evolution/regional/exeggcute_alolabiome"
-        },
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/exeggcute_kantobiome"
         }
       ],
       "requiredContext": "cobblemon:leaf_stone"
@@ -235,15 +274,11 @@
           "id": "exeggcute_exeggutor",
           "variant": "item_interact",
           "result": "exeggutor",
-          "consumeHeldItem": true,
+          "consumeHeldItem": false,
           "learnableMoves": [
             "stomp"
           ],
           "requirements": [
-            {
-              "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/exeggcute_alolabiome"
-            },
             {
               "variant": "biome",
               "biomeCondition": "#cobblemon:evolution/regional/exeggcute_kantobiome"
@@ -255,15 +290,9 @@
           "id": "exeggcute_exeggutoralola",
           "variant": "item_interact",
           "result": "exeggutor alolan",
-          "consumeHeldItem": true,
+          "consumeHeldItem": false,
           "learnableMoves": [
             "dragonhammer"
-          ],
-          "requirements": [
-            {
-              "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/exeggcute_kantobiome"
-            }
           ],
           "requiredContext": "cobblemon:leaf_stone"
         }

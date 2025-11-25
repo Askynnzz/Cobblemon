@@ -66,6 +66,7 @@ class PoseTransitionAnimation(
         val oldIntensity = 1 - newIntensity
 
         model.setDefault()
+        model.transformedParts.forEach { it.apply(state) }
 
         model.applyPose(state, beforePose, oldIntensity)
         beforePose.animations.forEach {
@@ -77,6 +78,6 @@ class PoseTransitionAnimation(
             it.apply(context, model, state, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch, newIntensity)
         }
 
-        return ratio < 1F
+        return ratio <= 1F
     }
 }

@@ -53,11 +53,15 @@
     "fixed": false
   },
   "drops": {
-    "amount": 3,
+    "amount": 4,
     "entries": [
       {
         "item": "minecraft:slime_ball",
         "quantityRange": "0-2"
+      },
+      {
+        "item": "cobblemon:shed_shell",
+        "percentage": 5.0
       },
       {
         "item": "cobblemon:haban_berry",
@@ -129,23 +133,21 @@
     "tutor:sleeptalk",
     "tutor:sludgebomb",
     "tutor:thunderbolt",
-    "tutor:waterpulse"
+    "tutor:waterpulse",
+    "legacy:attract",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:poisontail",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger"
   ],
   "preEvolution": "goomy",
   "evolutions": [
-    {
-      "id": "sliggoo_goodra",
-      "variant": "level_up",
-      "result": "goodra",
-      "consumeHeldItem": false,
-      "learnableMoves": [],
-      "requirements": [
-        {
-          "variant": "level",
-          "minLevel": 50
-        }
-      ]
-    },
     {
       "id": "sliggoo_goodra",
       "variant": "level_up",
@@ -203,11 +205,15 @@
         "fixed": false
       },
       "drops": {
-        "amount": 5,
+        "amount": 6,
         "entries": [
           {
             "item": "minecraft:slime_ball",
             "quantityRange": "0-2"
+          },
+          {
+            "item": "cobblemon:shed_shell",
+            "percentage": 5.0
           },
           {
             "item": "minecraft:iron_ingot",
@@ -290,7 +296,19 @@
         "tutor:sludgebomb",
         "tutor:steelbeam",
         "tutor:thunderbolt",
-        "tutor:waterpulse"
+        "tutor:waterpulse",
+        "legacy:attract",
+        "legacy:confide",
+        "legacy:doubleteam",
+        "legacy:frustration",
+        "legacy:hiddenpower",
+        "legacy:poisontail",
+        "legacy:return",
+        "legacy:round",
+        "legacy:secretpower",
+        "legacy:snore",
+        "legacy:swagger",
+        "legacy:toxic"
       ],
       "preEvolution": "goomy",
       "evolutions": [
@@ -314,7 +332,28 @@
           ]
         }
       ],
-      "battleOnly": false
+      "battleOnly": false,
+      "behaviour": {
+        "combat": {
+          "willDefendOwner": true
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        }
+      }
     }
-  ]
+  ],
+  "behaviour": {
+    "moving": {
+      "swim": {}
+    },
+    "combat": {
+      "willDefendOwner": true
+    },
+    "resting": {
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    }
+  }
 }

@@ -55,13 +55,48 @@
   "behaviour": {
     "resting": {
       "canSleep": true,
-      "light": "0-4"
+      "light": "0-4",
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
     },
     "moving": {
       "walk": {
         "walkSpeed": 0.35
+      },
+      "swim": {
+        "avoidsWater": true,
+        "canSwimInLava": true
       }
-    }
+    },
+    "herd": {
+      "maxSize": "9",
+      "toleratedLeaders": [
+        {
+          "pokemon": "zebstrika",
+          "tier": 1
+        },
+        {
+          "pokemon": "mudsdale",
+          "tier": 1
+        },
+        {
+          "pokemon": "rapidash",
+          "tier": 2
+        },
+        {
+          "pokemon": "glastrier",
+          "tier": 3
+        },
+        {
+          "pokemon": "spectrier",
+          "tier": 3
+        }
+      ]
+    },
+    "combat": {
+      "willDefendOwner": true
+    },
+    "fireImmune": true
   },
   "drops": {
     "amount": 4,
@@ -173,7 +208,26 @@
     "tutor:sleeptalk",
     "tutor:swift",
     "tutor:throatchop",
-    "tutor:wildcharge"
+    "tutor:wildcharge",
+    "legacy:attract",
+    "legacy:bide",
+    "legacy:confide",
+    "legacy:curse",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:mimic",
+    "legacy:naturalgift",
+    "legacy:quickattack",
+    "legacy:rage",
+    "legacy:reflect",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:skullbash",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic"
   ],
   "preEvolution": "ponyta",
   "evolutions": [],
@@ -302,14 +356,109 @@
         "tutor:sleeptalk",
         "tutor:swift",
         "tutor:throatchop",
-        "tutor:trick",
         "tutor:wildcharge",
         "tutor:wonderroom",
-        "tutor:zenheadbutt"
+        "tutor:zenheadbutt",
+        "legacy:attract",
+        "legacy:round",
+        "legacy:snore"
       ],
       "preEvolution": "ponyta galarian",
       "evolutions": [],
-      "battleOnly": false
+      "battleOnly": false,
+      "riding": {
+        "stats": {
+          "SPEED": {
+            "ranges": "45-70"
+          },
+          "ACCELERATION": {
+            "ranges": "30-65"
+          },
+          "SKILL": {
+            "ranges": "30-60"
+          },
+          "JUMP": {
+            "ranges": "25-55"
+          },
+          "STAMINA": {
+            "ranges": "40-85"
+          }
+        },
+        "seats": [],
+        "behaviour": {
+          "key": "cobblemon:land/horse"
+        }
+      },
+      "behaviour": {
+        "herd": {
+          "maxSize": "9",
+          "toleratedLeaders": [
+            {
+              "pokemon": "zebstrika",
+              "tier": 1
+            },
+            {
+              "pokemon": "mudsdale",
+              "tier": 1
+            },
+            {
+              "pokemon": "rapidash",
+              "tier": 2
+            },
+            {
+              "pokemon": "glastrier",
+              "tier": 3
+            },
+            {
+              "pokemon": "spectrier",
+              "tier": 3
+            }
+          ]
+        },
+        "moving": {
+          "swim": {
+            "avoidsWater": true
+          }
+        },
+        "combat": {
+          "willDefendOwner": true
+        },
+        "resting": {
+          "drowsyChance": 0.0333,
+          "rouseChance": 0.0042
+        }
+      },
+      "lightingData": {
+        "lightLevel": 11,
+        "liquidGlowMode": "LAND"
+      }
     }
-  ]
+  ],
+  "riding": {
+    "stats": {
+      "SPEED": {
+        "ranges": "45-75"
+      },
+      "ACCELERATION": {
+        "ranges": "30-60"
+      },
+      "SKILL": {
+        "ranges": "30-60"
+      },
+      "JUMP": {
+        "ranges": "25-50"
+      },
+      "STAMINA": {
+        "ranges": "40-85"
+      }
+    },
+    "seats": [],
+    "behaviour": {
+      "key": "cobblemon:land/horse"
+    }
+  },
+  "lightingData": {
+    "lightLevel": 15,
+    "liquidGlowMode": "LAND"
+  }
 }

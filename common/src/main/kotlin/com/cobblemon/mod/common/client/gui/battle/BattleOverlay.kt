@@ -9,6 +9,7 @@
 package com.cobblemon.mod.common.client.gui.battle
 
 import com.cobblemon.mod.common.api.abilities.Abilities
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.gui.blitk
 import com.cobblemon.mod.common.api.gui.renderSprite
 import com.cobblemon.mod.common.api.pokedex.PokedexEntryProgress
@@ -37,7 +38,6 @@ import com.cobblemon.mod.common.client.render.drawScaledText
 import com.cobblemon.mod.common.client.render.drawScaledTextJustifiedRight
 import com.cobblemon.mod.common.client.render.getDepletableRedGreen
 import com.cobblemon.mod.common.client.render.models.blockbench.PosableState
-import com.cobblemon.mod.common.client.render.models.blockbench.repository.PokeBallModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.PokemonModelRepository
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.RenderContext
 import com.cobblemon.mod.common.client.render.models.blockbench.repository.VaryingModelRepository
@@ -233,7 +233,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         }
 
         if (Minecraft.getInstance().screen !is BattleGUI && battle.mustChoose) {
-            val textOpacity = Companion.PROMPT_TEXT_OPACITY_CURVE(passedSeconds)
+            val textOpacity = PROMPT_TEXT_OPACITY_CURVE(passedSeconds)
             drawScaledText(
                 context = context,
                 text = battleLang("ui.actions_label", PartySendBinding.boundKey().displayName),
@@ -569,8 +569,9 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
                 contextScale = speciesToDisplay.getForm(stateToDisplay.currentAspects).baseScale,
                 repository = PokemonModelRepository,
                 reversed = reversed,
+                doQuirks = false,
                 state = stateToDisplay,
-                partialTicks = partialTicks
+                partialTicks = if (Cobblemon.config.animateBattleTiles) partialTicks else 0F
             )
         }
         matrixStack.popPose()
@@ -1671,8 +1672,8 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
         reversed: Boolean = false
     ) {
         val context = RenderContext()
-        val model = PokeBallModelRepository.getPoser(state.pokeBall.name, state)
-        val texture = PokeBallModelRepository.getTexture(state.pokeBall.name, state)
+        val model = VaryingModelRepository.getPoser(state.pokeBall.name, state)
+        val texture = VaryingModelRepository.getTexture(state.pokeBall.name, state)
         val renderType = RenderType.entityCutout(texture)//model.getLayer(texture)
 
         RenderSystem.applyModelViewMatrix()

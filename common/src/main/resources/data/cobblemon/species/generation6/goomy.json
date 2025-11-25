@@ -53,11 +53,15 @@
     "fixed": false
   },
   "drops": {
-    "amount": 2,
+    "amount": 3,
     "entries": [
       {
         "item": "minecraft:slime_ball",
         "quantityRange": "0-1"
+      },
+      {
+        "item": "cobblemon:shed_shell",
+        "percentage": 2.5
       },
       {
         "item": "cobblemon:haban_berry",
@@ -122,7 +126,19 @@
     "tutor:sleeptalk",
     "tutor:sludgebomb",
     "tutor:thunderbolt",
-    "tutor:waterpulse"
+    "tutor:waterpulse",
+    "legacy:attract",
+    "legacy:confide",
+    "legacy:doubleteam",
+    "legacy:frustration",
+    "legacy:hiddenpower",
+    "legacy:poisontail",
+    "legacy:return",
+    "legacy:round",
+    "legacy:secretpower",
+    "legacy:snore",
+    "legacy:swagger",
+    "legacy:toxic"
   ],
   "evolutions": [
     {
@@ -137,10 +153,6 @@
         {
           "variant": "level",
           "minLevel": 40
-        },
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/goomy_hisuibiome"
         }
       ]
     },
@@ -160,10 +172,6 @@
         {
           "variant": "biome",
           "biomeCondition": "#cobblemon:evolution/regional/goomy_hisuibiome"
-        },
-        {
-          "variant": "biome",
-          "biomeAnticondition": "#cobblemon:evolution/regional/goomy_kalosbiome"
         }
       ]
     }
@@ -203,10 +211,6 @@
             },
             {
               "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/goomy_hisuibiome"
-            },
-            {
-              "variant": "biome",
               "biomeCondition": "#cobblemon:evolution/regional/goomy_kalosbiome"
             }
           ]
@@ -223,14 +227,23 @@
             {
               "variant": "level",
               "minLevel": 40
-            },
-            {
-              "variant": "biome",
-              "biomeAnticondition": "#cobblemon:evolution/regional/goomy_kalosbiome"
             }
           ]
         }
       ]
     }
-  ]
+  ],
+  "behaviour": {
+    "resting": {
+      "willSleepOnBed": true,
+      "drowsyChance": 0.0333,
+      "rouseChance": 0.0042
+    },
+    "moving": {
+      "swim": {}
+    },
+    "combat": {
+      "willDefendOwner": true
+    }
+  }
 }

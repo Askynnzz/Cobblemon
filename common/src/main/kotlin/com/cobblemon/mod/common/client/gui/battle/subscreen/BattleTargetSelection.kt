@@ -41,16 +41,16 @@ import kotlin.math.floor
 import kotlin.math.sin
 
 class BattleTargetSelection(
-    battleGUI: BattleGUI,
-    val request: SingleActionRequest,
-    val move: InBattleMove,
-    val gimmickID: String?,
-    gimmickMove: InBattleGimmickMove?
+        battleGUI: BattleGUI,
+        request: SingleActionRequest,
+        val move: InBattleMove,
+        val gimmickID: String?,
+        gimmickMove: InBattleGimmickMove?
 ) : BattleActionSelection(
     battleGUI = battleGUI,
     x = 0,
-    y = if (Minecraft.getInstance().window.guiScaledHeight > 304) (Minecraft.getInstance().window.guiScaledHeight / 2) - (BattleSwitchPokemonSelection.Companion.BACKGROUND_HEIGHT / 2)
-    else Minecraft.getInstance().window.guiScaledHeight - (BattleSwitchPokemonSelection.Companion.BACKGROUND_HEIGHT + 78),
+    y = if (Minecraft.getInstance().window.guiScaledHeight > 304) (Minecraft.getInstance().window.guiScaledHeight / 2) - (BattleSwitchPokemonSelection.BACKGROUND_HEIGHT / 2)
+        else Minecraft.getInstance().window.guiScaledHeight - (BattleSwitchPokemonSelection.BACKGROUND_HEIGHT + 78),
     width = 100,
     height = 100,
     battleLang("ui.select_move")
@@ -114,11 +114,11 @@ class BattleTargetSelection(
 
 
     open inner class TargetTile(
-        val targetSelection: BattleTargetSelection,
-        val target: ActiveClientBattlePokemon,
-        val x: Float,
-        val y: Float,
-        val arrowDirection: ArrowDirection
+            val targetSelection: BattleTargetSelection,
+            val target: ActiveClientBattlePokemon,
+            val x: Float,
+            val y: Float,
+            val arrowDirection: ArrowDirection
     ) {
         var moveTemplate = MoveTemplate.dummy(target.battlePokemon?.displayName.toString())
         private val responseTarget = selectableTargetList?.firstOrNull { it.getPNX() == target.getPNX() }?.getPNX()
@@ -132,7 +132,7 @@ class BattleTargetSelection(
         val hue = target.getHue()
         val rgb = if ((target.battlePokemon?.hpValue ?: 0F) > 0)
             Triple(((hue shr 16) and 0b11111111) / 255F, ((hue shr 8) and 0b11111111) / 255F, (hue and 0b11111111) / 255F)
-        else Triple(0.5f, 0.5f, 0.5f)
+            else Triple(0.5f, 0.5f, 0.5f)
 
         val arrowTexture = when (arrowDirection) {
             ArrowDirection.LEFT -> battleArrowLeft
