@@ -888,7 +888,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
 
             matrixStack.translate(
                 model.portraitTranslation.x * if (reversed) -1F else 1F,
-                model.portraitTranslation.y,
+                model.portraitTranslation.y + 1.5 * model.portraitScale,
                 model.portraitTranslation.z - 4
             )
             matrixStack.scale(model.portraitScale, model.portraitScale, 1 / model.portraitScale)
