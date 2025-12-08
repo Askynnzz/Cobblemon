@@ -2041,6 +2041,7 @@
   "key.cobblemon.pokenavigator": "Open PokéNav",
   "key.cobblemon.summary": "Open Summary",
   "key.cobblemon.pokedex": "Open Pokédex",
+  "key.cobblemon.ridingfreelook": "Riding Freelook",
   "key.cobblemon.spectate_nearest": "Spectate Nearest Battle",
   "key.cobblemon.categories.cobblemon": "Cobblemon",
 
@@ -3650,7 +3651,8 @@
   "tag.item.cobblemon.small_flowers": "Small Flowers",
   "tag.item.cobblemon.held.blacklisted_items_to_hold": "Blacklisted Held Items",
   "tag.item.cobblemon.held.whitelisted_items_to_hold": "Whitelisted Held Items",
-  "tag.item.cobblemon.recipe_filters.poke_puff_seasoner": "Poké Puff Berries",
+  "tag.item.cobblemon.recipe_filters.poke_puff_seasoning": "Poké Puff Seasoning Items",
+  "tag.item.cobblemon.recipe_filters.tea_seasoning": "Tea Seasoning Items",
   "tag.item.cobblemon.recipe_filters.bait_seasoning": "Baits",
   "tag.item.cobblemon.recipe_filters.effect_seasoning": "Effect Seasoning Items",
   "tag.item.cobblemon.recipe_filters.nutrition_seasoning": "Nutrition Seasoning Items",
@@ -3905,6 +3907,9 @@
 
   "cobblemon.behaviour.attack_hostile_mobs.name": "Attacks Hostile Mobs",
   "cobblemon.behaviour.attack_hostile_mobs.desc": "Attacks hostile mobs that are nearby, even if unprovoked.",
+
+  "cobblemon.behaviour.defend_owner.name": "Defend Owner",
+  "cobblemon.behaviour.defend_owner.desc": "Defends its owner when they are attacked.",
 
   "cobblemon.behaviour.pokemon_bee.name": "Pollinates Flowers",
   "cobblemon.behaviour.pokemon_bee.desc": "Pollinates flowers and adds honey to hives and Saccharine tree leaves.",
