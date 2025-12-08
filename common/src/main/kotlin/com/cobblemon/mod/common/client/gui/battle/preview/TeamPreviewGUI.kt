@@ -27,4 +27,6 @@ class TeamPreviewGUI(val preview: ClientBattleTeamPreview) : Screen(battleLang("
     }
 
     override fun shouldCloseOnEsc() = false
+
+    override fun isPauseScreen() = false
 }

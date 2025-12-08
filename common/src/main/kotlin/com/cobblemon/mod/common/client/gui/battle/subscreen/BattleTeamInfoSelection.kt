@@ -8,9 +8,11 @@
 
 package com.cobblemon.mod.common.client.gui.battle.subscreen
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.abilities.Abilities
 import com.cobblemon.mod.common.api.gui.blitk
+import com.cobblemon.mod.common.api.gui.renderSprite
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.text.bold
 import com.cobblemon.mod.common.api.text.font
@@ -38,15 +40,32 @@ import com.cobblemon.mod.common.util.cobblemonResource
 import com.cobblemon.mod.common.util.lang
 import com.cobblemon.mod.common.util.math.fromEulerXYZDegrees
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay
+import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.PORTRAIT_DIAMETER
 import com.cobblemon.mod.common.client.gui.battle.BattleOverlay.Companion.questionMarkIcon
+import com.cobblemon.mod.common.client.gui.battle.preview.TeamPreviewWidget
+import com.cobblemon.mod.common.client.gui.battle.preview.TeamPreviewWidget.PokemonTile
+import com.cobblemon.mod.common.client.render.SpriteType
+import com.cobblemon.mod.common.client.render.models.blockbench.PosableState
+import com.cobblemon.mod.common.client.render.models.blockbench.repository.RenderContext
+import com.cobblemon.mod.common.client.render.models.blockbench.repository.VaryingModelRepository
+import com.cobblemon.mod.common.entity.PoseType
 import com.cobblemon.mod.common.net.messages.client.battle.BattlePokemonDTO
+import com.cobblemon.mod.common.util.toHex
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.narration.NarratableEntry
 import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.sounds.SoundManager
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -73,10 +92,12 @@ class BattleTeamInfoSelection(
 
         const val BACKGROUND_HEIGHT = 148
         val underlayTexture = cobblemonResource("textures/gui/battle/selection_underlay.png")
+        val title = cobblemonResource("textures/gui/battle/turn_counter.png")
         var visible = false
     }
 
-    val tiles = mutableListOf<PokemonTile>()
+    val teamTiles = mutableListOf<PokemonTile>()
+    val opponentTiles = mutableListOf<PokemonTile>()
     val backButton = BattleBackButton(x + 9F, Minecraft.getInstance().window.guiScaledHeight - 22F)
 
     init {
@@ -94,34 +115,39 @@ class BattleTeamInfoSelection(
         if (actors.size != 2) return
         val displayOrder = if (actors.last().uuid == Minecraft.getInstance().player?.uuid) actors.reversed() else actors
         val actorToPokemon = displayOrder.map { it to ClientBattleInformationRepository.actors[it.uuid] }
-        val activeSide1Pokemon = battle.side1.activeClientBattlePokemon.mapNotNull { it.battlePokemon?.uuid }
-        val activeSide2Pokemon = battle.side2.activeClientBattlePokemon.mapNotNull { it.battlePokemon?.uuid }
         actorToPokemon.first().second?.forEachIndexed { index, pokemon ->
+            if (pokemon == null) return@forEachIndexed
             val (slotX, slotY) = getSlotPosition(index, 1)
-            val isCurrentlyInBattle = pokemon.uuid in activeSide1Pokemon || pokemon.uuid in activeSide2Pokemon
-            tiles.add(PokemonTile(slotX, slotY, actorToPokemon.first().first, pokemon, isCurrentlyInBattle, this))
+            teamTiles.add(PokemonTile(slotX, slotY, pokemon, this, false))
         }
         actorToPokemon.last().second?.forEachIndexed { index, pokemon ->
+            if (pokemon == null) return@forEachIndexed
             val (slotX, slotY) = getSlotPosition(index, 2)
-            val isCurrentlyInBattle = pokemon.uuid in activeSide1Pokemon || pokemon.uuid in activeSide2Pokemon
-            tiles.add(PokemonTile(slotX, slotY, actorToPokemon.last().first, pokemon, isCurrentlyInBattle, this))
+            opponentTiles.add(PokemonTile(slotX, slotY, pokemon, this, true))
         }
     }
 
     fun getSlotPosition(index: Int, side: Int): Pair<Float, Float> {
-        val startX = if (side == 1) 10 else width - 10 - (PokemonTile.SELECT_WIDTH + SLOT_HORIZONTAL_SPACING) * 2
-        val startY = y + 34
+        val startX = if (side == 1) 10 else width - 10 - (41 + TeamPreviewWidget.Companion.SLOT_HORIZONTAL_SPACING) * 2
+        val startY = y + 15
         val row = index / 2
         val column = index % 2
-        val slotX = startX.toFloat() + column * (SLOT_HORIZONTAL_SPACING + PokemonTile.SELECT_WIDTH)
-        val slotY = startY.toFloat() + row * (SLOT_VERTICAL_SPACING + PokemonTile.SELECT_HEIGHT)
+        val slotX = startX.toFloat() + column * (SLOT_HORIZONTAL_SPACING + 41)
+        val slotY = startY.toFloat() + row * (SLOT_VERTICAL_SPACING + 39)
         return Pair(slotX, slotY)
+    }
+
+    private fun getHoveredTile(team: Boolean, mouseX: Int, mouseY: Int): Int {
+        val tiles = if (team) teamTiles else opponentTiles
+        return tiles.indexOfFirst { it.isHovered(mouseX.toDouble(), mouseY.toDouble()) }
     }
 
     override fun renderWidget(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         if (opacity <= 0.05F) return
 
         val matrixStack = context.pose()
+        val mc = Minecraft.getInstance()
+
         blitk(
             matrixStack = matrixStack,
             texture = underlayTexture,
@@ -131,47 +157,48 @@ class BattleTeamInfoSelection(
             height = BACKGROUND_HEIGHT
         )
 
-        // Draw Title Text
-        val text = "cobblemon.battle.ui.team_info".asTranslated()
-        val textWidth = Minecraft.getInstance().font.width(text)
-        drawScaledText(
-            context = context,
-            text = text,
-            x = (width - textWidth) / 2,
-            y = y + 17,
-            shadow = true
+        blitk(
+            matrixStack = matrixStack,
+            texture = title,
+            x = (mc.window.guiScaledWidth / 2) - (103 / 2),
+            y = 4,
+            width = 103,
+            height = 22
         )
 
-        for (index in 0 until 6) {
-            val (slotX, slotY) = getSlotPosition(index, 1)
-            blitk(
-                matrixStack = matrixStack,
-                texture = PokemonTile.partySelectDisabledResourse,
-                x = slotX,
-                y = slotY,
-                width = PokemonTile.SELECT_WIDTH,
-                height = PokemonTile.SELECT_HEIGHT - 7,
-                vOffset = PokemonTile.SELECT_HEIGHT,
-                textureHeight = PokemonTile.SELECT_HEIGHT * 2,
-            )
-        }
+        drawScaledText(
+            context = context,
+            text = "cobblemon.battle.ui.team_info.title".text().bold(),
+            x = (mc.window.guiScaledWidth / 2),
+            y = 6,
+            scale = 0.75f,
+            shadow = true,
+            centered = true
+        )
 
-        for (index in 0 until 6) {
-            val (slotX, slotY) = getSlotPosition(index, 2)
-            blitk(
-                matrixStack = matrixStack,
-                texture = PokemonTile.partySelectDisabledResourse,
-                x = slotX,
-                y = slotY,
-                width = PokemonTile.SELECT_WIDTH,
-                height = PokemonTile.SELECT_HEIGHT - 7,
-                vOffset = PokemonTile.SELECT_HEIGHT,
-                textureHeight = PokemonTile.SELECT_HEIGHT * 2,
-            )
+        teamTiles.forEachIndexed { index, tile ->
+            val hoveredTile = getHoveredTile(true, mouseX, mouseY)
+            if (shouldHide(hoveredTile, index, false)) return@forEachIndexed
+            tile.render(context, mouseX.toDouble(), mouseY.toDouble(), delta)
         }
-
-        tiles.forEach { it.render(context, mouseX.toDouble(), mouseY.toDouble(), delta) }
+        opponentTiles.forEachIndexed { index, tile ->
+            val hoveredTile = getHoveredTile(false, mouseX, mouseY)
+            if (shouldHide(hoveredTile, index, true)) return@forEachIndexed
+            tile.render(context, mouseX.toDouble(), mouseY.toDouble(), delta)
+        }
         backButton.render(context, mouseX, mouseY, delta)
+    }
+
+    private fun shouldHide(hoveredTile: Int, currentTile: Int, reversed: Boolean): Boolean {
+        if (hoveredTile != -1) {
+            val hoveredRow = hoveredTile / 2
+            val hoveredColumn = hoveredTile % 2
+            val currentRow = currentTile / 2
+            val currentColumn = currentTile % 2
+            if (!reversed && hoveredColumn < currentColumn && hoveredRow <= currentRow) return true
+            if (reversed && hoveredColumn > currentColumn && hoveredRow <= currentRow) return true
+        }
+        return false
     }
 
     override fun mousePrimaryClicked(mouseX: Double, mouseY: Double): Boolean {
@@ -196,18 +223,26 @@ class BattleTeamInfoSelection(
     class PokemonTile(
         val x: Float,
         val y: Float,
-        val actor: ClientBattleActor,
         val pokemonDto: BattlePokemonDTO,
-        val isCurrentlyInBattle: Boolean,
-        val teamInfoSelection: BattleTeamInfoSelection
+        val widget: BattleTeamInfoSelection,
+        val reversed: Boolean
     ) {
         companion object {
-            const val SELECT_WIDTH = 94
-            const val SELECT_HEIGHT = 29
+            const val SELECT_WIDTH = 41
+            const val SELECT_HEIGHT = 39
             const val SCALE = 0.5F
-            val partySelectResource = cobblemonResource("textures/gui/battle/party_select.png")
-            val partySelectDisabledResourse = cobblemonResource("textures/gui/battle/party_select_disabled.png")
             val expandedPokemonInfo = cobblemonResource("textures/gui/battle/expanded_pokemon_info_center.png")
+
+            val pokemonTile = cobblemonResource("textures/gui/battle/pokemon_tile.png")
+            val pokemonTileReversed = cobblemonResource("textures/gui/battle/pokemon_tile_reversed.png")
+            val pokemonTileDisabled = cobblemonResource("textures/gui/battle/pokemon_tile_disabled.png")
+            val pokemonTileDisabledReversed = cobblemonResource("textures/gui/battle/pokemon_tile_disabled_reversed.png")
+            val pokemonTileSelected = cobblemonResource("textures/gui/battle/pokemon_tile_selected.png")
+            val pokemonTileSelectedReversed = cobblemonResource("textures/gui/battle/pokemon_tile_selected_reversed.png")
+
+            val hoverGapSelected = cobblemonResource("textures/gui/battle/hover_gap_selected.png")
+            val hoverGap = cobblemonResource("textures/gui/battle/hover_gap.png")
+            val hoverGapReversed = cobblemonResource("textures/gui/battle/hover_gap_reversed.png")
 
             private val decimalFormat = DecimalFormat("0.00").also {
                 it.roundingMode = RoundingMode.CEILING
@@ -220,11 +255,7 @@ class BattleTeamInfoSelection(
 
         fun render(context: GuiGraphics, mouseX: Double, mouseY: Double, deltaTicks: Float) {
             val pokemon = pokemonDto.activeBattlePokemonDTO ?: return
-            state.currentAspects = pokemon.aspects
-            val matrixStack = context.pose()
-            val isFainted = pokemonDto.fainted
-
-            val clientPokemon = ClientBattlePokemon(
+            val battlePokemon = ClientBattlePokemon(
                 uuid = pokemon.uuid,
                 properties = pokemon.properties,
                 aspects = pokemon.aspects,
@@ -235,189 +266,95 @@ class BattleTeamInfoSelection(
                 status = pokemon.status,
                 statChanges = pokemon.statChanges,
             )
-            clientPokemon.actor = actor
+            state.currentAspects = pokemon.aspects
+            val matrixStack = context.pose()
+            val isFainted = pokemonDto.fainted
 
-            val status = pokemon.status?.showdownName
-            if (!isFainted && status != null) {
+            blitk(
+                matrixStack = matrixStack,
+                texture = cobblemonResource("textures/gui/battle/battle_info_underlay.png"),
+                x = x + 5 + (if (reversed) 3 else 0),
+                y = y + 4,
+                width = 28,
+                height = 28
+            )
+            val speciesToDisplay = battlePokemon.species
+            val stateToDisplay = battlePokemon.state
+            context.enableScissor(
+                (x + 5 + (if (reversed) 3 else 0)).toInt(),
+                (y + 5).toInt(),
+                (x + 5 + 28 + (if (reversed) 3 else 0)).toInt(),
+                (y + 5 + 28).toInt(),
+            )
+            matrixStack.pushPose()
+            matrixStack.translate(
+                x + (if (reversed) 3 else 0) + 5 + 28 / 2.0,
+                y.toDouble() + 5 - 5.0,
+                0.0
+            )
+            drawCustomPosablePortrait(
+                identifier = speciesToDisplay.resourceIdentifier,
+                matrixStack = matrixStack,
+                scale = 18f,
+                contextScale = speciesToDisplay.getForm(stateToDisplay.currentAspects).baseScale,
+                reversed = reversed,
+                doQuirks = false,
+                state = stateToDisplay,
+                partialTicks = if (Cobblemon.config.animateBattleTiles) deltaTicks else 0F
+            )
+            matrixStack.popPose()
+            context.disableScissor()
+
+            val tile = if (reversed) pokemonTileReversed else pokemonTile
+            val disabled = if (reversed) pokemonTileDisabledReversed else pokemonTileDisabled
+            val selected = if (reversed) pokemonTileSelectedReversed else pokemonTileSelected
+            if (isFainted) {
                 blitk(
                     matrixStack = matrixStack,
-                    texture = cobblemonResource("textures/gui/interact/party_select_status_$status.png"),
-                    x = x + 27,
-                    y = y + 24,
-                    height = 5,
-                    width = 37
-                )
-
-                drawScaledText(
-                    context = context,
-                    text = lang("ui.status.$status").bold(),
-                    x = x + 32.5,
-                    y = y + 24.5,
-                    shadow = true,
-                    scale = SCALE
+                    texture = disabled,
+                    x = x,
+                    y = y,
+                    width = 41,
+                    height = 39
                 )
             }
-
-            blitk(
-                matrixStack = matrixStack,
-                texture = if (!isFainted) partySelectResource else partySelectDisabledResourse,
-                x = x,
-                y = y,
-                width = SELECT_WIDTH,
-                height = SELECT_HEIGHT,
-                vOffset = if (!isFainted) SELECT_HEIGHT else 0,
-                textureHeight = SELECT_HEIGHT * 2,
-            )
-
-            val ballIcon = cobblemonResource("textures/gui/ball/poke_ball.png")
-            val ballHeight = 22
-            blitk(
-                matrixStack = matrixStack,
-                texture = ballIcon,
-                x = (x + 85) / SCALE,
-                y = (y - 3) / SCALE,
-                height = ballHeight,
-                width = 18,
-                vOffset = if (isCurrentlyInBattle) ballHeight else 0,
-                textureHeight = ballHeight * 2,
-                scale = SCALE
-            )
-
-            // Render Pokémon
-            matrixStack.pushPose()
-            matrixStack.translate(x + SELECT_WIDTH - (25 / 2.0) - 4, y - 1.0, 0.0)
-            matrixStack.scale(2.5F, 2.5F, 1F)
-            drawProfilePokemon(
-                species = clientPokemon.species.resourceIdentifier,
-                matrixStack = matrixStack,
-                rotation = Quaternionf().fromEulerXYZDegrees(Vector3f(13F, 35F, 0F)),
-                state = state,
-                scale = 4.5F,
-                partialTicks = deltaTicks
-            )
-            matrixStack.popPose()
-
-            // Ensure elements are not hidden behind Pokémon render
-            matrixStack.pushPose()
-            matrixStack.translate(0.0, 0.0, 100.0)
-            // Held Item
-            val heldItem = pokemonDto.heldItem ?: ItemStack.EMPTY
-            if (!heldItem.isEmpty) {
-                renderScaledGuiItemIcon(
+            else {
+                blitk(
                     matrixStack = matrixStack,
-                    itemStack = heldItem,
-                    x = x + 81.0,
-                    y = y + 11.0,
-                    scale = 0.5
+                    texture = tile,
+                    x = x,
+                    y = y,
+                    width = 41,
+                    height = 39
                 )
             }
-
-            val textOpacity = if (isFainted) 0.7F else 1F
-
-            // Target Level
-            drawScaledText(
-                context = context,
-                font = CobblemonResources.DEFAULT_LARGE,
-                text = lang("ui.lv").bold(),
-                x = x + 5,
-                y = y + 4,
-                opacity = textOpacity,
-                shadow = true
-            )
-            drawScaledText(
-                context = context,
-                font = CobblemonResources.DEFAULT_LARGE,
-                text = clientPokemon.level.toString().text().bold(),
-                x = x + 5 + 13,
-                y = y + 4,
-                opacity = textOpacity,
-                shadow = true
-            )
-
-            val displayText = clientPokemon.displayName.bold()
-            // Pokémon Display Name
-            drawScaledText(
-                context = context,
-                font = CobblemonResources.DEFAULT_LARGE,
-                text = displayText,
-                x = x + 5,
-                y = y + 11,
-                opacity = textOpacity,
-                shadow = true
-            )
-
-            // Gender
-            val gender = clientPokemon.gender
-            val pokemonDisplayNameWidth = Minecraft.getInstance().font.width(displayText.font(CobblemonResources.DEFAULT_LARGE))
-            if (gender != Gender.GENDERLESS) {
-                val isMale = gender == Gender.MALE
-                val textSymbol = if (isMale) "♂".text().bold() else "♀".text().bold()
-                drawScaledText(
-                    context = context,
-                    font = CobblemonResources.DEFAULT_LARGE,
-                    text = textSymbol,
-                    x = x + 6 + pokemonDisplayNameWidth,
-                    y = y + 11,
-                    colour = if (isMale) 0x32CBFF else 0xFC5454,
-                    opacity = textOpacity,
-                    shadow = true
-                )
-            }
-
-            // HP
-            val barWidthMax = 90
-            val hpRatio = if (clientPokemon.isHpFlat) clientPokemon.hpValue / clientPokemon.maxHp else clientPokemon.hpValue
-            val barWidth = hpRatio * barWidthMax
-            val (red, green) = getDepletableRedGreen(hpRatio)
-
-            blitk(
-                matrixStack = matrixStack,
-                texture = CobblemonResources.WHITE,
-                x = x + 1,
-                y = y + 22,
-                width = barWidth,
-                height = 1,
-                textureWidth = barWidth / hpRatio,
-                uOffset = barWidthMax - barWidth,
-                red = red * 0.8F,
-                green = green * 0.8F,
-                blue = 0.27F
-            )
-
-            val text = if (clientPokemon.isHpFlat) {
-                "${clientPokemon.hpValue.toInt()}/${clientPokemon.maxHp.toInt()}"
-            } else {
-                "${ceil(clientPokemon.hpValue * 100)}%"
-            }.text()
-
-            drawScaledText(
-                context = context,
-                text = text,
-                x = x + 14,
-                y = y + 24.5,
-                scale = SCALE,
-                centered = true
-            )
-            matrixStack.popPose()
 
             if (isHovered(mouseX, mouseY)) {
-                renderExpandedInfo(context, clientPokemon)
+                renderExpandedInfo(context, reversed, battlePokemon, pokemonDto)
             }
         }
 
-        private fun renderExpandedInfo(context: GuiGraphics, pokemon: ClientBattlePokemon) {
+        private fun renderExpandedInfo(context: GuiGraphics, reversed: Boolean, pokemon: ClientBattlePokemon, dto: BattlePokemonDTO) {
             context.pose().pushPose()
             context.pose().translate(0.0, 0.0, 300.0)
-            val startX = Minecraft.getInstance().window.guiScaledWidth / 2 - (137 / 2)
-            val startY = teamInfoSelection.y + 30
+            val startX = if (reversed) x - 136 else x + 40
+            val startY = y
             val species = pokemon.species
             val form = species.getForm(pokemon.state.currentAspects)
-
-            val actor = pokemon.actor.uuid
-            val actorTeam = ClientBattleInformationRepository.actors[actor]
-            val dto = actorTeam?.let { it.firstOrNull { dto -> pokemon.uuid == dto.uuid } }
-
             val expandedInfoTexture = expandedPokemonInfo
+
+            val gap = if (reversed) hoverGapReversed else hoverGap
+            val xOffset = if (reversed) 136 else -7
+            blitk(
+                matrixStack = context.pose(),
+                texture = gap,
+                x = startX + xOffset,
+                y = startY,
+                height = 36,
+                width = 8,
+                textureHeight = 36,
+                textureWidth = 8,
+            )
 
             blitk(
                 matrixStack = context.pose(),
@@ -470,7 +407,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.ATTACK)?.let {
+            dto.buffs.get(Stats.ATTACK)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -492,7 +429,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.DEFENCE)?.let {
+            dto.buffs.get(Stats.DEFENCE)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -514,7 +451,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.SPECIAL_ATTACK)?.let {
+            dto.buffs.get(Stats.SPECIAL_ATTACK)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -536,7 +473,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.SPECIAL_DEFENCE)?.let {
+            dto.buffs.get(Stats.SPECIAL_DEFENCE)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -558,7 +495,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.SPEED)?.let {
+            dto.buffs.get(Stats.SPEED)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -580,7 +517,7 @@ class BattleTeamInfoSelection(
                 centered = false
             )
 
-            dto?.buffs?.get(Stats.ACCURACY)?.let {
+            dto.buffs.get(Stats.ACCURACY)?.let {
                 drawScaledText(
                     context = context,
                     text = getMultiplierText(it),
@@ -624,7 +561,7 @@ class BattleTeamInfoSelection(
                 centered = true
             )
 
-            val ability = dto?.ability?.let { Abilities.get(it) }
+            val ability = dto.ability?.let { Abilities.get(it) }
             val abilityName = ability?.displayName?.text() ?: "?".text()
 
             drawScaledText(
@@ -647,7 +584,7 @@ class BattleTeamInfoSelection(
                 centered = true
             )
 
-            if (dto?.moves?.size != 4) {
+            if (dto.moves.size != 4) {
                 for (i in 0 until 4) {
                     drawScaledText(
                         context = context,
@@ -687,8 +624,8 @@ class BattleTeamInfoSelection(
                 }
             }
 
-            if (dto?.speed != null) {
-                val speed = dto.speed!!
+            if (dto.speed != null) {
+                val speed = dto.speed
                 val speedBoost = dto.buffs.get(Stats.SPEED) ?: 1.0
                 val speedAfterBoost = (speed * speedBoost).toInt()
                 drawScaledText(
@@ -722,7 +659,7 @@ class BattleTeamInfoSelection(
                     centered = true
                 )
 
-                val speedBoost = dto?.buffs?.get(Stats.SPEED) ?: 1.0
+                val speedBoost = dto.buffs.get(Stats.SPEED) ?: 1.0
                 val speedTier = getSpeedRange(form, pokemon.level, speedBoost)
 
                 drawScaledText(
@@ -782,7 +719,7 @@ class BattleTeamInfoSelection(
                 )
             }
 
-            val heldItem = dto?.heldItem
+            val heldItem = dto.heldItem
             if (heldItem != null && !heldItem.isEmpty()) {
                 context.pose().pushPose()
                 context.pose().scale(0.95F, 0.95F, 0.95F)
@@ -802,6 +739,93 @@ class BattleTeamInfoSelection(
                 )
             }
             context.pose().popPose()
+        }
+
+        @JvmOverloads
+        fun drawCustomPosablePortrait(
+            identifier: ResourceLocation,
+            matrixStack: PoseStack,
+            scale: Float = 13F,
+            contextScale: Float = 1F,
+            reversed: Boolean = false,
+            state: PosableState,
+            partialTicks: Float,
+            limbSwing: Float = 0F,
+            limbSwingAmount: Float = 0F,
+            ageInTicks: Float = 0F,
+            headYaw: Float = 0F,
+            headPitch: Float = 0F,
+            r: Float = 1F,
+            g: Float = 1F,
+            b: Float = 1F,
+            a: Float = 1F,
+            doQuirks: Boolean = true
+        ) {
+            RenderSystem.applyModelViewMatrix()
+            matrixStack.pushPose()
+            matrixStack.translate(0.0, PORTRAIT_DIAMETER.toDouble() + 2.0, 0.0)
+            matrixStack.scale(scale, scale, -scale)
+            matrixStack.translate(0.0, -PORTRAIT_DIAMETER / 18.0, 0.0)
+
+            val sprite = VaryingModelRepository.getSprite(identifier, state, SpriteType.PORTRAIT);
+
+            if (sprite == null) {
+                val model = VaryingModelRepository.getPoser(identifier, state)
+                state.currentModel = model
+                val texture = VaryingModelRepository.getTexture(identifier, state)
+
+                val context = RenderContext()
+                model.context = context
+                VaryingModelRepository.getTextureNoSubstitute(identifier, state).let { context.put(RenderContext.TEXTURE, it) }
+                context.put(RenderContext.SCALE, contextScale)
+                context.put(RenderContext.SPECIES, identifier)
+                context.put(RenderContext.ASPECTS, state.currentAspects)
+                context.put(RenderContext.POSABLE_STATE, state)
+                context.put(RenderContext.DO_QUIRKS, doQuirks)
+
+                val renderType = RenderType.entityCutout(texture)
+
+                val quaternion1 = Axis.YP.rotationDegrees(-32F * if (reversed) -1F else 1F)
+                val quaternion2 = Axis.XP.rotationDegrees(5F)
+
+                val originalPose = state.currentPose
+                state.setPoseToFirstSuitable(PoseType.PORTRAIT)
+                state.updatePartialTicks(partialTicks)
+                model.applyAnimations(null, state, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch)
+                originalPose?.let { state.setPose(it) }
+
+                matrixStack.translate(
+                    model.portraitTranslation.x * if (reversed) -1F else 1F,
+                    model.portraitTranslation.y + 1.5 * model.portraitScale,
+                    model.portraitTranslation.z - 4
+                )
+                matrixStack.scale(model.portraitScale, model.portraitScale, 1 / model.portraitScale)
+                matrixStack.mulPose(quaternion1)
+                matrixStack.mulPose(quaternion2)
+
+                val light1 = Vector3f(0.2F, 1.0F, -1.0F)
+                val light2 = Vector3f(0.1F, 0.0F, 8.0F)
+                RenderSystem.setShaderLights(light1, light2)
+                quaternion1.conjugate()
+
+                val immediate = Minecraft.getInstance().renderBuffers().bufferSource()
+                val buffer = immediate.getBuffer(renderType)
+                val packedLight = LightTexture.pack(11, 7)
+
+                val colour = toHex(r, g, b, a)
+                model.withLayerContext(immediate, state, VaryingModelRepository.getLayers(identifier, state)) {
+                    model.render(context, matrixStack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colour)
+                    immediate.endBatch()
+                }
+
+                model.setDefault()
+
+                Lighting.setupFor3DItems()
+            } else {
+                renderSprite(matrixStack, sprite)
+            }
+
+            matrixStack.popPose()
         }
 
         private fun getSpeedRange(form: FormData, level: Int, speedBoost: Double): MutableComponent {

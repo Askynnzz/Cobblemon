@@ -208,7 +208,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             matrixStack = matrixStack,
             texture = cobblemonResource("textures/gui/battle/name_plate.png"),
             x = 10,
-            y = 85,
+            y = y - 8,
             width = 128,
             height = 8
         )
@@ -216,7 +216,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
         drawScaledText(
             context = context,
             text = mc.player!!.name.string.text(),
-            y = 87,
+            y = y - 8 + 2,
             x = x + 14 + 10,
             scale = SCALE,
             shadow = true
@@ -226,7 +226,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
             matrixStack = matrixStack,
             texture = cobblemonResource("textures/gui/battle/nameplate_reversed.png"),
             x = mc.window.guiScaledWidth - 14 - 128,
-            y = 85,
+            y = y - 8,
             width = 128,
             height = 8
         )
@@ -234,7 +234,7 @@ class TeamPreviewWidget(val preview: ClientBattleTeamPreview) : ParentWidget(
         drawScaledTextJustifiedRight(
             context = context,
             text = preview.opponentName.string.text(),
-            y = 87,
+            y = y - 8 + 2,
             x = mc.window.guiScaledWidth - 14 - 12,
             scale = SCALE,
             shadow = true
