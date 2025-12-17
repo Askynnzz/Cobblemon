@@ -309,7 +309,14 @@ open class Pokemon : ShowdownIdentifiable {
                 entity?.health = 0F
                 status = null
             }
-            field = max(min(maxHealth, value), 0)
+            val newHealth = max(min(maxHealth, value), 0)
+            CobblemonEvents.POKEMON_HEALTH_CHANGE.post(PokemonHealthChangeEvent(
+                pokemon = this,
+                old = field,
+                new = newHealth,
+                delta = field - newHealth
+            ))
+            field = newHealth
             onChange(HealthUpdatePacket({ this }, field))
 
             // If the Pokémon is fainted, give it a timer for it to wake back up

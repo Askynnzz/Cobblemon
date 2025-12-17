@@ -122,6 +122,9 @@ object CobblemonEvents {
     val BATTLE_HP = EventObservable<BattleHPEvent>()
 
     @JvmField
+    val POKEMON_HEALTH_CHANGE = EventObservable<PokemonHealthChangeEvent>()
+
+    @JvmField
     val GIMMIGHOUL_FAKE = EventObservable<GimmighoulEvent>()
 
     @JvmField

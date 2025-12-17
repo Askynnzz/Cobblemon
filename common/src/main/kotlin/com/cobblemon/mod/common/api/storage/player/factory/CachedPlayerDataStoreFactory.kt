@@ -32,7 +32,7 @@ class CachedPlayerDataStoreFactory<T : InstancedPlayerData>(val backend: PlayerD
     }
 
     override fun getForPlayer(playerId: UUID): T {
-        return if (cache.contains(playerId))
+        return if (cache.containsKey(playerId))
             cache[playerId]!!;
         else {
             val data = backend.load(playerId);
