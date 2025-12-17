@@ -15,6 +15,7 @@ import com.cobblemon.mod.common.CobblemonSounds
 import com.cobblemon.mod.common.api.abilities.Abilities
 import com.cobblemon.mod.common.api.abilities.Ability
 import com.cobblemon.mod.common.api.abilities.AbilityPool
+import com.cobblemon.mod.common.api.battles.model.PokemonBattle
 import com.cobblemon.mod.common.api.battles.model.actor.EntityBackedBattleActor
 import com.cobblemon.mod.common.api.data.ShowdownIdentifiable
 import com.cobblemon.mod.common.api.entity.PokemonSender
@@ -309,14 +310,16 @@ open class Pokemon : ShowdownIdentifiable {
                 entity?.health = 0F
                 status = null
             }
-            val newHealth = max(min(maxHealth, value), 0)
+            val oldHealth = field
+            val newHealth = max(0, value)
+            val delta = newHealth - field
             CobblemonEvents.POKEMON_HEALTH_CHANGE.post(PokemonHealthChangeEvent(
                 pokemon = this,
-                old = field,
+                old = oldHealth,
                 new = newHealth,
-                delta = field - newHealth
+                delta = delta
             ))
-            field = newHealth
+            field = max(min(maxHealth, value), 0)
             onChange(HealthUpdatePacket({ this }, field))
 
             // If the Pokémon is fainted, give it a timer for it to wake back up
@@ -541,8 +544,10 @@ open class Pokemon : ShowdownIdentifiable {
             field = value
         }
 
+    var maxHealthOverride: Int? = null
+
     val maxHealth: Int
-        get() = getStat(Stats.HP)
+        get() = maxHealthOverride ?: getStat(Stats.HP)
     @Deprecated("Use maxHealth instead", ReplaceWith("maxHealth"), level = DeprecationLevel.WARNING)
     val hp: Int
         get() = maxHealth
