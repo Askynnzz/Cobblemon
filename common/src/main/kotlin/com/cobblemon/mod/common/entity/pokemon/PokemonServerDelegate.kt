@@ -403,9 +403,6 @@ class PokemonServerDelegate : PokemonSideDelegate {
 
     fun doDeathDrops() {
         if (entity.ownerUUID == null && entity.owner == null && entity.level().gameRules.getBoolean(CobblemonGameRules.DO_POKEMON_LOOT)) {
-            val heldItem = (entity as PokemonEntity?)?.pokemon?.heldItemNoCopy() ?: ItemStack.EMPTY
-            if (!heldItem.isEmpty) entity.spawnAtLocation(heldItem.item)
-
             val dropTable = (entity.drops ?: entity.pokemon.form.drops)
             val drops = dropTable.getDrops().toMutableList()
             if (entity.pokemon.forcedAspects.contains(DROPS_REROLL_ASPECT)) {
