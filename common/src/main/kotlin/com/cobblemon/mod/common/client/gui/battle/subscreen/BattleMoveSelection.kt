@@ -95,7 +95,7 @@ class BattleMoveSelection(
     var moveTiles = baseTiles
 
     val backButton = BattleBackButton(x - 11F, Minecraft.getInstance().window.guiScaledHeight - 22F)
-    val gimmickButtons = moveSet.getGimmicks().mapIndexed { index, gimmick ->
+    val gimmickButtons = moveSet.getGimmicks().filter { it !in moveSet.pendingGimmickUsedThisTurn }.mapIndexed { index, gimmick ->
         val initOff = BattleBackButton.Companion.WIDTH * 0.65F
         val xOff = initOff + BattleGimmickButton.Companion.SPACING * index
         BattleGimmickButton.Companion.create(gimmick, this, backButton.x + xOff, backButton.y)
