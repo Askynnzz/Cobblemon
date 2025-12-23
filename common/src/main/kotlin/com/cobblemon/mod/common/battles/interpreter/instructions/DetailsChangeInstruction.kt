@@ -31,14 +31,17 @@ class DetailsChangeInstruction(val message: BattleMessage): InterpreterInstructi
         val battlePokemon = message.battlePokemon(0, battle) ?: return
         val heldItemName = battlePokemon.effectedPokemon.heldItem().hoverName.string
         val formName = message.argumentAt(1)?.split(',')?.get(0)?.substringAfter('-')?.lowercase() ?: return
-        battle.dispatchWaiting {
-            val pokemonName = battlePokemon.getName()
-            println("DETAILS CHANGE: ${formName}")
-            val effectiveForm = when (formName) {
-                "mega-x" -> "mega_x"
-                "mega-y" -> "mega_y"
-                else -> formName
-            }
+
+        val pokemonName = battlePokemon.getName()
+        val effectiveForm = when (formName) {
+            "mega-x" -> "mega_x"
+            "mega-y" -> "mega_y"
+            else -> formName
+        }
+
+        val delay = if (effectiveForm in setOf("mega_x", "mega_y", "mega")) 3.5f else 1f
+
+        battle.dispatchWaiting(delaySeconds = delay) {
             battlePokemon.setBattleFeature(effectiveForm, true)
             battlePokemon.sendUpdate()
 
@@ -47,7 +50,6 @@ class DetailsChangeInstruction(val message: BattleMessage): InterpreterInstructi
             battlePokemon.effectedPokemon.currentHealth = flatHp.roundToInt()
             battle.sendSidedUpdate(battlePokemon.actor, BattleHealthChangePacket(pnx, flatHp), BattleHealthChangePacket(pnx, ratioHp))
             battle.sendUpdate(BattleSwitchPokemonPacket(pnx, battlePokemon, true, battlePokemon.getIllusion()))
-
 
             battle.broadcastChatMessage(battleLang("detailschange.$formName", pokemonName, heldItemName).lightPurple())
             battle.majorBattleActions[battlePokemon.uuid] = message

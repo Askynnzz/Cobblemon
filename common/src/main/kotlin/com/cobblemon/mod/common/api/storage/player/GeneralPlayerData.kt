@@ -27,7 +27,7 @@ data class GeneralPlayerData(
     var starterLocked: Boolean,
     var starterSelected: Boolean,
     var starterUUID: UUID?,
-    var keyItems: MutableSet<ResourceLocation> = mutableSetOf(cobblemonResource("key_stone"), cobblemonResource("z_ring")),
+    var keyItems: MutableSet<ResourceLocation> = mutableSetOf(),
     var battleTheme: ResourceLocation?,
     val extraData: MutableMap<String, PlayerDataExtension>,
 ) : InstancedPlayerData {

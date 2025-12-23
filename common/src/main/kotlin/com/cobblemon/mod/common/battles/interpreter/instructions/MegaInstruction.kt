@@ -14,10 +14,12 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.events.battles.instruction.MegaEvolutionEvent
 import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.battles.dispatch.InterpreterInstruction
+import com.cobblemon.mod.common.net.messages.client.effect.SpawnSnowstormEntityParticlePacket
 import com.cobblemon.mod.common.util.battleLang
 import com.cobblemon.mod.common.util.playSoundServer
 import com.cobblemon.mod.common.util.sendParticlesServer
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.phys.Vec3
 
@@ -34,11 +36,14 @@ class MegaInstruction(val message: BattleMessage): InterpreterInstruction {
         val battlePokemon = message.battlePokemon(0, battle) ?: return
         val speciesName = battlePokemon.effectedPokemon.species.translatedName
         battlePokemon.entity?.let { entity ->
-            entity.level().sendParticlesServer(ParticleTypes.EXPLOSION, entity.position().add(0.0, 1.0, 0.0), 10, Vec3(0.5, 0.5, 0.5), 0.4)
-            entity.level().sendParticlesServer(ParticleTypes.LARGE_SMOKE, entity.position().add(0.0, 1.0, 0.0), 10, Vec3(0.5, 0.5, 0.5), 0.4)
-            entity.level().playSoundServer(entity.position(), SoundEvents.GENERIC_EXPLODE.value())
+            val position = entity.position()
+            val spawnSnowstormParticlePacket = SpawnSnowstormEntityParticlePacket(ResourceLocation.parse("cobblemon:mega_evolution_particles"), entity.id, listOf("root"))
+            spawnSnowstormParticlePacket.sendToPlayersAround(position.x, position.y, position.z, 64.0, entity.level().dimension())
         }
-        battle.dispatchWaiting {
+        battle.dispatchWaiting(delaySeconds = 3.5f) {
+            battlePokemon.entity?.let { entity ->
+                entity.level().playSoundServer(entity.position(), SoundEvents.GENERIC_EXPLODE.value())
+            }
             val pokemonName = battlePokemon.getName()
             battle.broadcastChatMessage(battleLang("mega", pokemonName, speciesName).yellow())
             CobblemonEvents.MEGA_EVOLUTION.post(MegaEvolutionEvent(battle, battlePokemon))
