@@ -42,6 +42,10 @@ interface TeraType : ShowdownIdentifiable {
      */
     val displayName: Component
 
+    val r: Int
+    val g: Int
+    val b: Int
+
     companion object {
         @JvmStatic
         val BY_IDENTIFIER_CODEC: Codec<TeraType> = CodecUtils.createByIdentifierCodec(

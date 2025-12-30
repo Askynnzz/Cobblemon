@@ -14,7 +14,7 @@ import com.cobblemon.mod.common.util.cobblemonResource
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 
-class ElementalTypeTeraType(val type: ElementalType) : TeraType {
+class ElementalTypeTeraType(val type: ElementalType, override val r: Int, override val g: Int, override val b: Int) : TeraType {
     override val legalAsStatic: Boolean = true
 
     override val name: String = this.type.name

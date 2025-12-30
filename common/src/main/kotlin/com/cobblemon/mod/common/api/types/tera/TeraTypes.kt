@@ -23,58 +23,58 @@ object TeraTypes : Iterable<TeraType> {
     private val types = hashMapOf<ResourceLocation, TeraType>()
 
     @JvmStatic
-    val NORMAL = this.create(cobblemonResource("normal"), ElementalTypeTeraType(ElementalTypes.NORMAL))
+    val NORMAL = this.create(cobblemonResource("normal"), ElementalTypeTeraType(ElementalTypes.NORMAL, 189, 175, 175))
 
     @JvmStatic
-    val FIRE = this.create(cobblemonResource("fire"), ElementalTypeTeraType(ElementalTypes.FIRE))
+    val FIRE = this.create(cobblemonResource("fire"), ElementalTypeTeraType(ElementalTypes.FIRE, 192, 32, 32))
 
     @JvmStatic
-    val WATER = this.create(cobblemonResource("water"), ElementalTypeTeraType(ElementalTypes.WATER))
+    val WATER = this.create(cobblemonResource("water"), ElementalTypeTeraType(ElementalTypes.WATER, 30, 72, 203))
 
     @JvmStatic
-    val GRASS = this.create(cobblemonResource("grass"), ElementalTypeTeraType(ElementalTypes.GRASS))
+    val GRASS = this.create(cobblemonResource("grass"), ElementalTypeTeraType(ElementalTypes.GRASS, 35, 203, 30))
 
     @JvmStatic
-    val ELECTRIC = this.create(cobblemonResource("electric"), ElementalTypeTeraType(ElementalTypes.ELECTRIC))
+    val ELECTRIC = this.create(cobblemonResource("electric"), ElementalTypeTeraType(ElementalTypes.ELECTRIC, 222, 239, 18))
 
     @JvmStatic
-    val ICE = this.create(cobblemonResource("ice"), ElementalTypeTeraType(ElementalTypes.ICE))
+    val ICE = this.create(cobblemonResource("ice"), ElementalTypeTeraType(ElementalTypes.ICE, 18, 209, 239))
 
     @JvmStatic
-    val FIGHTING = this.create(cobblemonResource("fighting"), ElementalTypeTeraType(ElementalTypes.FIGHTING))
+    val FIGHTING = this.create(cobblemonResource("fighting"), ElementalTypeTeraType(ElementalTypes.FIGHTING, 255, 158, 94))
 
     @JvmStatic
-    val POISON = this.create(cobblemonResource("poison"), ElementalTypeTeraType(ElementalTypes.POISON))
+    val POISON = this.create(cobblemonResource("poison"), ElementalTypeTeraType(ElementalTypes.POISON, 153, 65, 211))
 
     @JvmStatic
-    val GROUND = this.create(cobblemonResource("ground"), ElementalTypeTeraType(ElementalTypes.GROUND))
+    val GROUND = this.create(cobblemonResource("ground"), ElementalTypeTeraType(ElementalTypes.GROUND, 181, 157, 57))
 
     @JvmStatic
-    val FLYING = this.create(cobblemonResource("flying"), ElementalTypeTeraType(ElementalTypes.FLYING))
+    val FLYING = this.create(cobblemonResource("flying"), ElementalTypeTeraType(ElementalTypes.FLYING, 244, 219, 255))
 
     @JvmStatic
-    val PSYCHIC = this.create(cobblemonResource("psychic"), ElementalTypeTeraType(ElementalTypes.PSYCHIC))
+    val PSYCHIC = this.create(cobblemonResource("psychic"), ElementalTypeTeraType(ElementalTypes.PSYCHIC, 255, 119, 173))
 
     @JvmStatic
-    val BUG = this.create(cobblemonResource("bug"), ElementalTypeTeraType(ElementalTypes.BUG))
+    val BUG = this.create(cobblemonResource("bug"), ElementalTypeTeraType(ElementalTypes.BUG, 186, 186, 40))
 
     @JvmStatic
-    val ROCK = this.create(cobblemonResource("rock"), ElementalTypeTeraType(ElementalTypes.ROCK))
+    val ROCK = this.create(cobblemonResource("rock"), ElementalTypeTeraType(ElementalTypes.ROCK, 158, 143, 110))
 
     @JvmStatic
-    val GHOST = this.create(cobblemonResource("ghost"), ElementalTypeTeraType(ElementalTypes.GHOST))
+    val GHOST = this.create(cobblemonResource("ghost"), ElementalTypeTeraType(ElementalTypes.GHOST, 148, 126, 221))
 
     @JvmStatic
-    val DRAGON = this.create(cobblemonResource("dragon"), ElementalTypeTeraType(ElementalTypes.DRAGON))
+    val DRAGON = this.create(cobblemonResource("dragon"), ElementalTypeTeraType(ElementalTypes.DRAGON, 123, 133, 242))
 
     @JvmStatic
-    val DARK = this.create(cobblemonResource("dark"), ElementalTypeTeraType(ElementalTypes.DARK))
+    val DARK = this.create(cobblemonResource("dark"), ElementalTypeTeraType(ElementalTypes.DARK, 35, 51, 82))
 
     @JvmStatic
-    val STEEL = this.create(cobblemonResource("steel"), ElementalTypeTeraType(ElementalTypes.STEEL))
+    val STEEL = this.create(cobblemonResource("steel"), ElementalTypeTeraType(ElementalTypes.STEEL, 175, 198, 219))
 
     @JvmStatic
-    val FAIRY = this.create(cobblemonResource("fairy"), ElementalTypeTeraType(ElementalTypes.FAIRY))
+    val FAIRY = this.create(cobblemonResource("fairy"), ElementalTypeTeraType(ElementalTypes.FAIRY, 175, 153, 234))
 
     @JvmStatic
     val STELLAR = this.create(StellarTeraType.ID, StellarTeraType())

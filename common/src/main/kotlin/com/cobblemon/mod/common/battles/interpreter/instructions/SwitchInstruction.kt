@@ -83,7 +83,8 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                                     doCry = false,
                                     position = targetPos,
                                     illusion = illusion?.let { IllusionEffect(it.effectedPokemon) }
-                            ).thenApply {
+                            ).thenApply { entity ->
+                                pokemon.terastallized?.let { entity.terastallize(it) }
                                 actor.stillSendingOutCount--
                             }
                             activePokemon.battlePokemon?.sendUpdate()
@@ -199,7 +200,10 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                         position = pos,
                         doCry = !imposter,
                         illusion = illusion?.let { IllusionEffect(it.effectedPokemon) }
-                    ).thenAccept { sendOutFuture.complete(Unit) }
+                    ).thenAccept { entity ->
+                        newPokemon.terastallized?.let { entity.terastallize(it) }
+                        sendOutFuture.complete(Unit)
+                    }
                 }
 
                 broadcastSwitch(battle, actor, newPokemon, illusion)

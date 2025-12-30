@@ -374,7 +374,10 @@ open class PokemonBattle(
         actors.forEach { actor ->
             actor.pokemonList.forEach { battlePokemon ->
                 battlePokemon.clearBattleFeatures()
-                battlePokemon.entity?.let { entity -> battlePokemon.postBattleEntityOperation(entity) }
+                battlePokemon.entity?.let { entity ->
+                    entity.terastallize(null)
+                    battlePokemon.postBattleEntityOperation(entity)
+                }
                 if (battlePokemon.effectedPokemon.entity != null
                         && battlePokemon.effectedPokemon.entity?.beamMode == 0
                         && battlePokemon.effectedPokemon.entity?.platform != PlatformType.NONE) {

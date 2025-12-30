@@ -14,6 +14,7 @@ import com.cobblemon.mod.common.util.readString
 import com.cobblemon.mod.common.util.writeSizedInt
 import com.cobblemon.mod.common.util.writeString
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.resources.ResourceLocation
 
 /**
  * Rules around how a battle is going to work.
@@ -27,7 +28,8 @@ data class BattleFormat(
     var ruleSet: Set<String> = setOf(),
     val gen: Int = 9,
     var adjustLevel: Int = -1, // Stop gap rule before a more general system for rules enforced by Cobblemon is implemented.
-    val isOpenTeamSheet: Boolean = false
+    val isOpenTeamSheet: Boolean = false,
+    val allowedGimmicks: Set<ShowdownMoveset.Gimmick> = ShowdownMoveset.Gimmick.entries.toSet()
 ) {
     companion object {
         fun setBattleRules(

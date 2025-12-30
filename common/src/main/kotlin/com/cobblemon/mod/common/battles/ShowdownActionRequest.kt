@@ -81,7 +81,7 @@ class ShowdownActionRequest(
                     ShowdownMoveset.Gimmick.TERASTALLIZATION -> cobblemonResource("tera_orb")
                     else -> cobblemonResource("z_ring")
                 }
-                if (!player.hasKeyItem(triggerItem)) moveset.blockGimmick(gimmick)
+                if (!battle.format.allowedGimmicks.contains(gimmick) || !player.hasKeyItem(triggerItem)) moveset.blockGimmick(gimmick)
             }
 
             if (moveset.canMegaEvo && moveset.moves.any { it.id == "dragonascent" } && !Cobblemon.permissionValidator.hasPermission(player, "quests.mega_rayquaza.completed", 4)) {

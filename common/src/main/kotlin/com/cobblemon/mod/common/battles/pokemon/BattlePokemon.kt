@@ -20,6 +20,7 @@ import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemManager
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemProvider
 import com.cobblemon.mod.common.api.pokemon.stats.Stat
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
+import com.cobblemon.mod.common.api.types.tera.TeraType
 import com.cobblemon.mod.common.battles.actor.MultiPokemonBattleActor
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
@@ -124,6 +125,7 @@ open class BattlePokemon(
     val revealedMoves: MutableList<MoveDTO?> = mutableListOf(null, null, null, null)
     var revealedHeldItem: ItemStack? = null
     var transformed: BattlePokemon? = null
+    var terastallized: TeraType? = null
 
     open fun getName(): MutableComponent {
         val displayPokemon = getIllusion()?.effectedPokemon ?: effectedPokemon
@@ -216,6 +218,7 @@ open class BattlePokemon(
     }
 
     fun isSentOut() = actor.battle.activePokemon.any { it.battlePokemon == this }
+
     fun canBeSentOut(): Boolean {
         val reviving = actor.request?.side?.pokemon?.any { it.reviving } == true
         println("${actor.getName().string} ${originalPokemon.species.name} canBeSentOut: reviving: $reviving isSentOut: ${isSentOut()} willBeSwitchedIn: $willBeSwitchedIn health: $health")

@@ -25,6 +25,12 @@ class StellarTeraType : TeraType {
 
     override fun showdownId(): String = ID.path
 
+    override val r = 255
+
+    override val g = 255
+
+    override val b = 255
+
     companion object {
         val ID = cobblemonResource("stellar")
         private val LANG = Component.translatable("${Cobblemon.MODID}.terra_type.stellar")
