@@ -16,7 +16,7 @@ import com.cobblemon.mod.common.util.getPlayer
 import java.time.Duration
 import java.time.Instant
 
-class ShowdownTimer(val battle: PokemonBattle, val actor: PlayerBattleActor) {
+class ShowdownTimer(override val battle: PokemonBattle, override val actor: PlayerBattleActor): PlayerBattleTimer {
     private lateinit var turnStart: Instant
     private var secondsRemaining = 210
     private var hasSelected = false
@@ -35,28 +35,24 @@ class ShowdownTimer(val battle: PokemonBattle, val actor: PlayerBattleActor) {
         secondsRemaining *= 2
     }
 
-    fun tick() {
+    override fun tick() {
         if (hasSelected) return
         val secondsSinceStart = Duration.between(turnStart, Instant.now()).seconds
         if (secondsRemaining - secondsSinceStart <= 0) timeout()
     }
 
-    fun selection() {
+    override fun selection() {
         val secondsSinceStart = Duration.between(turnStart, Instant.now()).seconds.toInt()
         secondsRemaining = secondsRemaining - secondsSinceStart + 10
         hasSelected = true
     }
 
-    fun startTurn() {
+    override fun startTurn() {
         turnStart = Instant.now()
         hasSelected = false
     }
 
-    fun timeout() {
-        actor.setActionResponses(listOf(ForfeitActionResponse()))
-    }
-
-    fun mustChooseBy(): Instant {
+    override fun mustChooseBy(): Instant {
         return Instant.now().plusSeconds(secondsRemaining.toLong())
     }
 }

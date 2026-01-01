@@ -45,6 +45,7 @@ import com.cobblemon.mod.common.battles.dispatch.WaitDispatch
 import com.cobblemon.mod.common.battles.interpreter.ContextManager
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.battles.runner.ShowdownService
+import com.cobblemon.mod.common.battles.timers.PlayerBattleTimer
 import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.cobblemon.mod.common.entity.PlatformType
 import com.cobblemon.mod.common.entity.npc.NPCBattleActor
@@ -86,6 +87,7 @@ open class PokemonBattle(
     val format: BattleFormat,
     val side1: BattleSide,
     val side2: BattleSide,
+    val playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer = { battle, actor -> ShowdownTimer(battle, actor) }
 ) {
     /** Whether logging will be silenced for this battle. */
     var mute = !CobblemonBuildDetails.SNAPSHOT
@@ -101,7 +103,7 @@ open class PokemonBattle(
         side2.battle = this
         this.actors.forEach { actor ->
             if (actor is PlayerBattleActor) {
-                actor.timer = ShowdownTimer(this, actor)
+                actor.timer = playerTimer(this, actor)
             }
             actor.battle = this
             actor.pokemonList.forEach { battlePokemon ->

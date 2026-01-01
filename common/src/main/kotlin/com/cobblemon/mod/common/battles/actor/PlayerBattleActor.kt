@@ -24,6 +24,7 @@ import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.api.text.yellow
 import com.cobblemon.mod.common.battles.ShowdownActionResponse
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.battles.timers.PlayerBattleTimer
 import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMessagePacket
@@ -56,7 +57,7 @@ class PlayerBattleActor(
             field = value
         }
 
-    lateinit var timer: ShowdownTimer
+    lateinit var timer: PlayerBattleTimer
 
     override fun getName(): MutableComponent = this.entity?.name?.copy() ?: "Offline Player".red()
     override fun nameOwned(name: String): MutableComponent = battleLang("owned_pokemon", this.getName(), name)
