@@ -23,6 +23,8 @@ import com.cobblemon.mod.common.api.events.entity.*
 import com.cobblemon.mod.common.api.events.farming.ApricornHarvestEvent
 import com.cobblemon.mod.common.api.events.fishing.*
 import com.cobblemon.mod.common.api.events.item.LeftoversCreatedEvent
+import com.cobblemon.mod.common.api.events.pokebag.PokeBagContainerValidCheckEvent
+import com.cobblemon.mod.common.api.events.pokebag.PokeBagOpenRequestEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokeBallCaptureCalculatedEvent
 import com.cobblemon.mod.common.api.events.pokeball.PokemonCatchRateEvent
 import com.cobblemon.mod.common.api.events.pokeball.ThrownPokeballHitBlockEvent
@@ -405,6 +407,13 @@ object CobblemonEvents {
 
     @JvmField
     val BATTLE_CHOICE_REQUESTED = EventObservable<BattleChoiceRequestedEvent>()
+
     @JvmField
     val BATTLE_CHOICE_MADE = EventObservable<BattleChoiceMadeEvent>()
+
+    @JvmField
+    val POKE_BAG_CONTAINER_VALID_CHECK = SimpleObservable<PokeBagContainerValidCheckEvent>()
+
+    @JvmField
+    val POKE_BAG_OPEN_REQUEST = SimpleObservable<PokeBagOpenRequestEvent>()
 }

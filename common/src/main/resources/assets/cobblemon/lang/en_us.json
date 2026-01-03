@@ -852,6 +852,7 @@
   "itemGroup.cobblemon.mega_evolution": "Mega Evolution",
   "itemGroup.cobblemon.terastallization": "Terastallization",
   "itemGroup.cobblemon.legendary_items": "Legendary Items",
+  "itemGroup.cobblemon.poke_bags": "Poké Bags",
 
   "block.cobblemon.black_apricorn": "Black Apricorn",
   "block.cobblemon.blue_apricorn": "Blue Apricorn",
@@ -2046,6 +2047,7 @@
   "key.cobblemon.pokedex": "Open Pokédex",
   "key.cobblemon.ridingfreelook": "Riding Freelook",
   "key.cobblemon.spectate_nearest": "Spectate Nearest Battle",
+  "key.cobblemon.open_poke_bag": "Open Poké Bag",
   "key.cobblemon.categories.cobblemon": "Cobblemon",
 
   "key.cobblemon.scaleportraitup": "Scale Portrait Up",
@@ -9669,8 +9671,13 @@
   "item.cobblemon.steel_tera_shard": "Steel Tera Shard",
   "item.cobblemon.stellar_tera_shard": "Stellar Tera Shard",
   "item.cobblemon.water_tera_shard": "Water Tera Shard",
+  "item.cobblemon.small_poke_bag": "Small Poké Bag",
+  "item.cobblemon.medium_poke_bag": "Medium Poké Bag",
+  "item.cobblemon.large_poke_bag": "Large Poké Bag",
+  "item.cobblemon.huge_poke_bag": "Huge Poké Bag",
   "trinkets.slot.hand.mega_bracelet": "Mega Bracelet",
   "interaction.megaevolution.mega_evolve": "Mega Evolve",
   "interaction.megaevolution.mega_evolve.remove": "Remove Mega Evolution",
-  "trinkets.slot.hand.tera_orb": "Tera Orb"
+  "trinkets.slot.hand.tera_orb": "Tera Orb",
+  "trinkets.slot.chest.pokebag": "Poké Bag"
 }

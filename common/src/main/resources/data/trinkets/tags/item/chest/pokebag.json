@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "cobblemon:small_poke_bag",
+    "cobblemon:medium_poke_bag",
+    "cobblemon:large_poke_bag",
+    "cobblemon:huge_poke_bag"
+  ]
+}

@@ -66,6 +66,10 @@ object CobblemonItemGroups {
         ItemStack(CobblemonItems.GRISEOUS_ORB)
     }
 
+    @JvmStatic val POKE_BAGS = this.create("poke_bags", this::pokeBagItemEntries) {
+        ItemStack(CobblemonItems.HUGE_POKE_BAG)
+    }
+
     @JvmStatic val BLOCKS get() = BuiltInRegistries.CREATIVE_MODE_TAB.get(BLOCKS_KEY)
     @JvmStatic val UTILITY_ITEMS get() = BuiltInRegistries.CREATIVE_MODE_TAB.get(UTILITY_ITEMS_KEY)
     @JvmStatic val AGRICULTURE get() = BuiltInRegistries.CREATIVE_MODE_TAB.get(AGRICULTURE_KEY)
@@ -634,6 +638,12 @@ object CobblemonItemGroups {
 
     private fun legendaryItemEntries(displayContext: ItemDisplayParameters, entries: Output) {
         CobblemonItems.LEGENDARY_ITEMS.forEach {
+            entries.accept(it)
+        }
+    }
+
+    private fun pokeBagItemEntries(displayContext: ItemDisplayParameters, entries: Output) {
+        CobblemonItems.POKE_BAGS.forEach {
             entries.accept(it)
         }
     }

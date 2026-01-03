@@ -206,6 +206,7 @@ object Cobblemon {
         implementation.registerEntitySubPredicates()
         DispenserBehaviorRegistry.registerDispenserBehaviors()
 
+
         DropEntry.register("command", CommandDropEntry::class.java)
         DropEntry.register("item", ItemDropEntry::class.java, isDefault = true)
         DropEntry.register("evolution", EvolutionItemDropEntry::class.java)

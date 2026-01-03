@@ -40,6 +40,7 @@ object CobblemonKeyBinds {
     val SEND_OUT_POKEMON = this.queue(PartySendBinding)
     val RIDING_FREELOOK = this.queue(RidingFreelookBinding)
     val SPECTATE_NEAREST = this.queue(SpectateNearestBinding)
+    val OPEN_POKEBAG = this.queue(OpenPokeBagBinding)
 
     fun register(registrar: (KeyMapping) -> Unit) {
         this.keyBinds.forEach(registrar::invoke)

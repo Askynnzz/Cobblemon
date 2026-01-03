@@ -73,6 +73,8 @@ import com.cobblemon.mod.common.client.tooltips.TooltipManager
 import com.cobblemon.mod.common.client.trade.ClientTrade
 import com.cobblemon.mod.common.entity.boat.CobblemonBoatType
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
+import com.cobblemon.mod.common.item.pokebag.inventory.PokeBagMenuType
+import com.cobblemon.mod.common.item.pokebag.inventory.PokeBagScreen
 import com.cobblemon.mod.common.platform.events.PlatformEvents
 import com.cobblemon.mod.common.pokedex.scanner.PokedexUsageContext
 import com.cobblemon.mod.common.util.isLookingAt
@@ -348,6 +350,10 @@ object CobblemonClient {
 
     private fun registerMenuScreens() {
         MenuScreens.register(CobblemonMenuType.COOKING_POT, ::CookingPotScreen)
+        MenuScreens.register(PokeBagMenuType.SMALL_POKE_BAG, ::PokeBagScreen)
+        MenuScreens.register(PokeBagMenuType.MEDIUM_POKE_BAG, ::PokeBagScreen)
+        MenuScreens.register(PokeBagMenuType.LARGE_POKE_BAG, ::PokeBagScreen)
+        MenuScreens.register(PokeBagMenuType.HUGE_POKE_BAG, ::PokeBagScreen)
     }
 
     private fun registerBlockEntityRenderers() {

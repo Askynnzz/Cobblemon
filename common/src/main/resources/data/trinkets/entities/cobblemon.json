@@ -4,6 +4,7 @@
   ],
   "slots": [
     "hand/mega_bracelet",
-    "hand/tera_orb"
+    "hand/tera_orb",
+    "chest/pokebag"
   ]
 }

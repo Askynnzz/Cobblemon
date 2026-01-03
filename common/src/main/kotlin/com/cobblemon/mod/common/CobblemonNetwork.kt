@@ -178,6 +178,7 @@ import com.cobblemon.mod.common.net.messages.server.pasture.PasturePokemonPacket
 import com.cobblemon.mod.common.net.messages.server.pasture.SetPastureConflictPacket
 import com.cobblemon.mod.common.net.messages.server.pasture.UnpastureAllPokemonPacket
 import com.cobblemon.mod.common.net.messages.server.pasture.UnpasturePokemonPacket
+import com.cobblemon.mod.common.net.messages.server.pokebag.C2SOpenPokeBagPacket
 import com.cobblemon.mod.common.net.messages.server.pokedex.scanner.FinishScanningPacket
 import com.cobblemon.mod.common.net.messages.server.pokedex.scanner.StartScanningPacket
 import com.cobblemon.mod.common.net.messages.server.pokemon.interact.InteractPokemonPacket
@@ -237,6 +238,7 @@ import com.cobblemon.mod.common.net.serverhandling.pasture.PasturePokemonHandler
 import com.cobblemon.mod.common.net.serverhandling.pasture.SetPastureConflictHandler
 import com.cobblemon.mod.common.net.serverhandling.pasture.UnpastureAllPokemonHandler
 import com.cobblemon.mod.common.net.serverhandling.pasture.UnpasturePokemonHandler
+import com.cobblemon.mod.common.net.serverhandling.pokebag.C2SOpenPokeBagHandler
 import com.cobblemon.mod.common.net.serverhandling.pokedex.scanner.FinishScanningHandler
 import com.cobblemon.mod.common.net.serverhandling.pokedex.scanner.StartScanningHandler
 import com.cobblemon.mod.common.net.serverhandling.pokemon.interact.InteractPokemonHandler
@@ -633,6 +635,9 @@ object CobblemonNetwork {
         // Mega Evolution
         list.add(PacketRegisterInfo(C2SMegaEvolvePacket.ID, C2SMegaEvolvePacket::decode, C2SMegaEvolveHandler))
         list.add(PacketRegisterInfo(C2SRemoveMegaEvolutionPacket.ID, C2SRemoveMegaEvolutionPacket::decode, C2SRemoveMegaEvolutionHandler))
+
+        // Poke Bags
+        list.add(PacketRegisterInfo(C2SOpenPokeBagPacket.ID, C2SOpenPokeBagPacket::decode, C2SOpenPokeBagHandler))
         return list
     }
 

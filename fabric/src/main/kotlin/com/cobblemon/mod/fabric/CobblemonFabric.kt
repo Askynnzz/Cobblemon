@@ -11,11 +11,14 @@ package com.cobblemon.mod.fabric
 import com.cobblemon.mod.common.*
 import com.cobblemon.mod.common.advancement.CobblemonCriteria
 import com.cobblemon.mod.common.advancement.predicate.CobblemonEntitySubPredicates
+import com.cobblemon.mod.common.api.events.CobblemonEvents
 import com.cobblemon.mod.common.api.net.serializers.*
 import com.cobblemon.mod.common.api.storage.player.PlayerInstancedDataStoreTypes
 import com.cobblemon.mod.common.item.gimmicks.MegaBraceletItem
 import com.cobblemon.mod.common.item.gimmicks.TeraOrbItem
 import com.cobblemon.mod.common.item.group.CobblemonItemGroups
+import com.cobblemon.mod.common.item.pokebag.PokeBagItem
+import com.cobblemon.mod.common.item.pokebag.inventory.PokeBagMenuType
 import com.cobblemon.mod.common.loot.LootInjector
 import com.cobblemon.mod.common.particle.CobblemonParticles
 import com.cobblemon.mod.common.platform.events.*
@@ -303,6 +306,25 @@ object CobblemonFabric : CobblemonImplementation {
                 }
             }
         }
+
+        CobblemonEvents.POKE_BAG_CONTAINER_VALID_CHECK.subscribe { event ->
+            val trinketComponent = TrinketsApi.getTrinketComponent(event.player).orElse(null)
+            if (trinketComponent != null) {
+                event.isValid = trinketComponent.allEquipped.any { it.b == event.backpack }
+            }
+        }
+
+        CobblemonEvents.POKE_BAG_OPEN_REQUEST.subscribe { event ->
+            TrinketsApi.getTrinketComponent(event.player).ifPresent { trinket ->
+                trinket.allEquipped.forEach { entry ->
+                    val stack = entry.b
+                    val item = entry.b.item
+                    if (item is PokeBagItem) {
+                        item.open(event.player, stack)
+                    }
+                }
+            }
+        }
     }
 
     override fun registerItems() {
@@ -371,6 +393,7 @@ object CobblemonFabric : CobblemonImplementation {
 
     override fun registerMenu() {
         CobblemonMenuType.register { identifier, factory -> Registry.register(CobblemonMenuType.registry, identifier, factory) }
+        PokeBagMenuType.initialise()
     }
 
     override fun addFeatureToWorldGen(feature: ResourceKey<PlacedFeature>, step: GenerationStep.Decoration, validTag: TagKey<Biome>?) {

@@ -46,6 +46,7 @@ import com.cobblemon.mod.common.item.gimmicks.TeraOrbItem
 import com.cobblemon.mod.common.item.gimmicks.TeraShardItem
 import com.cobblemon.mod.common.item.interactive.*
 import com.cobblemon.mod.common.item.interactive.ability.AbilityChangeItem
+import com.cobblemon.mod.common.item.pokebag.PokeBagItem
 import com.cobblemon.mod.common.platform.PlatformRegistry
 import com.cobblemon.mod.common.pokeball.PokeBall
 import com.cobblemon.mod.common.pokemon.IVs
@@ -1789,6 +1790,17 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     @JvmField
     val ZERAORA_TUFT = legendaryItem("zeraora_tuft", 2)
 
+    val POKE_BAGS = mutableListOf<PokeBagItem>()
+
+    @JvmField
+    val SMALL_POKE_BAG = pokeBag("small_poke_bag", 3, Rarity.RARE)
+    @JvmField
+    val MEDIUM_POKE_BAG = pokeBag("medium_poke_bag", 4, Rarity.RARE)
+    @JvmField
+    val LARGE_POKE_BAG = pokeBag("large_poke_bag", 5, Rarity.RARE)
+    @JvmField
+    val HUGE_POKE_BAG = pokeBag("huge_poke_bag", 6, Rarity.EPIC)
+
     private fun blockItem(name: String, block: Block, rarity: Rarity = Rarity.COMMON): BlockItem = this.create(name, BlockItem(block, Item.Properties().rarity(rarity)))
 
     private fun itemNameBlockItem(name: String, block: Block, rarity: Rarity = Rarity.COMMON): ItemNameBlockItem = this.create(name, ItemNameBlockItem(block, Item.Properties().rarity(rarity)))
@@ -1824,6 +1836,12 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     fun legendaryItem(name: String, durability: Int): LegendaryItem {
         val item = create(name, LegendaryItem(durability))
         LEGENDARY_ITEMS.add(item)
+        return item
+    }
+
+    fun pokeBag(path: String, size: Int, rarity: Rarity): PokeBagItem {
+        val item = create(path, PokeBagItem(size, rarity))
+        POKE_BAGS.add(item)
         return item
     }
 

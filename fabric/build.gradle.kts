@@ -40,6 +40,7 @@ repositories {
     maven(url = "https://maven.terraformersmc.com/")
     maven(url = "https://maven.ladysnake.org/releases")
     maven(url = "https://maven.terraformersmc.com/")
+    maven(url = "https://maven.misterpemodder.com/libs-release/")
 }
 
 dependencies {
@@ -76,7 +77,9 @@ dependencies {
     }
 
     minecraftServerLibraries(libs.icu4j)
-
+    modImplementation("com.misterpemodder:shulkerboxtooltip-fabric:5.1.8+1.21.1") {
+        isTransitive = false
+    }
 }
 
 tasks {
