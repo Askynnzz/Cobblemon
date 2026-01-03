@@ -8,7 +8,6 @@
 
 package com.cobblemon.mod.common.net.messages.server
 
-import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.battles.BattleFormat
 import com.cobblemon.mod.common.net.serverhandling.ChallengeHandler

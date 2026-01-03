@@ -450,6 +450,8 @@ object Cobblemon {
         AdvancementHandler.registerListeners()
         PokedexHandler.registerListeners()
         StatHandler.registerListeners()
+        MegaEvolutionEventHandler.initialise()
+
     }
 
     fun getLevel(dimension: ResourceKey<Level>): Level? {

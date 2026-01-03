@@ -7,7 +7,8 @@
   "choices": [
     "mega",
     "mega_x",
-    "mega_y"
+    "mega_y",
+    "none"
   ],
   "isAspect": true,
   "aspectFormat": "{{choice}}"

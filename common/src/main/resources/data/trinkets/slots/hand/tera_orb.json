@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "amount": 1,
+  "order": 1,
+  "icon": "cobblemon:gui/slots/tera_orb_trinket",
+  "drop_rule": "keep",
+  "validator_predicates": [
+    "trinkets:tag"
+  ],
+  "quick_move_predicates": [
+    "trinkets:all"
+  ],
+  "tooltip_predicates": [
+    "trinkets:all"
+  ]
+}

@@ -18,6 +18,8 @@ import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.pokemon.status.Statuses
 import com.cobblemon.mod.common.api.text.blue
 import com.cobblemon.mod.common.api.text.gray
+import com.cobblemon.mod.common.api.types.tera.TeraType
+import com.cobblemon.mod.common.api.types.tera.TeraTypes
 import com.cobblemon.mod.common.block.BerryBlock
 import com.cobblemon.mod.common.block.MintBlock
 import com.cobblemon.mod.common.block.MintBlock.MintType
@@ -37,6 +39,11 @@ import com.cobblemon.mod.common.item.berry.PortionHealingBerryItem
 import com.cobblemon.mod.common.item.berry.StatusCuringBerryItem
 import com.cobblemon.mod.common.item.interactive.PonigiriItem
 import com.cobblemon.mod.common.item.food.SinisterTeaItem
+import com.cobblemon.mod.common.item.gimmicks.LegendaryItem
+import com.cobblemon.mod.common.item.gimmicks.MegaBraceletItem
+import com.cobblemon.mod.common.item.gimmicks.MegaStoneItem
+import com.cobblemon.mod.common.item.gimmicks.TeraOrbItem
+import com.cobblemon.mod.common.item.gimmicks.TeraShardItem
 import com.cobblemon.mod.common.item.interactive.*
 import com.cobblemon.mod.common.item.interactive.ability.AbilityChangeItem
 import com.cobblemon.mod.common.platform.PlatformRegistry
@@ -504,8 +511,6 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     @JvmField val MALICIOUS_ARMOR = heldItem("malicious_armor")
     @JvmField val SHELL_HELMET = heldItem("shell_helmet")
     @JvmField val METAL_ALLOY = noSettingsItem("metal_alloy")
-    @JvmField val SCROLL_OF_DARKNESS = noSettingsItem("scroll_of_darkness")
-    @JvmField val SCROLL_OF_WATERS = noSettingsItem("scroll_of_waters")
 
     private val berries = mutableMapOf<ResourceLocation, BerryItem>()
     // Plants
@@ -1456,6 +1461,333 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     val FAIRY_GEM = noSettingsItem("fairy_gem")
     //@JvmField
     //val BINDING_SOIL = blockItem("binding_soil", CobblemonBlocks.BINDING_SOIL)
+    @JvmField
+    val MEGA_BRACELET = create("mega_bracelet", MegaBraceletItem())
+    @JvmField
+    val TERA_ORB = create("tera_orb", TeraOrbItem())
+
+    val TERA_SHARDS = mutableListOf<TeraShardItem>()
+
+    @JvmField
+    val TERA_SHARD_BUG = teraShard(TeraTypes.BUG)
+    @JvmField
+    val TERA_SHARD_DARK = teraShard(TeraTypes.DARK)
+    @JvmField
+    val TERA_SHARD_DRAGON = teraShard(TeraTypes.DRAGON)
+    @JvmField
+    val TERA_SHARD_ELECTRIC = teraShard(TeraTypes.ELECTRIC)
+    @JvmField
+    val TERA_SHARD_FAIRY = teraShard(TeraTypes.FAIRY)
+    @JvmField
+    val TERA_SHARD_FIGHTING = teraShard(TeraTypes.FIGHTING)
+    @JvmField
+    val TERA_SHARD_FIRE = teraShard(TeraTypes.FIRE)
+    @JvmField
+    val TERA_SHARD_FLYING = teraShard(TeraTypes.FLYING)
+    @JvmField
+    val TERA_SHARD_GHOST = teraShard(TeraTypes.GHOST)
+    @JvmField
+    val TERA_SHARD_GRASS = teraShard(TeraTypes.GRASS)
+    @JvmField
+    val TERA_SHARD_GROUND = teraShard(TeraTypes.GROUND)
+    @JvmField
+    val TERA_SHARD_ICE = teraShard(TeraTypes.ICE)
+    @JvmField
+    val TERA_SHARD_NORMAL = teraShard(TeraTypes.NORMAL)
+    @JvmField
+    val TERA_SHARD_POISON = teraShard(TeraTypes.POISON)
+    @JvmField
+    val TERA_SHARD_PSYCHIC = teraShard(TeraTypes.PSYCHIC)
+    @JvmField
+    val TERA_SHARD_ROCK = teraShard(TeraTypes.ROCK)
+    @JvmField
+    val TERA_SHARD_STEEL = teraShard(TeraTypes.STEEL)
+    @JvmField
+    val TERA_SHARD_STELLAR = teraShard(TeraTypes.STELLAR)
+    @JvmField
+    val TERA_SHARD_WATER = teraShard(TeraTypes.WATER)
+
+    val MEGASTONES = mutableListOf<MegaStoneItem>()
+
+    @JvmField
+    val ABOMASITE = megaStone("abomasite", "abomasnow", "mega_evolution=mega")
+    @JvmField
+    val ABSOLITE = megaStone("absolite", "absol", "mega_evolution=mega")
+    @JvmField
+    val AERODACTYLITE = megaStone("aerodactylite", "aerodactyl", "mega_evolution=mega")
+    @JvmField
+    val AGGRONITE = megaStone("aggronite", "aggron", "mega_evolution=mega")
+    @JvmField
+    val ALAKAZITE = megaStone("alakazite", "alakazam", "mega_evolution=mega")
+    @JvmField
+    val ALTARIANITE = megaStone("altarianite", "altaria", "mega_evolution=mega")
+    @JvmField
+    val AMPHAROSITE = megaStone("ampharosite", "ampharos", "mega_evolution=mega")
+    @JvmField
+    val AUDINITE = megaStone("audinite", "audino", "mega_evolution=mega")
+    @JvmField
+    val BANETTITE = megaStone("banettite", "banette", "mega_evolution=mega")
+    @JvmField
+    val BEEDRILLITE = megaStone("beedrillite", "beedrill", "mega_evolution=mega")
+    @JvmField
+    val BLASTOISINITE = megaStone("blastoisinite", "blastoise", "mega_evolution=mega")
+    @JvmField
+    val BLAZIKENITE = megaStone("blazikenite", "blaziken", "mega_evolution=mega")
+    @JvmField
+    val CAMERUPTITE = megaStone("cameruptite", "camerupt", "mega_evolution=mega")
+    @JvmField
+    val CHARIZARDITE_X = megaStone("charizarditex", "charizard", "mega_evolution=mega_x")
+    @JvmField
+    val CHARIZARDITE_Y = megaStone("charizarditey", "charizard", "mega_evolution=mega_y")
+    @JvmField
+    val DIANCITE = megaStone("diancite", "diance", "mega_evolution=mega")
+    @JvmField
+    val GALLADITE = megaStone("galladite", "gallade", "mega_evolution=mega")
+    @JvmField
+    val GARCHOMPITE = megaStone("garchompite", "garchomp", "mega_evolution=mega")
+    @JvmField
+    val GARDEVOIRITE = megaStone("gardevoirite", "gardevoire", "mega_evolution=mega")
+    @JvmField
+    val GENGARITE = megaStone("gengarite", "gengar", "mega_evolution=mega")
+    @JvmField
+    val GYARADOSITE = megaStone("gyaradosite", "gyarados", "mega_evolution=mega")
+    @JvmField
+    val HERACRONITE = megaStone("heracronite", "heracross", "mega_evolution=mega")
+    @JvmField
+    val HOUNDOOMINITE = megaStone("houndoominite", "houndoom", "mega_evolution=mega")
+    @JvmField
+    val KANGASKHANITE = megaStone("kangaskhanite", "kangaskan", "mega_evolution=mega")
+    @JvmField
+    val LATIASITE = megaStone("latiasite", "latias", "mega_evolution=mega")
+    @JvmField
+    val LATIOSITE = megaStone("latiosite", "latios", "mega_evolution=mega")
+    @JvmField
+    val LOPUNNITE = megaStone("lopunnite", "lopunny", "mega_evolution=mega")
+    @JvmField
+    val LUCARIONITE = megaStone("lucarionite", "lucario", "mega_evolution=mega")
+    @JvmField
+    val MANECTITE = megaStone("manectite", "manectric", "mega_evolution=mega")
+    @JvmField
+    val MAWILITE = megaStone("mawilite", "mawile", "mega_evolution=mega")
+    @JvmField
+    val MEDICHAMITE = megaStone("medichamite", "medicham", "mega_evolution=mega")
+    @JvmField
+    val METAGROSSITE = megaStone("metagrossite", "metagross", "mega_evolution=mega")
+    @JvmField
+    val MEWTWONITE_X = megaStone("mewtwonitex", "mewtwo", "mega_evolution=mega_x")
+    @JvmField
+    val MEWTWONITE_Y = megaStone("mewtwonitey", "mewtwo", "mega_evolution=mega_y")
+    @JvmField
+    val PIDGEOTITE = megaStone("pidgeotite", "pidgeot", "mega_evolution=mega")
+    @JvmField
+    val PINSIRITE = megaStone("pinsirite", "pinsir", "mega_evolution=mega")
+    @JvmField
+    val SABLENITE = megaStone("sablenite", "sableye", "mega_evolution=mega")
+    @JvmField
+    val SALAMENCITE = megaStone("salamencite", "salamence", "mega_evolution=mega")
+    @JvmField
+    val SCEPTILITE = megaStone("sceptilite", "sceptile", "mega_evolution=mega")
+    @JvmField
+    val SCIZORITE = megaStone("scizorite", "scizor", "mega_evolution=mega")
+    @JvmField
+    val SHARPEDONITE = megaStone("sharpedonite", "sharpedo", "mega_evolution=mega")
+    @JvmField
+    val SLOWBRONITE = megaStone("slowbronite", "slowbro", "mega_evolution=mega")
+    @JvmField
+    val STEELIXITE = megaStone("steelixite", "steelix", "mega_evolution=mega")
+    @JvmField
+    val SWAMPERTITE = megaStone("swampertite", "swampert", "mega_evolution=mega")
+    @JvmField
+    val TYRANITARITE = megaStone("tyranitarite", "tyranitar", "mega_evolution=mega")
+    @JvmField
+    val VENUSAURITE = megaStone("venusaurite", "venusaur", "mega_evolution=mega")
+
+    val LEGENDARY_ITEMS = mutableListOf<LegendaryItem>()
+
+    @JvmField
+    val RARE_DNA = legendaryItem("rare_dna", 2)
+    @JvmField
+    val TIME_CORE = legendaryItem("time_core", 2)
+    @JvmField
+    val WISHING_STAR = legendaryItem("wishing_star", 2)
+    @JvmField
+    val METEORITE = legendaryItem("meteorite", 2)
+    @JvmField
+    val RARE_SEA_EGG = legendaryItem("rare_sea_egg", 2)
+    @JvmField
+    val NIGHTMARE_CORE = legendaryItem("nightmare_core", 2)
+    @JvmField
+    val GRACIDEA = legendaryItem("gracidea", 2)
+    @JvmField
+    val JEWEL_OF_LIFE = legendaryItem("jewel_of_life", 2)
+    @JvmField
+    val VICTORY_STAR = legendaryItem("victory_star", 2)
+    @JvmField
+    val RESOLUTE_SWORD = legendaryItem("resolute_sword", 2)
+    @JvmField
+    val RELIC_DISC = legendaryItem("relic_disc", 2)
+    @JvmField
+    val DISC_DRIVE = legendaryItem("disc_drive", 2)
+    @JvmField
+    val PINK_DIAMOND = legendaryItem("pink_diamond", 2)
+    @JvmField
+    val RING = legendaryItem("ring", 2)
+    @JvmField
+    val STEAM_ENGINE = legendaryItem("steam_engine", 2)
+    @JvmField
+    val SOUL_HEART = legendaryItem("soul_heart", 2)
+    @JvmField
+    val Z_SOUL = legendaryItem("z_soul", 2)
+    @JvmField
+    val MELTAN_NUT = legendaryItem("meltan_nut", 2)
+    @JvmField
+    val DADA_SCARF = legendaryItem("dada_scarf", 2)
+    @JvmField
+    val MYTHICAL_PECHA_BERRY = legendaryItem("mythical_pecha_berry", 2)
+    @JvmField
+    val GLACIAL_ORB = legendaryItem("glacial_orb", 2)
+    @JvmField
+    val STATIC_ORB = legendaryItem("static_orb", 2)
+    @JvmField
+    val FLARE_ORB = legendaryItem("flare_orb", 2)
+    @JvmField
+    val CLONING_CABLE = legendaryItem("cloning_cable", 2)
+    @JvmField
+    val SACRED_LIGHTNING = legendaryItem("sacred_lightning", 2)
+    @JvmField
+    val SACRED_FLAME = legendaryItem("sacred_flame", 2)
+    @JvmField
+    val SACRED_DROPLET = legendaryItem("sacred_droplet", 2)
+    @JvmField
+    val SILVER_WING = legendaryItem("silver_wing", 2)
+    @JvmField
+    val RAINBOW_WING = legendaryItem("rainbow_wing", 2)
+    @JvmField
+    val STEEL_ALLOY = legendaryItem("steel_alloy", 2)
+    @JvmField
+    val NEVER_MELT_ICICLE = legendaryItem("never_melt_icicle", 2)
+    @JvmField
+    val ANCIENT_INGOT = legendaryItem("ancient_ingot", 2)
+    @JvmField
+    val INFINITE_SOURCE = legendaryItem("infinite_source", 2)
+    @JvmField
+    val DRAGON_SKULL = legendaryItem("dragon_skull", 2)
+    @JvmField
+    val TITAN_TOTEM = legendaryItem("titan_totem", 2)
+    @JvmField
+    val BLUE_EON_TICKET = legendaryItem("blue_eon_ticket", 2)
+    @JvmField
+    val RED_EON_TICKET = legendaryItem("red_eon_ticket", 2)
+    @JvmField
+    val BLUE_ORB = legendaryItem("blue_orb", 2)
+    @JvmField
+    val RED_ORB = legendaryItem("red_orb", 2)
+    @JvmField
+    val JADE_ORB = legendaryItem("jade_orb", 2)
+    @JvmField
+    val RUBY_OF_WILLPOWER = legendaryItem("ruby_of_willpower", 2)
+    @JvmField
+    val RUBY_OF_EMOTION = legendaryItem("ruby_of_emotion", 2)
+    @JvmField
+    val RUBY_OF_KNOWLEDGE = legendaryItem("ruby_of_knowledge", 2)
+    @JvmField
+    val ADAMANT_ORB = legendaryItem("adamant_orb", 2)
+    @JvmField
+    val LUSTROUS_ORB = legendaryItem("lustrous_orb", 2)
+    @JvmField
+    val GRISEOUS_ORB = legendaryItem("griseous_orb", 2)
+    @JvmField
+    val MAGMA_CHUNK = legendaryItem("magma_chunk", 2)
+    @JvmField
+    val LUNAR_FEATHER = legendaryItem("lunar_feather", 2)
+    @JvmField
+    val COBALION_SWORD = legendaryItem("cobalion_sword", 2)
+    @JvmField
+    val VIRIZION_SWORD = legendaryItem("virizion_sword", 2)
+    @JvmField
+    val TERRAKION_SWORD = legendaryItem("terrakion_sword", 2)
+    @JvmField
+    val THUNDURUS_BOTTLE = legendaryItem("thundurus_bottle", 2)
+    @JvmField
+    val TORNADUS_BOTTLE = legendaryItem("tornadus_bottle", 2)
+    @JvmField
+    val LANDORUS_BOTTLE = legendaryItem("landorus_bottle", 2)
+    @JvmField
+    val ENAMORUS_BOTTLE = legendaryItem("enamorus_bottle", 2)
+    @JvmField
+    val LIGHT_STONE = legendaryItem("light_stone", 2)
+    @JvmField
+    val DARK_STONE = legendaryItem("dark_stone", 2)
+    @JvmField
+    val GRAY_STONE = legendaryItem("gray_stone", 2)
+    @JvmField
+    val TREE_OF_LIFE = legendaryItem("tree_of_life", 2)
+    @JvmField
+    val COCOON_OF_DESTRUCTION = legendaryItem("cocoon_of_destruction", 2)
+    @JvmField
+    val ZYGARDE_CUBE = legendaryItem("zygarde_cube", 2)
+    @JvmField
+    val BROKEN_MEMORY = legendaryItem("broken_memory", 2)
+    @JvmField
+    val ELECTRIC_TOTEM = legendaryItem("electric_totem", 2)
+    @JvmField
+    val PSYCHIC_TOTEM = legendaryItem("psychic_totem", 2)
+    @JvmField
+    val GRASS_TOTEM = legendaryItem("grass_totem", 2)
+    @JvmField
+    val WATER_TOTEM = legendaryItem("water_totem", 2)
+    @JvmField
+    val SOLAR_CORE = legendaryItem("solar_core", 2)
+    @JvmField
+    val LUNAR_CORE = legendaryItem("lunar_core", 2)
+    @JvmField
+    val ECLIPSE_CORE = legendaryItem("eclipse_core", 2)
+    @JvmField
+    val RUSTED_SWORD = legendaryItem("rusted_sword", 2)
+    @JvmField
+    val RUSTED_SHIELD = legendaryItem("rusted_shield", 2)
+    @JvmField
+    val DYNAMAX_CORE = legendaryItem("dynamax_core", 2)
+    @JvmField
+    val SCROLL_OF_DARKNESS = legendaryItem("scroll_of_darkness", 2)
+    @JvmField
+    val SCROLL_OF_WATERS = legendaryItem("scroll_of_waters", 2)
+    @JvmField
+    val MYSTICAL_BRANCH = legendaryItem("mystical_branch", 2)
+    @JvmField
+    val FROZEN_HOOF = legendaryItem("frozen_hoof", 2)
+    @JvmField
+    val GHOSTLY_HOOF = legendaryItem("ghostly_hoof", 2)
+    @JvmField
+    val KORAIDON_KEY = legendaryItem("koraidon_key", 2)
+    @JvmField
+    val MIRAIDON_KEY = legendaryItem("miraidon_key", 2)
+    @JvmField
+    val TOXIC_SCARF = legendaryItem("toxic_scarf", 2)
+    @JvmField
+    val TOXIC_HEADBAND = legendaryItem("toxic_headband", 2)
+    @JvmField
+    val TOXIC_RIBBON = legendaryItem("toxic_ribbon", 2)
+    @JvmField
+    val TEAL_MASK = legendaryItem("teal_mask", 2)
+    @JvmField
+    val STELLAR_TERA_CORE = legendaryItem("stellar_tera_core", 2)
+    @JvmField
+    val PSYCHIC_ORB = legendaryItem("psychic_orb", 2)
+    @JvmField
+    val COMBAT_ORB = legendaryItem("combat_orb", 2)
+    @JvmField
+    val DARK_ORB = legendaryItem("dark_orb", 2)
+    @JvmField
+    val RUINOUS_SWORD = legendaryItem("ruinous_sword", 2)
+    @JvmField
+    val RUINOUS_BEADS = legendaryItem("ruinous_beads", 2)
+    @JvmField
+    val RUINOUS_TABLET = legendaryItem("ruinous_tablet", 2)
+    @JvmField
+    val RUINOUS_VESSEL = legendaryItem("ruinous_vessel", 2)
+    @JvmField
+    val ZERAORA_TUFT = legendaryItem("zeraora_tuft", 2)
 
     private fun blockItem(name: String, block: Block, rarity: Rarity = Rarity.COMMON): BlockItem = this.create(name, BlockItem(block, Item.Properties().rarity(rarity)))
 
@@ -1473,6 +1805,25 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
         val item = create(pokeBall.name.path, PokeBallItem(pokeBall))
         pokeBall.item = item
         pokeBalls.add(item)
+        return item
+    }
+
+    fun teraShard(type: TeraType): TeraShardItem {
+        val item = create("${type.name.lowercase()}_tera_shard", TeraShardItem(type))
+        TERA_SHARDS.add(item)
+        return item
+    }
+
+    fun megaStone(path: String, evolvablePokemon: String, aspect: String): MegaStoneItem {
+        val item = create(path, MegaStoneItem(evolvablePokemon, aspect))
+        CobblemonHeldItemManager.registerRemap(item, path)
+        MEGASTONES.add(item)
+        return item
+    }
+
+    fun legendaryItem(name: String, durability: Int): LegendaryItem {
+        val item = create(name, LegendaryItem(durability))
+        LEGENDARY_ITEMS.add(item)
         return item
     }
 

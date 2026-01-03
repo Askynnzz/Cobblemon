@@ -12,6 +12,9 @@ import com.cobblemon.mod.common.*
 import com.cobblemon.mod.common.advancement.CobblemonCriteria
 import com.cobblemon.mod.common.advancement.predicate.CobblemonEntitySubPredicates
 import com.cobblemon.mod.common.api.net.serializers.*
+import com.cobblemon.mod.common.api.storage.player.PlayerInstancedDataStoreTypes
+import com.cobblemon.mod.common.item.gimmicks.MegaBraceletItem
+import com.cobblemon.mod.common.item.gimmicks.TeraOrbItem
 import com.cobblemon.mod.common.item.group.CobblemonItemGroups
 import com.cobblemon.mod.common.loot.LootInjector
 import com.cobblemon.mod.common.particle.CobblemonParticles
@@ -27,7 +30,12 @@ import com.cobblemon.mod.common.world.structureprocessors.CobblemonProcessorType
 import com.cobblemon.mod.common.world.structureprocessors.CobblemonStructureProcessorListOverrides
 import com.cobblemon.mod.fabric.net.CobblemonFabricNetworkManager
 import com.cobblemon.mod.fabric.permission.FabricPermissionValidator
+import com.cobblemon.mod.fabric.terastallization.TerastallizationEventHandler
 import com.mojang.brigadier.arguments.ArgumentType
+import dev.emi.trinkets.api.TrinketsApi
+import dev.emi.trinkets.api.event.TrinketDropCallback
+import dev.emi.trinkets.api.event.TrinketEquipCallback
+import dev.emi.trinkets.api.event.TrinketUnequipCallback
 import net.fabricmc.api.EnvType
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext
@@ -213,6 +221,9 @@ object CobblemonFabric : CobblemonImplementation {
         }
 
         CommandRegistrationCallback.EVENT.register(CobblemonCommands::register)
+
+        registerTrinketEvents()
+        TerastallizationEventHandler.initialise()
     }
 
     override fun isModInstalled(id: String) = FabricLoader.getInstance().isModLoaded(id)
@@ -248,6 +259,50 @@ object CobblemonFabric : CobblemonImplementation {
         EntityDataSerializers.registerSerializer(UUIDSetDataSerializer)
         EntityDataSerializers.registerSerializer(NPCPlayerTextureSerializer)
         EntityDataSerializers.registerSerializer(RideBoostsDataSerializer)
+    }
+
+    fun registerTrinketEvents() {
+        TrinketEquipCallback.EVENT.register { stack, _, entity ->
+            if (entity is ServerPlayer) {
+                if (stack.item is MegaBraceletItem) {
+                    val playerData = Cobblemon.playerDataManager.getGenericData(entity)
+                    val keyItems = playerData.keyItems
+                    if (!keyItems.contains(cobblemonResource("key_stone"))) {
+                        keyItems.add(cobblemonResource("key_stone"))
+                    }
+                    Cobblemon.playerDataManager.saveSingle(playerData, PlayerInstancedDataStoreTypes.GENERAL)
+                }
+                if (stack.item is TeraOrbItem) {
+                    val playerData = Cobblemon.playerDataManager.getGenericData(entity)
+                    val keyItems = playerData.keyItems
+                    if (!keyItems.contains(cobblemonResource("tera_orb"))) {
+                        keyItems.add(cobblemonResource("tera_orb"))
+                    }
+                    Cobblemon.playerDataManager.saveSingle(playerData, PlayerInstancedDataStoreTypes.GENERAL)
+                }
+            }
+        }
+
+        TrinketUnequipCallback.EVENT.register { stack, _, entity ->
+            if (entity is ServerPlayer) {
+                if (stack.item is MegaBraceletItem) {
+                    val playerData = Cobblemon.playerDataManager.getGenericData(entity)
+                    val keyItems = playerData.keyItems
+                    if (keyItems.contains(cobblemonResource("key_stone"))) {
+                        keyItems.remove(cobblemonResource("key_stone"))
+                    }
+                    Cobblemon.playerDataManager.saveSingle(playerData, PlayerInstancedDataStoreTypes.GENERAL)
+                }
+                if (stack.item is TeraOrbItem) {
+                    val playerData = Cobblemon.playerDataManager.getGenericData(entity)
+                    val keyItems = playerData.keyItems
+                    if (keyItems.contains(cobblemonResource("tera_orb"))) {
+                        keyItems.remove(cobblemonResource("tera_orb"))
+                    }
+                    Cobblemon.playerDataManager.saveSingle(playerData, PlayerInstancedDataStoreTypes.GENERAL)
+                }
+            }
+        }
     }
 
     override fun registerItems() {

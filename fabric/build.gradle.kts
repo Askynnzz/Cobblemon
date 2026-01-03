@@ -38,6 +38,8 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven(url = "https://api.modrinth.com/maven")
     maven(url = "https://maven.terraformersmc.com/")
+    maven(url = "https://maven.ladysnake.org/releases")
+    maven(url = "https://maven.terraformersmc.com/")
 }
 
 dependencies {
@@ -58,6 +60,7 @@ dependencies {
 
     modImplementation(libs.bundles.fabric.integrations.implementation)
     modRuntimeOnly(libs.bundles.fabric.integrations.runtimeOnly)
+    modImplementation("dev.emi:trinkets:3.10.0")
 
 //    modImplementation(libs.flywheelFabric)
 //    include(libs.flywheelFabric)

@@ -56,6 +56,15 @@ object CobblemonItemGroups {
     @JvmStatic val EVOLUTION_ITEMS_KEY = this.create("evolution_item", this::evolutionItemEntries) {
         ItemStack(CobblemonItems.BLACK_AUGURITE)
     }
+    @JvmStatic val MEGASTONES = this.create("mega_stones", this::megaStoneEntries) {
+        ItemStack(CobblemonItems.MEGA_BRACELET)
+    }
+    @JvmStatic val TERASTALLIZATION = this.create("terastallization", this::terastallizationEntries) {
+        ItemStack(CobblemonItems.TERA_ORB)
+    }
+    @JvmStatic val LEGENDARY_ITEMS = this.create("legendary_items", this::legendaryItemEntries) {
+        ItemStack(CobblemonItems.GRISEOUS_ORB)
+    }
 
     @JvmStatic val BLOCKS get() = BuiltInRegistries.CREATIVE_MODE_TAB.get(BLOCKS_KEY)
     @JvmStatic val UTILITY_ITEMS get() = BuiltInRegistries.CREATIVE_MODE_TAB.get(UTILITY_ITEMS_KEY)
@@ -607,6 +616,26 @@ object CobblemonItemGroups {
         entries.accept(CobblemonItems.METAL_ALLOY)
         entries.accept(CobblemonItems.SCROLL_OF_DARKNESS)
         entries.accept(CobblemonItems.SCROLL_OF_WATERS)
+    }
+
+    private fun megaStoneEntries(displayContext: ItemDisplayParameters, entries: Output) {
+        entries.accept(CobblemonItems.MEGA_BRACELET)
+        CobblemonItems.MEGASTONES.forEach {
+            entries.accept(it)
+        }
+    }
+
+    private fun terastallizationEntries(displayContext: ItemDisplayParameters, entries: Output) {
+        entries.accept(CobblemonItems.TERA_ORB)
+        CobblemonItems.TERA_SHARDS.forEach {
+            entries.accept(it)
+        }
+    }
+
+    private fun legendaryItemEntries(displayContext: ItemDisplayParameters, entries: Output) {
+        CobblemonItems.LEGENDARY_ITEMS.forEach {
+            entries.accept(it)
+        }
     }
 
     private fun heldItemEntries(displayContext: ItemDisplayParameters, entries: Output) {

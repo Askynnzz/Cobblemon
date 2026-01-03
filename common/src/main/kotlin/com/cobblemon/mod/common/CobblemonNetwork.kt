@@ -170,6 +170,8 @@ import com.cobblemon.mod.common.net.messages.server.debug.ServerboundUpdateRidin
 import com.cobblemon.mod.common.net.messages.server.debug.ServerboundUpdateRidingStatsPacket
 import com.cobblemon.mod.common.net.messages.server.dialogue.EscapeDialoguePacket
 import com.cobblemon.mod.common.net.messages.server.dialogue.InputToDialoguePacket
+import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SMegaEvolvePacket
+import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SRemoveMegaEvolutionPacket
 import com.cobblemon.mod.common.net.messages.server.npc.SaveNPCPacket
 import com.cobblemon.mod.common.net.messages.server.orientation.ServerboundUpdateOrientationPacket
 import com.cobblemon.mod.common.net.messages.server.pasture.PasturePokemonPacket
@@ -227,6 +229,8 @@ import com.cobblemon.mod.common.net.serverhandling.debug.ServerboundUpdateRiding
 import com.cobblemon.mod.common.net.serverhandling.dialogue.EscapeDialogueHandler
 import com.cobblemon.mod.common.net.serverhandling.dialogue.InputToDialogueHandler
 import com.cobblemon.mod.common.net.serverhandling.evolution.AcceptEvolutionHandler
+import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SMegaEvolveHandler
+import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SRemoveMegaEvolutionHandler
 import com.cobblemon.mod.common.net.serverhandling.npc.SaveNPCHandler
 import com.cobblemon.mod.common.net.serverhandling.orientation.ServerboundUpdateOrientationHandler
 import com.cobblemon.mod.common.net.serverhandling.pasture.PasturePokemonHandler
@@ -626,6 +630,9 @@ object CobblemonNetwork {
 
         list.add(PacketRegisterInfo(SpectateNearestBattlePacket.ID, SpectateNearestBattlePacket::decode, SpectateNearestBattleHandler))
 
+        // Mega Evolution
+        list.add(PacketRegisterInfo(C2SMegaEvolvePacket.ID, C2SMegaEvolvePacket::decode, C2SMegaEvolveHandler))
+        list.add(PacketRegisterInfo(C2SRemoveMegaEvolutionPacket.ID, C2SRemoveMegaEvolutionPacket::decode, C2SRemoveMegaEvolutionHandler))
         return list
     }
 

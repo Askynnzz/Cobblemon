@@ -1,0 +1,9 @@
+{
+  "entities": [
+    "player"
+  ],
+  "slots": [
+    "hand/mega_bracelet",
+    "hand/tera_orb"
+  ]
+}
