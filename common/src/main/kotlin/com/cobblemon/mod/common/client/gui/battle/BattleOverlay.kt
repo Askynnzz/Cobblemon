@@ -299,14 +299,14 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             alpha = opacity
         )
 
-        val maybeShortened = if (names.length > 10) names.take(10) + "..." else names
+        val maybeShortened = if (names.length > 18) names.take(18) + "..." else names
 
         if (isReversed) {
             drawScaledTextJustifiedRight(
                 context = context,
                 text = maybeShortened.text(),
                 y = 9,
-                x = x + 128 - 5,
+                x = x + 128 - 12,
                 scale = SCALE,
                 opacity = opacity,
                 shadow = true
@@ -317,7 +317,7 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
                 context = context,
                 text = maybeShortened.text(),
                 y = 9,
-                x = x + 5,
+                x = x + 12,
                 scale = SCALE,
                 opacity = opacity,
                 shadow = true

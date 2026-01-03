@@ -20,6 +20,7 @@ import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
 import com.cobblemon.mod.common.battles.actor.PokemonBattleActor
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
+import com.cobblemon.mod.common.battles.timers.PlayerBattleTimer
 import com.cobblemon.mod.common.entity.npc.NPCBattleActor
 import com.cobblemon.mod.common.entity.npc.NPCEntity
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
@@ -62,7 +63,8 @@ object BattleBuilder {
         battleFormat: BattleFormat = BattleFormat.GEN_9_SINGLES,
         cloneParties: Boolean = false,
         healFirst: Boolean = false,
-        partyAccessor: (ServerPlayer) -> PartyStore = { it.party() }
+        partyAccessor: (ServerPlayer) -> PartyStore = { it.party() },
+        playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer? = { _, _ -> null }
     ): BattleStartResult {
 
         val adjustLevel = battleFormat.adjustLevel
@@ -118,7 +120,8 @@ object BattleBuilder {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
                 side1 = BattleSide(player1Actor),
-                side2 = BattleSide(player2Actor)
+                side2 = BattleSide(player2Actor),
+                playerTimer = playerTimer
             ).ifSuccessful {
                 it.battlePartyStores.addAll(battlePartyStores)
             }
@@ -134,7 +137,8 @@ object BattleBuilder {
         battleFormat: BattleFormat = BattleFormat.GEN_9_MULTI,
         cloneParties: Boolean = false,
         healFirst: Boolean = false,
-        partyAccessor: (ServerPlayer) -> PartyStore = { it.party() }
+        partyAccessor: (ServerPlayer) -> PartyStore = { it.party() },
+        playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer? = { _, _ -> null }
     ): BattleStartResult {
         val adjustLevel = battleFormat.adjustLevel
         val teams = players.mapIndexed { index, it ->
@@ -217,7 +221,8 @@ object BattleBuilder {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
                 side1 = BattleSide(playerActors[0], playerActors[1]),
-                side2 = BattleSide(playerActors[2], playerActors[3])
+                side2 = BattleSide(playerActors[2], playerActors[3]),
+                playerTimer = playerTimer
             ).ifSuccessful {
                 it.battlePartyStores.addAll(battlePartyStores)
             }
@@ -249,7 +254,8 @@ object BattleBuilder {
         cloneParties: Boolean = false,
         healFirst: Boolean = false,
         fleeDistance: Float = Cobblemon.config.defaultFleeDistance,
-        party: PartyStore = player.party()
+        party: PartyStore = player.party(),
+        playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer? = { _, _ -> null }
     ): BattleStartResult {
         val playerTeam = party.toBattleTeam(clone = cloneParties, healPokemon = healFirst, leadingPokemon = leadingPokemon).sortedBy { it.health <= 0 }
         val playerActor = PlayerBattleActor(player.uuid, playerTeam)
@@ -297,7 +303,8 @@ object BattleBuilder {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
                 side1 = BattleSide(playerActor),
-                side2 = BattleSide(wildActor)
+                side2 = BattleSide(wildActor),
+                playerTimer = playerTimer
             ).ifSuccessful {
                 if (!cloneParties) {
                     pokemonEntity.battleId = it.battleId
@@ -327,7 +334,8 @@ object BattleBuilder {
         battleFormat: BattleFormat = BattleFormat.GEN_9_SINGLES,
         cloneParties: Boolean = false,
         healFirst: Boolean = false,
-        party: PartyStore = player.party()
+        party: PartyStore = player.party(),
+        playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer? = { _, _ -> null }
     ): BattleStartResult {
         val playerTeam = party.toBattleTeam(clone = cloneParties, healPokemon = healFirst, leadingPokemon = leadingPokemon)
         val playerActor = PlayerBattleActor(player.uuid, playerTeam)
@@ -397,7 +405,8 @@ object BattleBuilder {
             BattleRegistry.startBattle(
                 battleFormat = battleFormat,
                 side1 = BattleSide(playerActor),
-                side2 = BattleSide(npcActor)
+                side2 = BattleSide(npcActor),
+                playerTimer = playerTimer,
             ).ifSuccessful { battle ->
                 npcEntity.entityData.update(NPCEntity.BATTLE_IDS) { it + battle.battleId }
             }

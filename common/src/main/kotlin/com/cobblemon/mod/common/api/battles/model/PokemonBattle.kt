@@ -87,7 +87,7 @@ open class PokemonBattle(
     val format: BattleFormat,
     val side1: BattleSide,
     val side2: BattleSide,
-    val playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer = { battle, actor -> ShowdownTimer(battle, actor) }
+    val playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer? = { battle, actor -> ShowdownTimer(battle, actor) }
 ) {
     /** Whether logging will be silenced for this battle. */
     var mute = !CobblemonBuildDetails.SNAPSHOT
@@ -266,8 +266,9 @@ open class PokemonBattle(
     fun turn(newTurnNumber: Int) {
         actors.forEach { it.turn() }
         actors.filterIsInstance<PlayerBattleActor>().forEach { actor ->
-            val mustChooseBy = actor.timer.mustChooseBy()
-            actor.uuid.getPlayer()?.sendPacket(BattleTimerPacket(mustChooseBy))
+            actor.timer?.mustChooseBy()?.let {
+                actor.uuid.getPlayer()?.sendPacket(BattleTimerPacket(it))
+            }
         }
         // TODO: If a pokemon switches in the same turn another pokemon is KO'd it will not receive exp for the KO
         for (side in sides) {
@@ -516,7 +517,7 @@ open class PokemonBattle(
 
     fun tick() {
         if (turn >= 1) {
-            this.actors.filterIsInstance<PlayerBattleActor>().forEach { it.timer.tick() }
+            this.actors.filterIsInstance<PlayerBattleActor>().forEach { it.timer?.tick() }
         }
         try {
             while (dispatchResult.canProceed()) {

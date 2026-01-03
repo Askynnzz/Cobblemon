@@ -56,7 +56,7 @@ object TeamPreviewManager {
                 TeamPreviewPacket(
                     sideB.neededSelections,
                     sideB.party,
-                    sideB.party,
+                    sideA.party,
                     openTeamSheet,
                     now.plusSeconds(TEAM_PREVIEW_TIME_SECONDS.toLong()),
                     sideA.name

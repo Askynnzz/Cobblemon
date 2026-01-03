@@ -57,7 +57,7 @@ class PlayerBattleActor(
             field = value
         }
 
-    lateinit var timer: PlayerBattleTimer
+    var timer: PlayerBattleTimer? = null
 
     override fun getName(): MutableComponent = this.entity?.name?.copy() ?: "Offline Player".red()
     override fun nameOwned(name: String): MutableComponent = battleLang("owned_pokemon", this.getName(), name)
@@ -77,7 +77,7 @@ class PlayerBattleActor(
     }
 
     override fun turn() {
-        timer.startTurn()
+        timer?.startTurn()
         super.turn()
     }
 
@@ -86,7 +86,7 @@ class PlayerBattleActor(
     }
 
     override fun setActionResponses(responses: List<ShowdownActionResponse>) {
-        timer.selection()
+        timer?.selection()
         super.setActionResponses(responses)
         val player = uuid.getPlayer() ?: return
         battle.players.filter { it != uuid.getPlayer() && hasStreamerBattleMode(it) }
