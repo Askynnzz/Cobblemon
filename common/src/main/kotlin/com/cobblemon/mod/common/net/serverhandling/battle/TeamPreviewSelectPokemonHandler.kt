@@ -22,6 +22,6 @@ object TeamPreviewSelectPokemonHandler : ServerNetworkPacketHandler<TeamPreviewS
             if (slot < 0 || slot >= party.size) return
             if (party[slot] == null) return
         }
-        TeamPreviewManager.changeSelections(player, packet.selected)
+        TeamPreviewManager.changeSelections(player.uuid, packet.selected)
     }
 }

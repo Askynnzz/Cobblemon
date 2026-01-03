@@ -15,8 +15,11 @@ import com.cobblemon.mod.common.api.moves.HiddenPowerUtil
 import com.cobblemon.mod.common.api.pokemon.helditem.HeldItemProvider
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.api.pokemon.status.Statuses
+import com.cobblemon.mod.common.battles.actor.PlayerBattleActor
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon
 import com.cobblemon.mod.common.battles.runner.ShowdownService
+import com.cobblemon.mod.common.battles.timers.PlayerBattleTimer
+import com.cobblemon.mod.common.battles.timers.ShowdownTimer
 import com.google.gson.GsonBuilder
 import net.minecraft.server.level.ServerPlayer
 import java.util.*
@@ -202,9 +205,10 @@ object BattleRegistry {
         battleFormat: BattleFormat,
         side1: BattleSide,
         side2: BattleSide,
-        canPreempt: Boolean = true
+        canPreempt: Boolean = true,
+        playerTimer: (PokemonBattle, PlayerBattleActor) -> PlayerBattleTimer = { battle, actor -> ShowdownTimer(battle, actor) }
     ): BattleStartResult {
-        val battle = PokemonBattle(battleFormat, side1, side2)
+        val battle = PokemonBattle(battleFormat, side1, side2, playerTimer)
         val start: () -> Unit = {
             battleMap[battle.battleId] = battle
             startShowdown(battle)
