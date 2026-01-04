@@ -167,7 +167,8 @@ open class BattlePokemon(
 
         val boostMultipliers = boosts.mapValues { getBoostMultiplier(it.key) }.filter { it.value != 1.0 }
 
-        if (ally || actor.battle.format.isOpenTeamSheet) {
+        val isTeamSheet = ::actor.isInitialized && actor.battle.format.isOpenTeamSheet
+        if (ally || isTeamSheet) {
             val allyDto = BattleInitializePacket.ActiveBattlePokemonDTO.fromPokemon(this, true, getIllusion())
             return BattlePokemonDTO(
                 this.effectedPokemon.uuid,
