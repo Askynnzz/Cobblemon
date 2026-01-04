@@ -39,11 +39,7 @@ import com.cobblemon.mod.common.item.berry.PortionHealingBerryItem
 import com.cobblemon.mod.common.item.berry.StatusCuringBerryItem
 import com.cobblemon.mod.common.item.interactive.PonigiriItem
 import com.cobblemon.mod.common.item.food.SinisterTeaItem
-import com.cobblemon.mod.common.item.gimmicks.LegendaryItem
-import com.cobblemon.mod.common.item.gimmicks.MegaBraceletItem
-import com.cobblemon.mod.common.item.gimmicks.MegaStoneItem
-import com.cobblemon.mod.common.item.gimmicks.TeraOrbItem
-import com.cobblemon.mod.common.item.gimmicks.TeraShardItem
+import com.cobblemon.mod.common.item.gimmicks.*
 import com.cobblemon.mod.common.item.interactive.*
 import com.cobblemon.mod.common.item.interactive.ability.AbilityChangeItem
 import com.cobblemon.mod.common.item.pokebag.PokeBagItem
@@ -1790,6 +1786,15 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     @JvmField
     val ZERAORA_TUFT = legendaryItem("zeraora_tuft", 2)
 
+    val COIN_ITEMS = mutableListOf<CoinItem>()
+
+    @JvmField
+    val BRONZE_COIN = coinItem("bronze_coin")
+    @JvmField
+    val SILVER_COIN = coinItem("silver_coin")
+    @JvmField
+    val GOLD_COIN = coinItem("gold_coin")
+
     val POKE_BAGS = mutableListOf<PokeBagItem>()
 
     @JvmField
@@ -1836,6 +1841,12 @@ object CobblemonItems : PlatformRegistry<Registry<Item>, ResourceKey<Registry<It
     fun legendaryItem(name: String, durability: Int): LegendaryItem {
         val item = create(name, LegendaryItem(durability))
         LEGENDARY_ITEMS.add(item)
+        return item
+    }
+
+    fun coinItem(name: String): CoinItem {
+        val item = create(name, CoinItem())
+        COIN_ITEMS.add(item)
         return item
     }
 
