@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.block
 
 import com.cobblemon.mod.common.CobblemonBlocks
 import com.cobblemon.mod.common.CobblemonItems
+import com.cobblemon.mod.common.block.ApricornBlock.Companion
 import com.cobblemon.mod.common.item.MintLeafItem
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -68,6 +69,8 @@ class MintBlock(private val mintType: MintType, settings: Properties) : CropBloc
     }
 
     override fun getBaseSeedId(): ItemLike = this.mintType.getSeed()
+
+    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState) = false
 
     override fun getBonemealAgeIncrease(world: Level): Int = 1
 
