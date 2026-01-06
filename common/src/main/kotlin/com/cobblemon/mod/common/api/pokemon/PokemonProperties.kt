@@ -241,6 +241,9 @@ open class PokemonProperties {
                 val value = matched.second?.let(::cleanSpeciesName) ?: return null
                 return if (value.lowercase() == "random") {
                     "random"
+                }
+                else if (value.lowercase() == "random_common") {
+                    "random_common"
                 } else {
                     try {
                         val species = PokemonSpecies.getByIdentifier(value.asIdentifierDefaultingNamespace()) ?: return null
@@ -255,7 +258,11 @@ open class PokemonProperties {
                 val keyPair = keyPairs.find { pair ->
                     species = if (pair.second == null && pair.first.lowercase() == "random") {
                         "random"
-                    } else {
+                    }
+                    else if (pair.second == null && pair.first.lowercase() == "random_common") {
+                        "random_common"
+                    }
+                    else {
                         try {
                             val identifier = cleanSpeciesName(pair.first).asIdentifierDefaultingNamespace()
                             val found = PokemonSpecies.getByIdentifier(identifier) ?: return@find false
@@ -367,6 +374,7 @@ open class PokemonProperties {
     var ivs: IVs? = null
     var evs: EVs? = null
     var customProperties = mutableListOf<CustomPokemonProperty>()
+    val legendLabels = listOf("legendary", "mythical", "ultra_beast")
 
     fun asRenderablePokemon() = RenderablePokemon(
         species = species?.let {
@@ -400,7 +408,11 @@ open class PokemonProperties {
             return@let try {
                 if (it == "random") {
                     PokemonSpecies.implemented.random()
-                } else {
+                }
+                else if (it == "random_common") {
+                    PokemonSpecies.implemented.filter { it.labels.none { it in legendLabels } }.random()
+                }
+                else {
                     PokemonSpecies.getByIdentifier(it.asIdentifierDefaultingNamespace())
                 }
             } catch (e: ResourceLocationException) {
@@ -514,7 +526,11 @@ open class PokemonProperties {
             try {
                 val species = if (this == "random") {
                     PokemonSpecies.species.random()
-                } else {
+                }
+                else if (this == "random_common") {
+                    PokemonSpecies.species.filter { it.labels.none { it in legendLabels } }.random()
+                }
+                else {
                     PokemonSpecies.getByIdentifier(this.asIdentifierDefaultingNamespace()) ?: return@run
                 }
                 if (pokemon.species != species) {
@@ -577,6 +593,9 @@ open class PokemonProperties {
                 // TODO get context on this bit, it's highly unlikely two randoms would result in the same Pokémon, doesn't mean the prop is not equal?
                 val species = if (this == "random") {
                     PokemonSpecies.species.random()
+                }
+                else if (this == "random_common") {
+                    PokemonSpecies.species.filter { it.labels.none { it in legendLabels } }.random()
                 } else {
                     PokemonSpecies.getByIdentifier(this.asIdentifierDefaultingNamespace()) ?: return@run
                 }
