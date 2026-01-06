@@ -31,6 +31,8 @@ import com.cobblemon.mod.common.client.gui.cookingpot.CookingPotScreen
 import com.cobblemon.mod.common.client.particle.BedrockParticleOptionsRepository
 import com.cobblemon.mod.common.client.render.ClientPlayerIcon
 import com.cobblemon.mod.common.client.render.DeferredRenderer
+import com.cobblemon.mod.common.client.render.bedrock.SimpleAnimationRepository
+import com.cobblemon.mod.common.client.render.bedrock.SimpleModelRepository
 import com.cobblemon.mod.common.client.render.block.BerryBlockRenderer
 import com.cobblemon.mod.common.client.render.block.CampfireBlockEntityRenderer
 import com.cobblemon.mod.common.client.render.block.DisplayCaseRenderer
@@ -421,6 +423,9 @@ object CobblemonClient {
             directories = VaryingModelRepository.animationDirectories
         )
         VaryingModelRepository.reload(resourceManager)
+
+        SimpleModelRepository.reload(resourceManager)
+        SimpleAnimationRepository.loadAnimations(resourceManager)
 
         BerryModelRepository.reload(resourceManager)
         MiscModelRepository.reload(resourceManager)

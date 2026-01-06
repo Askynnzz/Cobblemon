@@ -10,21 +10,29 @@ package com.cobblemon.mod.common.mixin.client;
 
 import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.ModAPI;
+import com.cobblemon.mod.common.client.render.bedrock.SimpleBedrockRenderer;
+import com.cobblemon.mod.common.client.render.bedrock.SimplePosableState;
+import com.cobblemon.mod.common.client.render.models.blockbench.PosableState;
 import com.cobblemon.mod.common.item.PokeBallItem;
 import com.cobblemon.mod.common.item.PokedexItem;
 import com.cobblemon.mod.common.item.WearableItem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,7 +54,22 @@ public abstract class ItemRendererMixin {
 
     @Shadow @Final private ItemModelShaper itemModelShaper;
 
+    @Unique SimplePosableState deltaclient$simplePosableState = new SimplePosableState();
+
     @Shadow public abstract void render(ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model);
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void cobblemon$renderCosmetic(ItemStack itemStack, ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, BakedModel model, CallbackInfo ci) {
+        if (itemStack.isEmpty()) return;
+
+        if (!itemStack.has(DataComponents.CUSTOM_DATA)) return;
+
+        CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
+
+        if (data.contains("BedrockModelData")) {
+            cobblemon$renderBedrockModelFromItemStack(data, displayContext, poseStack, bufferSource, combinedLight, ci);
+        }
+    }
 
     @Inject(
         method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V",
@@ -98,6 +121,96 @@ public abstract class ItemRendererMixin {
                        (original.getParticleIcon().contents().name().equals(replacement.getParticleIcon().contents().name()) &&
                                 original.getParticleIcon().contents().width() == replacement.getParticleIcon().contents().width() &&
                                 original.getParticleIcon().contents().height() == replacement.getParticleIcon().contents().height());
+    }
+
+    @Unique
+    private void cobblemon$renderBedrockModelFromItemStack(CustomData data, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, CallbackInfo ci) {
+        var bedrockModelData = data.getUnsafe().get("BedrockModelData");
+        if (!(bedrockModelData instanceof CompoundTag nbt)) return;
+
+        var model = nbt.getString("Model");
+        var texture = nbt.getString("Texture");
+        var state = deltaclient$simplePosableState;
+        var animation = nbt.contains("Animation", 8) ? nbt.getString("Animation") : null;
+
+        var translation = cobblemon$getNullableArrayFromCompound(nbt, "Translation", new float[]{0f, 0f, 0f});
+        var rotation = cobblemon$getNullableArrayFromCompound(nbt, "Rotation", new float[]{0f, 0f, 0f});
+        var scale = cobblemon$getNullableArrayFromCompound(nbt, "Scale", new float[]{1f, 1f, 1f});
+
+        if (model.isEmpty() || texture.isEmpty()) return;
+
+        cobblemon$renderBedrockModel(
+                displayContext,
+                poseStack,
+                bufferSource,
+                combinedLight,
+                ResourceLocation.parse(model),
+                ResourceLocation.parse(texture),
+                animation != null ? ResourceLocation.parse(animation) : null,
+                state,
+                translation,
+                rotation,
+                scale,
+                ci
+        );
+    }
+
+    @Unique
+    private float[] cobblemon$getNullableArrayFromCompound(CompoundTag nbt, String tag, float[] fallback) {
+        if (!nbt.contains(tag, 10)) return fallback;
+        return new float[]{
+                nbt.getCompound(tag).getFloat("X"),
+                nbt.getCompound(tag).getFloat("Y"),
+                nbt.getCompound(tag).getFloat("Z")
+        };
+    }
+
+    @Unique
+    private void cobblemon$renderBedrockModel(ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, ResourceLocation model, ResourceLocation texture, ResourceLocation animation, PosableState state, float[] translation, float[] rotation, float[] scale, CallbackInfo ci) {
+        poseStack.pushPose();
+
+
+        if (displayContext != ItemDisplayContext.GROUND) {
+            poseStack.translate(0f, -0.5f, 0f);
+        }
+
+        if (translation != null) {
+            poseStack.translate(translation[0], translation[1], translation[2]);
+        }
+
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+
+        if (rotation != null) {
+            poseStack.mulPose(Axis.XP.rotationDegrees(rotation[0]));
+            poseStack.mulPose(Axis.YP.rotationDegrees(rotation[1]));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(rotation[2]));
+        }
+
+        if (scale != null) {
+            poseStack.scale(scale[0], scale[1], scale[2]);
+        }
+
+        var player = Minecraft.getInstance().player;
+        if (player == null) {
+            poseStack.popPose();
+            return;
+        }
+
+        SimpleBedrockRenderer.INSTANCE.render(
+                model,
+                deltaclient$simplePosableState,
+                texture,
+                poseStack,
+                bufferSource,
+                combinedLight,
+                player.tickCount,
+                animation,
+                player.tickCount
+        );
+
+        poseStack.popPose();
+        ci.cancel();
     }
 
 }
