@@ -177,7 +177,8 @@ open class BattlePokemon(
                 moves,
                 this.effectedPokemon.heldItem,
                 boostMultipliers,
-                speed = effectedPokemon.speed,
+                effectedPokemon.speed,
+                terastallized = terastallized,
                 allyDto
             )
         }
@@ -191,6 +192,7 @@ open class BattlePokemon(
                 revealedHeldItem,
                 boostMultipliers,
                 speed = null,
+                terastallized = terastallized,
                 if (forceReveal || revealed) nonAllyDto else null
             )
         }

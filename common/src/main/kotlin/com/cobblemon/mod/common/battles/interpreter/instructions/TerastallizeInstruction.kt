@@ -41,6 +41,7 @@ class TerastallizeInstruction(val message: BattleMessage): InterpreterInstructio
             if (battlePokemon.effectedPokemon.getOwnerPlayer() != null) {
                 CobblemonEvents.BATTLE_TERA.post(BattleTerastallizeEvent(battle, battlePokemon.effectedPokemon.getOwnerPlayer()!!, battlePokemon))
             }
+            battlePokemon.sendUpdate()
         }
     }
 }

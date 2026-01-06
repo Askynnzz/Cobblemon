@@ -10,6 +10,7 @@ package com.cobblemon.mod.common.net.messages.client.battle
 
 import com.cobblemon.mod.common.api.net.NetworkPacket
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
+import com.cobblemon.mod.common.api.types.tera.TeraTypes
 import com.cobblemon.mod.common.util.cobblemonResource
 import com.cobblemon.mod.common.util.readItemStack
 import com.cobblemon.mod.common.util.readString
@@ -37,6 +38,7 @@ class BattleActorTeamPacket(val actor: UUID, val team: List<BattlePokemonDTO>): 
             pb.writeNullable(value.heldItem) { _, item -> buffer.writeItemStack(item) }
             pb.writeMap(value.buffs, { _, v -> buffer.writeEnum(v) }, { _, v -> buffer.writeDouble(v) })
             buffer.writeNullable(value.speed) { _, v -> buffer.writeInt(v) }
+            buffer.writeNullable(value.terastallized) { _, v -> buffer.writeResourceLocation(v.id) }
             buffer.writeNullable(value.activeBattlePokemonDTO) { _, v -> v.saveToBuffer(buffer) }
         }
     }
@@ -54,6 +56,7 @@ class BattleActorTeamPacket(val actor: UUID, val team: List<BattlePokemonDTO>): 
                     heldItem = buffer.readNullable { buffer.readItemStack() },
                     buffs = buffer.readMap({ buffer.readEnum(Stats::class.java) }, { buffer.readDouble() }),
                     speed = buffer.readNullable { buffer.readInt() },
+                    terastallized = buffer.readNullable { TeraTypes.get(buffer.readResourceLocation()) },
                     activeBattlePokemonDTO = buffer.readNullable { BattleInitializePacket.ActiveBattlePokemonDTO.loadFromBuffer(buffer) }
                 )
             }

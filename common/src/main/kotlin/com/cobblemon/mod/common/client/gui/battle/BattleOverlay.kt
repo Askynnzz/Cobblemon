@@ -20,6 +20,7 @@ import com.cobblemon.mod.common.api.text.bold
 import com.cobblemon.mod.common.api.text.green
 import com.cobblemon.mod.common.api.text.red
 import com.cobblemon.mod.common.api.text.text
+import com.cobblemon.mod.common.api.types.tera.elemental.ElementalTypeTeraType
 import com.cobblemon.mod.common.client.CobblemonClient
 import com.cobblemon.mod.common.client.CobblemonResources
 import com.cobblemon.mod.common.client.battle.ActiveClientBattlePokemon
@@ -1381,14 +1382,37 @@ class BattleOverlay : Gui(Minecraft.getInstance()), Schedulable {
             centered = true
         )
 
-        TypeIcon(
-            x = startX + 100.5,
-            y = startY + 99,
-            type = form.primaryType,
-            secondaryType = form.secondaryType,
-            small = false,
-            centeredX = true
-        ).render(context)
+        if (dto != null && dto.terastallized != null) {
+            val teraType = dto.terastallized
+            if (teraType is ElementalTypeTeraType) {
+                TypeIcon(
+                    x = startX + 100.5,
+                    y = startY + 99,
+                    type = teraType.type,
+                    small = false,
+                    centeredX = true
+                ).render(context)
+            }
+            else {
+                TypeIcon(
+                    x = startX + 100.5,
+                    y = startY + 99,
+                    small = false,
+                    centeredX = true,
+                    isStellar = true
+                ).render(context)
+            }
+        }
+        else {
+            TypeIcon(
+                x = startX + 100.5,
+                y = startY + 99,
+                type = form.primaryType,
+                secondaryType = form.secondaryType,
+                small = false,
+                centeredX = true
+            ).render(context)
+        }
 
         if (form.secondaryType != null) {
             blitk(
