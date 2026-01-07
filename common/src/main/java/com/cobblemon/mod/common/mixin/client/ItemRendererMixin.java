@@ -66,7 +66,7 @@ public abstract class ItemRendererMixin {
 
         CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
 
-        if (data.contains("BedrockModelData")) {
+        if (data != null && data.contains("BedrockModelData")) {
             cobblemon$renderBedrockModelFromItemStack(data, displayContext, poseStack, bufferSource, combinedLight, ci);
         }
     }

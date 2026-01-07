@@ -37,7 +37,7 @@ object SimpleAnimationRepository {
     fun loadAnimations(resourceManager: ResourceManager) {
         JsonPose.registerAnimationFactory("bedrock", BedrockAnimationReferenceFactory)
 
-        Cobblemon.LOGGER.info("Loading animations...")
+        LOGGER.info("Loading animations...")
         var animationCount = 0
         animationGroups.clear()
         var wereValidationErrors = false
