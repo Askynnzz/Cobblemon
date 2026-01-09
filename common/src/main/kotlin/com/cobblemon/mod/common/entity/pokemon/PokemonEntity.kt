@@ -497,6 +497,14 @@ open class PokemonEntity(
             POSE_TYPE -> {
                 val value = entityData.get(data) as PoseType
                 isNoGravity = (value in NO_GRAV_POSES) && passengers.isEmpty()
+                val hasChestAspect = pokemon.aspects.any {
+                    it == "chest" || it == "chest2" || it == "chest3"
+                }
+                if ((value in NO_GRAV_POSES) && passengers.isEmpty()) {
+                    isNoGravity = true
+                } else if (!hasChestAspect) {
+                    isNoGravity = false
+                }
             }
 
             BATTLE_ID -> {
