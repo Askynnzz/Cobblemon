@@ -85,33 +85,19 @@ internal data class PokemonP2(
                 PokemonProperties.CUSTOM_PROPERTIES_CODEC.optionalFieldOf(DataKeys.POKEMON_DATA, arrayListOf()).forGetter(PokemonP2::customProperties),
                 Nature.BY_IDENTIFIER_CODEC.fieldOf(DataKeys.POKEMON_NATURE).forGetter(PokemonP2::nature),
                 Nature.BY_IDENTIFIER_CODEC.optionalFieldOf(DataKeys.POKEMON_MINTED_NATURE).forGetter(PokemonP2::mintedNature),
-                ItemStack.CODEC.mapResult(object: Codec.ResultFunction<ItemStack> {
-                    override fun <T : Any> apply(
-                        ops: DynamicOps<T>,
-                        input: T,
-                        a: DataResult<Pair<ItemStack, T>>
-                    ): DataResult<Pair<ItemStack, T>> {
-                        a.error().ifPresent {
-                            Cobblemon.LOGGER.error("Failed to read held item due to following error: ${it.message()}")
-                        }
-                        return DataResult.success(a.result().orElse(Pair.of(ItemStack.EMPTY, input)))
-                    }
-
-                    override fun <T : Any> coApply(
-                        ops: DynamicOps<T>,
-                        input: ItemStack?,
-                        t: DataResult<T>
-                    ): DataResult<T> {
-                        return t
-                    }
-                }).optionalFieldOf(DataKeys.HELD_ITEM, ItemStack.EMPTY).forGetter(PokemonP2::heldItem),
+                ItemStack.CODEC.optionalFieldOf(DataKeys.HELD_ITEM).forGetter { Optional.ofNullable(it.heldItem.takeIf { !it.isEmpty }) },
                 CompoundTag.CODEC.fieldOf(DataKeys.POKEMON_PERSISTENT_DATA).forGetter(PokemonP2::persistentData),
                 UUIDUtil.LENIENT_CODEC.optionalFieldOf(DataKeys.TETHERING_ID).forGetter(PokemonP2::tetheringId),
                 TeraType.BY_IDENTIFIER_CODEC.fieldOf(DataKeys.POKEMON_TERA_TYPE).forGetter(PokemonP2::teraType),
                 CodecUtils.dynamicIntRange(0) { Cobblemon.config.maxDynamaxLevel }.fieldOf(DataKeys.POKEMON_DMAX_LEVEL).forGetter(PokemonP2::dmaxLevel),
                 Codec.BOOL.fieldOf(DataKeys.POKEMON_GMAX_FACTOR).forGetter(PokemonP2::gmaxFactor),
                 Codec.BOOL.fieldOf(DataKeys.POKEMON_TRADEABLE).forGetter(PokemonP2::tradeable)
-            ).apply(instance, ::PokemonP2)
+            ).apply(instance) {
+                    state, status, caughtBall, faintedTimer, healTimer, evolutionController, customProperties, nature,
+                    mintedNature, heldItem, persistentData, tetheringId, teraType, dmaxLevel, gmaxFactor, tradeable
+                -> PokemonP2(state, status, caughtBall, faintedTimer, healTimer, evolutionController, customProperties, nature,
+                mintedNature, heldItem.orElse(ItemStack.EMPTY), persistentData, tetheringId, teraType, dmaxLevel, gmaxFactor, tradeable)
+            }
         }
 
         internal fun from(pokemon: Pokemon): PokemonP2 = PokemonP2(
