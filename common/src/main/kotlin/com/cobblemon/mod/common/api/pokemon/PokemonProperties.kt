@@ -374,7 +374,7 @@ open class PokemonProperties {
     var ivs: IVs? = null
     var evs: EVs? = null
     var customProperties = mutableListOf<CustomPokemonProperty>()
-    val legendLabels = listOf("legendary", "mythical", "ultra_beast")
+    val legendLabels = listOf("legendary", "mythical", "ultra_beast", "paradox")
 
     fun asRenderablePokemon() = RenderablePokemon(
         species = species?.let {
