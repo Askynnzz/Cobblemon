@@ -295,6 +295,9 @@ object Cobblemon {
     fun initialize() {
         showdownThread.launch()
 
+        // Initialize Economy System (Common)
+        com.cobblemon.mod.common.economy.EconomyManager.load()
+
         // Start up the data provider.
         CobblemonDataProvider.registerDefaults()
 
@@ -346,7 +349,13 @@ object Cobblemon {
         PlatformEvents.SERVER_STARTING.subscribe { event ->
             val server = event.server
             MoLangLoadedFilesCache.initialize(server)
-            playerDataManager = PlayerInstancedDataStoreManager().also { it.setup(server) }
+            playerDataManager = PlayerInstancedDataStoreManager()
+
+            // Initialize Economy System Backend (Server)
+            com.cobblemon.mod.common.economy.EconomyManager.setup(server)
+            
+            // Setup Data Manager (must be after all registrations)
+            playerDataManager.setup(server)
 
             val mongoClient: MongoClient?
 
@@ -451,7 +460,23 @@ object Cobblemon {
         AdvancementHandler.registerListeners()
         PokedexHandler.registerListeners()
         StatHandler.registerListeners()
-        MegaEvolutionEventHandler.initialise()
+        // DISABLED: Mega Evolution integration (conflicts with Mega Showdown mod)
+        // MegaEvolutionEventHandler.initialise()
+        
+        // Battle Factory system event handlers
+        com.cobblemon.mod.common.api.battlefactory.BattleFactoryEventHandler.register()
+        
+        // Load Battle Factory Tower configuration
+        val configDir = java.io.File("config/cobblemon")
+        configDir.mkdirs()
+        com.cobblemon.mod.common.api.battlefactory.BattleFactoryTowerManager.loadConfig(configDir)
+        
+        // Register Tower Battle Interaction type (Must be done on both client and server)
+        com.cobblemon.mod.common.api.npc.configuration.NPCInteractConfiguration.register(
+            type = "tower_battle",
+            displayName = net.minecraft.network.chat.Component.literal("Tower Battle"),
+            clazz = com.cobblemon.mod.common.api.battlefactory.TowerBattleInteraction::class.java
+        )
 
     }
 

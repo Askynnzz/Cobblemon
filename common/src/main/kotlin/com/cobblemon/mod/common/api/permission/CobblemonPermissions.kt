@@ -143,6 +143,9 @@ object CobblemonPermissions {
     val CHANGE_BOX_COUNT = this.create("${COMMAND_PREFIX}boxcount", PermissionLevel.CHEAT_COMMANDS_AND_COMMAND_BLOCKS)
     @JvmStatic
     val SPECTATE_BATTLE = this.create("${COMMAND_PREFIX}spectatebattle", PermissionLevel.ALL_COMMANDS)
+    
+    // Battle Factory permissions
+    const val BATTLE_FACTORY = "${COMMAND_PREFIX}battlefactory"
 
     @JvmStatic
     val SEE_HIDDEN_NPCS = this.create("seehiddennpcs", PermissionLevel.CHEAT_COMMANDS_AND_COMMAND_BLOCKS)

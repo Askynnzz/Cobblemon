@@ -83,8 +83,13 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                                     doCry = false,
                                     position = targetPos,
                                     illusion = illusion?.let { IllusionEffect(it.effectedPokemon) }
-                            ).thenApply { entity ->
-                                pokemon.terastallized?.let { entity.terastallize(it) }
+                            ).handle { entity, ex ->
+                                if (ex != null) {
+                                    com.cobblemon.mod.common.Cobblemon.LOGGER.warn("SwitchInstruction: Send out animation failed/cancelled", ex)
+                                }
+                                if (entity != null) {
+                                    pokemon.terastallized?.let { entity.terastallize(it) }
+                                }
                                 actor.stillSendingOutCount--
                             }
                             activePokemon.battlePokemon?.sendUpdate()
@@ -172,6 +177,9 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
             val pokemonEntity = activePokemon.battlePokemon?.entity
             // If we can't find the entity for some reason then we're going to skip the recall animation
             val sendOutFuture = CompletableFuture<Unit>()
+            actor.stillSendingOutCount++
+            sendOutFuture.whenComplete { _, _ -> actor.stillSendingOutCount-- }
+
             (pokemonEntity?.recallWithAnimation() ?: CompletableFuture.completedFuture(Unit)).thenApply {
                 activePokemon.battlePokemon?.boosts?.clear()
                 activePokemon.battlePokemon?.sendUpdate()
@@ -190,8 +198,10 @@ class SwitchInstruction(val instructionSet: InstructionSet, val battleActor: Bat
                 } else {
                     // For Singles, we modify the sendout position based on the pokemon's hitbox size
                     val pos = (if (battle.format.battleType.pokemonPerSide == 1) activePokemon.getSendOutPosition()
-                        else  activePokemon.position?.second) ?: entity.position()
-                    // Send out at previous Pokémon's location if it is known, otherwise actor location
+                        else  activePokemon.position?.second) 
+                        ?: (actor as? EntityBackedBattleActor<*>)?.initialPos 
+                        ?: entity.position()
+                    // Sendout at previous Pokémon's location if it is known, otherwise actor location
                     val world = entity.level() as ServerLevel
                     newPokemon.effectedPokemon.sendOutWithAnimation(
                         source = entity,

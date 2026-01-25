@@ -1,0 +1,13 @@
+{
+    "id": "tower_lobby_attendant",
+    "displayName": "§6Tower Attendant",
+    "aspects": [
+        "male"
+    ],
+    "interaction": {
+        "type": "dialogue",
+        "dialogue": "cobblemon:tower_lobby_attendant"
+    },
+    "behaviour": "cobblemon:standard",
+    "canDespawn": false
+}

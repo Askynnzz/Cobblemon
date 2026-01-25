@@ -9,6 +9,7 @@
 package com.cobblemon.mod.common.client.gui.battle.subscreen
 
 import com.cobblemon.mod.common.api.gui.ParentWidget
+import com.cobblemon.mod.common.client.battle.SingleActionRequest
 import com.cobblemon.mod.common.client.gui.battle.BattleGUI
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.network.chat.MutableComponent
@@ -21,6 +22,33 @@ abstract class BattleActionSelection(
     height: Int,
     name: MutableComponent
 ) : ParentWidget(x, y, width, height, name) {
+    
+    /**
+     * Compatibility field for Mega Showdown mod.
+     * Stores the SingleActionRequest if the object was created via the 7-parameter constructor.
+     * This field must remain to maintain binary compatibility with Mega Showdown.
+     */
+    var request: SingleActionRequest? = null
+    
+    /**
+     * Secondary constructor for compatibility with Mega Showdown mod.
+     * Mega Showdown was built against vanilla Cobblemon 1.7.1 which had a different constructor signature.
+     * This constructor accepts the old 7-parameter signature and delegates to the current 6-parameter constructor.
+     * 
+     * @param singleActionRequest The SingleActionRequest parameter (stored in request field for compatibility)
+     */
+    constructor(
+        battleGUI: BattleGUI,
+        singleActionRequest: SingleActionRequest,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        name: MutableComponent
+    ) : this(battleGUI, x, y, width, height, name) {
+        this.request = singleActionRequest
+    }
+    
     val opacity: Float
         get() = battleGUI.opacity
 

@@ -1,0 +1,39 @@
+{
+  "battlefactory_attendant": {
+    "pages": [
+      {
+        "text": "§6Welcome to the Battle Factory!§r\n\nI'll lend you rental Pokémon for exciting battles. Ready to test your skills?",
+        "input": {
+          "inputType": "optionset",
+          "options": [
+            {
+              "text": "§aStart Battle Factory",
+              "value": "start",
+              "condition": "!q.has_battlefactory_session"
+            },
+            {
+              "text": "§cEnd Current Session",
+              "value": "end",
+              "condition": "q.has_battlefactory_session"
+            },
+            {
+              "text": "§eCheck My Status",
+              "value": "status"
+            },
+            {
+              "text": "§7Leave",
+              "value": "exit"
+            }
+          ]
+        },
+        "action": {
+          "type": "battlefactory_action"
+        }
+      },
+      {
+        "text": "Good luck in your battles! Come back when you're ready.",
+        "hideAfter": 3.0
+      }
+    ]
+  }
+}

@@ -695,7 +695,7 @@ open class PokemonEntity(
 
         } else {
             // Battle clone destruction
-            if (this.beamMode == 0 && this.isBattleClone()) {
+            if (this.beamMode == 0 && this.isBattleClone() && ticksLived > 20) {
                 discard()
                 return
             }
@@ -744,7 +744,7 @@ open class PokemonEntity(
         }
 
         previousRidingState = ridingController?.context?.state?.copy()
-        if (!this.pokemon.isWild() && this.pokemon.originalTrainerType != OriginalTrainerType.NPC && this.pokemon.getOwnerPlayer() == null) {
+        if (!this.pokemon.isWild() && this.pokemon.originalTrainerType != OriginalTrainerType.NPC && this.pokemon.getOwnerPlayer() == null && !isBattling && ticksLived > 60) {
             this.tethering = null
             this.pokemon.recall()
         }
@@ -817,7 +817,7 @@ open class PokemonEntity(
         }
 
         // Owned Pokémon cannot be hurt by players or suffocation
-        if (ownerUUID != null && (damageSource.entity is Player || damageSource.`is`(DamageTypes.IN_WALL))) {
+        if ((ownerUUID != null || isBattling) && (damageSource.entity is Player || damageSource.`is`(DamageTypes.IN_WALL))) {
             return true
         }
 
@@ -1357,6 +1357,8 @@ open class PokemonEntity(
 
     override fun isPersistenceRequired(): Boolean {
         return super.isPersistenceRequired()
+                || isBattling
+                || ticksLived < 60
                 || (this.pokemon.canDropHeldItem && !this.pokemon.heldItem.isEmpty)
                 || this.brain.checkMemory(CobblemonMemories.HIVE_LOCATION, MemoryStatus.VALUE_PRESENT)
                 || this.brain.checkMemory(CobblemonMemories.HIVE_COOLDOWN, MemoryStatus.VALUE_PRESENT)

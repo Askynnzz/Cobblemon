@@ -28,7 +28,7 @@ import net.minecraft.resources.ResourceLocation
 
 class BattleGeneralActionSelection(
     battleGUI: BattleGUI,
-    val request: SingleActionRequest
+    val actionRequest: SingleActionRequest
 ) : BattleActionSelection(
     battleGUI,
     BattleGUI.OPTION_ROOT_X,
@@ -37,6 +37,11 @@ class BattleGeneralActionSelection(
     (BattleOptionTile.OPTION_HEIGHT + 3 * BattleGUI.OPTION_VERTICAL_SPACING),
     battleLang("choose_action")
 ) {
+    init {
+        // Populate parent's request field for Mega Showdown compatibility
+        this.request = this.actionRequest
+    }
+    
     companion object {
         val battleInfoSelection = cobblemonResource("textures/gui/battle/team_info.png")
     }
@@ -51,12 +56,12 @@ class BattleGeneralActionSelection(
 
         addOption(rank++, battleLang("ui.fight"), BattleGUI.fightResource) {
             playDownSound(Minecraft.getInstance().soundManager)
-            battleGUI.changeActionSelection(BattleMoveSelection(battleGUI, request))
+            battleGUI.changeActionSelection(BattleMoveSelection(battleGUI, actionRequest))
         }
 
-        if (request.moveSet?.trapped != true) {
+        if (actionRequest.moveSet?.trapped != true) {
             addOption(rank++, battleLang("ui.switch"), BattleGUI.switchResource) {
-                battleGUI.changeActionSelection(BattleSwitchPokemonSelection(battleGUI, request))
+                battleGUI.changeActionSelection(BattleSwitchPokemonSelection(battleGUI, actionRequest))
                 playDownSound(Minecraft.getInstance().soundManager)
             }
         }
@@ -76,7 +81,7 @@ class BattleGeneralActionSelection(
                 }
             } else {
                 addOption(rank++, battleLang("ui.forfeit"), BattleGUI.forfeitResource) {
-                    battleGUI.changeActionSelection(ForfeitConfirmationSelection(battleGUI, request))
+                    battleGUI.changeActionSelection(ForfeitConfirmationSelection(battleGUI, actionRequest))
                     playDownSound(Minecraft.getInstance().soundManager)
                 }
 
@@ -118,7 +123,7 @@ class BattleGeneralActionSelection(
         if (lastAnwseredRequest != null && backButton.isHovered(mouseX, mouseY)) {
             playDownSound(Minecraft.getInstance().soundManager)
             CobblemonClient.battle?.cancelLastAnsweredRequest()
-            battleGUI.selectAction(request, null)
+            battleGUI.selectAction(actionRequest, null)
             battleGUI.changeActionSelection(null)
         }
         return tiles.any { it.mousePrimaryClicked(mouseX, mouseY) }

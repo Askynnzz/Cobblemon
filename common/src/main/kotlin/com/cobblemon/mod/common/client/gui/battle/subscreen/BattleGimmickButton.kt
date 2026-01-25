@@ -114,7 +114,7 @@ abstract class BattleGimmickButton(gimmick: ShowdownMoveset.Gimmick, val x: Floa
         override val response: MoveActionResponse
             get() = MoveActionResponse(move.id, targetPnx, gimmick.id)
         override val targetList: List<Targetable>?
-            get() = if (gimmickMove != null) gimmickMove.target.targetList(moveSelection.request.activePokemon) else super.targetList
+            get() = if (gimmickMove != null) gimmickMove.target.targetList(moveSelection.actionRequest.activePokemon) else super.targetList
         override val selectable: Boolean
             get() = if (gimmickMove != null) !gimmickMove.disabled else super.selectable
 

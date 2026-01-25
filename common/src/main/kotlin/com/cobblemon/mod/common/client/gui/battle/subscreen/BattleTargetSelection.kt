@@ -43,7 +43,7 @@ import kotlin.math.sin
 
 class BattleTargetSelection(
         battleGUI: BattleGUI,
-        val request: SingleActionRequest,
+        val actionRequest: SingleActionRequest,
         val move: InBattleMove,
         val gimmickID: String?,
         gimmickMove: InBattleGimmickMove?
@@ -56,6 +56,11 @@ class BattleTargetSelection(
     height = 100,
     battleLang("ui.select_move")
 ) {
+    init {
+        // Populate parent's request field for Mega Showdown compatibility
+        this.request = this.actionRequest
+    }
+    
     companion object {
         const val TARGET_WIDTH = 93
         const val TARGET_HEIGHT = 33
@@ -81,16 +86,16 @@ class BattleTargetSelection(
         }
     }
 
-    val targets = request.activePokemon.getAllActivePokemon()
+    val targets = actionRequest.activePokemon.getAllActivePokemon()
 
     val targetType = if (gimmickID != null && gimmickMove != null) gimmickMove.target else move.target
     val backButton = BattleBackButton(x + 9F, Minecraft.getInstance().window.guiScaledHeight - 22F)
-    val selectableTargetList = targetType.targetList(request.activePokemon)
-    val multiTargetList = if(selectableTargetList == null) request.activePokemon.getMultiTargetList(targetType) else null
+    val selectableTargetList = targetType.targetList(actionRequest.activePokemon)
+    val multiTargetList = if(selectableTargetList == null) actionRequest.activePokemon.getMultiTargetList(targetType) else null
 
     val baseTiles = targets.mapIndexed { index, target ->
-        val isAlly = target.isAllied(request.activePokemon)
-        val teamSize = request.activePokemon.getSidePokemon().count()
+        val isAlly = target.isAllied(actionRequest.activePokemon)
+        val teamSize = actionRequest.activePokemon.getSidePokemon().count()
         val fieldPos = if(isAlly) index % teamSize else teamSize - 1 - (index % teamSize)
         val verticalAligned = false
         val x: Float
@@ -124,7 +129,7 @@ class BattleTargetSelection(
         var moveTemplate = MoveTemplate.dummy(target.battlePokemon?.displayName.toString())
         private val responseTarget = selectableTargetList?.firstOrNull { it.getPNX() == target.getPNX() }?.getPNX()
         private val isMultiTarget = multiTargetList?.firstOrNull { it.getPNX() == target.getPNX() } != null
-        private val isCurrentPokemon = request.activePokemon.battlePokemon?.uuid == target.battlePokemon!!.uuid
+        private val isCurrentPokemon = actionRequest.activePokemon.battlePokemon?.uuid == target.battlePokemon!!.uuid
 
         open val response: MoveActionResponse get() = MoveActionResponse(targetSelection.move.id, responseTarget, gimmickID)
         val state = FloatingState()
@@ -317,7 +322,7 @@ class BattleTargetSelection(
                     it.moveSet?.pendingGimmickUsedThisTurn?.add(gimmick)
                 }
             }
-            targetSelection.battleGUI.selectAction(targetSelection.request, response)
+            targetSelection.battleGUI.selectAction(targetSelection.actionRequest, response)
         }
     }
 
@@ -340,7 +345,7 @@ class BattleTargetSelection(
             context = context,
             text = text,
             x = (Minecraft.getInstance().window.guiScaledWidth - width) / 2,
-            y = y + if (request.activePokemon.getSidePokemon().count() == 2) 25 else 16,
+            y = y + if (actionRequest.activePokemon.getSidePokemon().count() == 2) 25 else 16,
             scale = 1F,
             shadow = true
         )
@@ -358,7 +363,7 @@ class BattleTargetSelection(
             return true
         } else if (backButton.isHovered(mouseX, mouseY)) {
             playDownSound(Minecraft.getInstance().soundManager)
-            battleGUI.changeActionSelection(BattleMoveSelection(battleGUI, request))
+            battleGUI.changeActionSelection(BattleMoveSelection(battleGUI, actionRequest))
         }
         return false
     }

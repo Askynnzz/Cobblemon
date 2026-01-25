@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "cobblemon",
   "version": "${version}",
-  "name": "Cobblemon",
-  "description": "Adds Pokémon to the world, letting you find, battle, capture, and evolve them.",
+  "name": "Cobblemon AcademY Alternative",
+  "description": "[Please do not seek any support from Cobblemon Official Team or Abes Hutt's team]Fork of Cobblemon Academy with missing features like battle factory , economy/shop , battle fixes for radgym standard npc and raid dens , megashowdown compatibility...(MAY STILL EXPECT SOME ISSUES)",
   "authors": [
-    "The Cobblemon Team"
+    "Ya2s"
   ],
   "contact": {
     "homepage": "https://cobblemon.com/",
@@ -58,7 +58,9 @@
       }
     },
     "loom:injected_interfaces": {
-      "net/minecraft/class_630": ["com/cobblemon/mod/common/client/render/models/blockbench/pose/Bone"]
+      "net/minecraft/class_630": [
+        "com/cobblemon/mod/common/client/render/models/blockbench/pose/Bone"
+      ]
     }
   }
 }

@@ -87,6 +87,7 @@ object ShowdownInterpreter {
         updateInstructionParser["-immune"]               = { _, _, message, _ -> ImmuneInstruction(message) }
         updateInstructionParser["-invertboost"]          = { _, _, message, _ -> InvertBoostInstruction(message) }
         updateInstructionParser["-item"]                 = { _, _, message, _ -> ItemInstruction(message) }
+        // DISABLED: Mega Evolution integration (conflicts with Mega Showdown mod)
         updateInstructionParser["-mega"]                 = { _, _, message, _ -> MegaInstruction(message) }
         updateInstructionParser["-miss"]                 = { battle, _, message, _ -> MissInstruction(battle, message) }
         updateInstructionParser["move"]                  = { _, instructionSet, message, _ -> MoveInstruction(instructionSet, message) }

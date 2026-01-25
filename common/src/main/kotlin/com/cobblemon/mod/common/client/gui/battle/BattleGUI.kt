@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.client.gui.battle
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.battles.PassActionResponse
 import com.cobblemon.mod.common.battles.ShowdownActionResponse
 import com.cobblemon.mod.common.client.CobblemonClient
@@ -119,12 +120,22 @@ class BattleGUI : Screen(battleLang("gui.title")), CobblemonRenderable {
                 if (getCurrentActionSelection() == null) {
                     val unanswered = battle.getFirstUnansweredRequest()
                     if (unanswered != null) {
+                        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Battle.mustChoose is true and unanswered request found - calling deriveRootActionSelection")
                         changeActionSelection(deriveRootActionSelection(actor, unanswered))
+                    } else {
+                        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Battle.mustChoose is true but no unanswered request")
                     }
+                } else {
+                    Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Battle.mustChoose is true but getCurrentActionSelection() is NOT NULL")
                 }
-            } else if (getCurrentActionSelection() != null) {
-                changeActionSelection(null)
+            } else {
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Battle.mustChoose is FALSE - not showing UI")
+                if (getCurrentActionSelection() != null) {
+                    changeActionSelection(null)
+                }
             }
+        } else {
+            Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] Actor is NULL in render()")
         }
 
         if (battle.spectating && !BattleTeamInfoSelection.visible) {
@@ -156,17 +167,66 @@ class BattleGUI : Screen(battleLang("gui.title")), CobblemonRenderable {
     }
 
     fun deriveRootActionSelection(actor: ClientBattleActor, request: SingleActionRequest): BattleActionSelection? {
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] deriveRootActionSelection called")
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.forceSwitch = ${request.forceSwitch}")
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.side = ${if (request.side != null) "NOT NULL" else "NULL"}")
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.moveSet = ${if (request.moveSet != null) "NOT NULL" else "NULL"}")
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.activePokemon.battlePokemon = ${if (request.activePokemon.battlePokemon != null) "NOT NULL" else "NULL"}")
+        
+        if (request.activePokemon.battlePokemon != null) {
+            Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.activePokemon.battlePokemon.uuid = ${request.activePokemon.battlePokemon?.uuid}")
+        }
+        
         return if (request.forceSwitch) {
+            Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Returning BattleSwitchPokemonSelection (forceSwitch = true)")
             BattleSwitchPokemonSelection(this, request)
         } else {
             // Known quirk of Showdown. It'll ask for actions on fainted slots
             // Also during a forced switch in doubles/triples it'll ask for actions on non-switching slots
-            val pokemon = request.side?.pokemon?.firstOrNull { it.uuid == request.activePokemon.battlePokemon?.uuid }
-            if (pokemon == null || pokemon.condition.contains("fnt") || pokemon.commanding || request.moveSet == null) {
+            Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Attempting to find pokemon in request.side...")
+            
+            if (request.side == null) {
+                Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] request.side is NULL - returning PassActionResponse")
+                this.selectAction(request, PassActionResponse)
+                return null
+            }
+            
+            Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] request.side has ${request.side!!.pokemon.size} pokemon")
+            request.side!!.pokemon.forEachIndexed { index, pokemon ->
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   Side Pokemon[$index]: uuid=${pokemon.uuid}, active=${pokemon.active}, commanding=${pokemon.commanding}, condition=${pokemon.condition}")
+            }
+            
+            val targetUuid = request.activePokemon.battlePokemon?.uuid
+            Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Looking for pokemon with UUID: $targetUuid")
+            
+            val pokemon = request.side?.pokemon?.firstOrNull { it.uuid == targetUuid }
+            
+            if (pokemon == null) {
+                Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] Pokemon NOT FOUND in side.pokemon - returning PassActionResponse")
                 this.selectAction(request, PassActionResponse)
                 null
             } else {
-                BattleGeneralActionSelection(this, request)
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] Pokemon FOUND: uuid=${pokemon.uuid}")
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   pokemon.condition = '${pokemon.condition}' (contains 'fnt': ${pokemon.condition.contains("fnt")})")
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   pokemon.commanding = ${pokemon.commanding}")
+                Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT]   request.moveSet = ${if (request.moveSet != null) "NOT NULL (has ${request.moveSet?.moves?.size} moves)" else "NULL"}")
+                
+                if (pokemon.condition.contains("fnt")) {
+                    Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] Pokemon is FAINTED - returning PassActionResponse")
+                    this.selectAction(request, PassActionResponse)
+                    null
+                } else if (pokemon.commanding) {
+                    Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] Pokemon is COMMANDING - returning PassActionResponse")
+                    this.selectAction(request, PassActionResponse)
+                    null
+                } else if (request.moveSet == null) {
+                    Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] MoveSet is NULL - returning PassActionResponse")
+                    this.selectAction(request, PassActionResponse)
+                    null
+                } else {
+                    Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] All checks passed - creating BattleGeneralActionSelection!")
+                    BattleGeneralActionSelection(this, request)
+                }
             }
         }
     }

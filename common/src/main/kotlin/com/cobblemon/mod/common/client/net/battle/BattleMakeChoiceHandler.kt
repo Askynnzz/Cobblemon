@@ -8,6 +8,7 @@
 
 package com.cobblemon.mod.common.client.net.battle
 
+import com.cobblemon.mod.common.Cobblemon
 import com.cobblemon.mod.common.api.net.ClientNetworkPacketHandler
 import com.cobblemon.mod.common.client.CobblemonClient
 import com.cobblemon.mod.common.net.messages.client.battle.BattleMakeChoicePacket
@@ -15,8 +16,13 @@ import net.minecraft.client.Minecraft
 
 object BattleMakeChoiceHandler : ClientNetworkPacketHandler<BattleMakeChoicePacket> {
     override fun handle(packet: BattleMakeChoicePacket, client: Minecraft) {
-        val battle = CobblemonClient.battle ?: return
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] BattleMakeChoicePacket received!")
+        val battle = CobblemonClient.battle ?: run {
+            Cobblemon.LOGGER.warn("[TOWER DEBUG CLIENT] Battle is NULL when receiving BattleMakeChoicePacket")
+            return
+        }
         CobblemonClient.battleOverlay.passedSeconds = 0F
         battle.mustChoose = true
+        Cobblemon.LOGGER.info("[TOWER DEBUG CLIENT] battle.mustChoose set to TRUE")
     }
 }

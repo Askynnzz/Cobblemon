@@ -25,7 +25,7 @@ import net.minecraft.client.gui.GuiGraphics
 
 class ForfeitConfirmationSelection(
     battleGUI: BattleGUI,
-    val request: SingleActionRequest
+    val actionRequest: SingleActionRequest
 ) : BattleActionSelection(
     battleGUI,
     x = 0,
@@ -34,6 +34,11 @@ class ForfeitConfirmationSelection(
     height = HEIGHT,
     battleLang("ui.forfeit_confirmation")
 ) {
+    init {
+        // Populate parent's request field for Mega Showdown compatibility
+        this.request = this.actionRequest
+    }
+    
     companion object {
         private const val WIDTH = 113
         private const val HEIGHT = 45
@@ -57,7 +62,7 @@ class ForfeitConfirmationSelection(
             if (declineButton.isHovered(mouseX, mouseY)) {
                 battleGUI.changeActionSelection(null)
             } else {
-                battleGUI.selectAction(request, ForfeitActionResponse())
+                battleGUI.selectAction(actionRequest, ForfeitActionResponse())
 
                 // Need to fill out any other pending requests
                 var pendingRequest = CobblemonClient.battle?.getFirstUnansweredRequest()

@@ -1,0 +1,44 @@
+{
+    "pages": [
+        {
+            "id": "main",
+            "speaker": "npc",
+            "lines": [
+                "§6§lWelcome to the Battle Tower!§r",
+                "§7Face 7 battles. Choose difficulty:"
+            ],
+            "input": {
+                "type": "option",
+                "vertical": true,
+                "options": [
+                    {
+                        "text": "§a§lRookie Challenge§r\n§7 | Moderate Rewards",
+                        "value": "easy",
+                        "action": {
+                            "type": "tower_start"
+                        }
+                    },
+                    {
+                        "text": "§e§lAdvanced Trial§r\n§7 | Great Rewards",
+                        "value": "normal",
+                        "action": {
+                            "type": "tower_start"
+                        }
+                    },
+                    {
+                        "text": "§c§lMaster Challenge§r\n§ | Legendary Rewards",
+                        "value": "hard",
+                        "action": {
+                            "type": "tower_start"
+                        }
+                    },
+                    {
+                        "text": "§7Leave",
+                        "value": "exit",
+                        "action": "q.dialogue.close();"
+                    }
+                ]
+            }
+        }
+    ]
+}

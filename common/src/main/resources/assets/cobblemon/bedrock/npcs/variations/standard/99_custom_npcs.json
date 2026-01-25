@@ -1,0 +1,22 @@
+{
+    "name": "cobblemon:standard",
+    "order": 99,
+    "variations": [
+        {
+            "aspects": [
+                "tower-trainer-custom"
+            ],
+            "poser": "cobblemon:standard",
+            "model": "cobblemon:trainer.geo",
+            "texture": "cobblemon:textures/npcs/standard/trainertower.png"
+        },
+        {
+            "aspects": [
+                "shopkeeper-custom"
+            ],
+            "poser": "cobblemon:standard",
+            "model": "cobblemon:trainer.geo",
+            "texture": "cobblemon:textures/npcs/standard/shopkeeper.png"
+        }
+    ]
+}

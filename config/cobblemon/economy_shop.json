@@ -1,0 +1,50 @@
+{
+    "shop_name": "PokeMart",
+    "items": [
+        {
+            "slot": 10,
+            "item": "cobblemon:poke_ball",
+            "price": 200,
+            "amount": 1,
+            "lore": [
+                "Standard ball for catching Pokémon."
+            ]
+        },
+        {
+            "slot": 11,
+            "item": "cobblemon:great_ball",
+            "price": 600,
+            "amount": 1,
+            "lore": [
+                "A better ball."
+            ]
+        },
+        {
+            "slot": 12,
+            "item": "cobblemon:ultra_ball",
+            "price": 1200,
+            "amount": 1,
+            "lore": [
+                "The best standard ball."
+            ]
+        },
+        {
+            "slot": 14,
+            "item": "cobblemon:potion",
+            "price": 300,
+            "amount": 1,
+            "lore": [
+                "Heals 20 HP."
+            ]
+        },
+        {
+            "slot": 13,
+            "item": "cobblemon:rare_candy",
+            "price": 4800,
+            "amount": 1,
+            "lore": [
+                "Levels up a Pokémon."
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "id": "tower_trainer",
+    "displayName": "Tower Trainer",
+    "aspects": [
+        "tower-trainer-custom"
+    ],
+    "interaction": {
+        "type": "tower_battle"
+    },
+    "battleConfiguration": {
+        "canChallenge": true
+    },
+    "behaviour": "cobblemon:standard",
+    "canDespawn": false
+}

@@ -42,7 +42,7 @@ import org.joml.Vector3f
 
 class BattleSwitchPokemonSelection(
     battleGUI: BattleGUI,
-    val request: SingleActionRequest
+    val actionRequest: SingleActionRequest
 ) : BattleActionSelection(
     battleGUI,
     x = 0,
@@ -52,6 +52,11 @@ class BattleSwitchPokemonSelection(
     height = Minecraft.getInstance().window.guiScaledHeight,
     battleLang("switch_pokemon")
 ) {
+    init {
+        // Populate parent's request field for Mega Showdown compatibility
+        this.request = this.actionRequest
+    }
+    
     companion object {
         const val SLOT_HORIZONTAL_SPACING = 4F
         const val SLOT_VERTICAL_SPACING = 2F
@@ -68,18 +73,18 @@ class BattleSwitchPokemonSelection(
     init {
         val pendingActionRequests = CobblemonClient.battle!!.pendingActionRequests
         val switchingInPokemon = pendingActionRequests.mapNotNull { it.response }.filterIsInstance<SwitchActionResponse>().map { it.newPokemonId }
-        val showdownPokemonToPokemon = request.side!!.pokemon
+        val showdownPokemonToPokemon = actionRequest.side!!.pokemon
             .mapNotNull { showdownPokemon ->
                 battleGUI.actor!!.pokemon
                     .find { it.uuid == showdownPokemon.uuid }
                     ?.let { showdownPokemon to it }
             }.filter { it.second.uuid !in switchingInPokemon }
 
-        isReviving = request.side!!.pokemon.any { it.reviving && it.uuid == request.activePokemon.battlePokemon?.uuid }
-        if (request.forceSwitch && !isReviving && showdownPokemonToPokemon.all {
+        isReviving = actionRequest.side!!.pokemon.any { it.reviving && it.uuid == actionRequest.activePokemon.battlePokemon?.uuid }
+        if (actionRequest.forceSwitch && !isReviving && showdownPokemonToPokemon.all {
                 (it.second.uuid in battleGUI.actor!!.activePokemon.map { it.battlePokemon?.uuid } || ("fnt" in it.first.condition))}) { // on field or fainted
             // Occurs after a multi-knock out and the player doesn't have enough pokemon to fill every vacant slot
-            battleGUI.selectAction(request, PassActionResponse)
+            battleGUI.selectAction(actionRequest, PassActionResponse)
         }
 
         showdownPokemonToPokemon.forEachIndexed { index, (showdownPokemon, pokemon) ->
@@ -140,7 +145,7 @@ class BattleSwitchPokemonSelection(
         }
 
         tiles.forEach { it.render(context, mouseX.toDouble(), mouseY.toDouble(), delta) }
-        if(!request.forceSwitch) {
+        if(!actionRequest.forceSwitch) {
             backButton.render(context, mouseX, mouseY, delta)
         }
     }
@@ -154,7 +159,7 @@ class BattleSwitchPokemonSelection(
         val clicked = tiles.find { it.isHovered(mouseX, mouseY) && if (isReviving) it.isFainted else (!it.isFainted && !it.isCurrentlyInBattle) } ?: return false
         val pokemon = clicked.pokemon
         playDownSound(Minecraft.getInstance().soundManager)
-        battleGUI.selectAction(request, SwitchActionResponse(pokemon.uuid))
+        battleGUI.selectAction(actionRequest, SwitchActionResponse(pokemon.uuid))
 
         return true
     }

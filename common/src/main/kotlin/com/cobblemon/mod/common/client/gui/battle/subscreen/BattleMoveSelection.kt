@@ -48,7 +48,7 @@ import java.text.DecimalFormat
 
 class BattleMoveSelection(
     battleGUI: BattleGUI,
-    val request: SingleActionRequest,
+    val actionRequest: SingleActionRequest,
 ) : BattleActionSelection(
     battleGUI = battleGUI,
     x = 20,
@@ -57,6 +57,11 @@ class BattleMoveSelection(
     height = 100,
     battleLang("ui.select_move")
 ) {
+    init {
+        // Populate parent's request field for Mega Showdown compatibility
+        this.request = this.actionRequest
+    }
+    
     companion object {
         const val MOVE_WIDTH = 92
         const val MOVE_HEIGHT = 24
@@ -81,7 +86,7 @@ class BattleMoveSelection(
         }
     }
 
-    val moveSet = request.moveSet!!
+    val moveSet = actionRequest.moveSet!!
     val baseTiles = moveSet.moves.mapIndexed { index, inBattleMove ->
         val isEven = index % 2 == 0
         val x = if (isEven) this.x.toFloat() else this.x + MOVE_HORIZONTAL_SPACING + MOVE_WIDTH
@@ -110,11 +115,11 @@ class BattleMoveSelection(
         val y: Float,
     ) {
         var moveTemplate = Moves.getByNameOrDummy(move.id)
-        val pokemon = moveSelection.request.activePokemon.actor.pokemon.firstOrNull { it.uuid == moveSelection.request.activePokemon.battlePokemon?.uuid }
+        val pokemon = moveSelection.actionRequest.activePokemon.actor.pokemon.firstOrNull { it.uuid == moveSelection.actionRequest.activePokemon.battlePokemon?.uuid }
         val elementalType = moveTemplate.getEffectiveElementalType(pokemon)
         var rgb = elementalType.hue.toRGB()
 
-        open val targetList: List<Targetable>? get() = move.target.targetList(moveSelection.request.activePokemon)
+        open val targetList: List<Targetable>? get() = move.target.targetList(moveSelection.actionRequest.activePokemon)
         open val response: MoveActionResponse get() = MoveActionResponse(move.id, targetPnx)
         open val selectable: Boolean get() = !move.disabled
 
@@ -458,7 +463,7 @@ class BattleMoveSelection(
         fun onClick() {
             if (!selectable) return
             moveSelection.playDownSound(Minecraft.getInstance().soundManager)
-            moveSelection.battleGUI.selectAction(moveSelection.request, response)
+            moveSelection.battleGUI.selectAction(moveSelection.actionRequest, response)
         }
     }
 
@@ -470,7 +475,7 @@ class BattleMoveSelection(
         gimmickButtons.forEach {
             it.render(context.pose(), mouseX, mouseY, delta)
         }
-        if(this.request.activePokemon.getFormat().battleType.slotsPerActor == 3 && (request.activePokemon.getPNX()[2] == 'a' || request.activePokemon.getPNX()[2] == 'c')) {
+        if(this.actionRequest.activePokemon.getFormat().battleType.slotsPerActor == 3 && (actionRequest.activePokemon.getPNX()[2] == 'a' || actionRequest.activePokemon.getPNX()[2] == 'c')) {
             shiftButton.render(context, mouseX, mouseY, delta)
         }
     }
@@ -479,13 +484,13 @@ class BattleMoveSelection(
         val move = moveTiles.find { it.isHovered(mouseX, mouseY) }
         val gimmick = gimmickButtons.find { it.isHovered(mouseX, mouseY) }
         if (move != null) {
-            if(request.activePokemon.getFormat().battleType.pokemonPerSide == 1) {
+            if(actionRequest.activePokemon.getFormat().battleType.pokemonPerSide == 1) {
                 move.onClick()
             } else {
                 battleGUI.changeActionSelection(
                     BattleTargetSelection(
                         battleGUI,
-                        request,
+                        actionRequest,
                         move.move,
                         move.response.gimmickID,
                         move.move.gimmickMove
@@ -502,7 +507,7 @@ class BattleMoveSelection(
             moveTiles = if (gimmick.toggle()) gimmick.tiles else baseTiles
         } else if(shiftButton.isHovered(mouseX,mouseY)) {
             playDownSound(Minecraft.getInstance().soundManager)
-            battleGUI.selectAction(request, ShiftActionResponse())
+            battleGUI.selectAction(actionRequest, ShiftActionResponse())
         }
         return false
     }

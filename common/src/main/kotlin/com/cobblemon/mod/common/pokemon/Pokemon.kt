@@ -754,7 +754,8 @@ open class Pokemon : ShowdownIdentifiable {
         }
 
         preamble.thenApply {
-            sendOut(level, position, illusion) {
+            // Capture the result of sendOut. If it returns null, it means the spawn was cancelled (POKEMON_SENT_PRE event).
+            val sentEntity = sendOut(level, position, illusion) {
                 val owner = getOwnerEntity()
                 if (owner is LivingEntity) {
                     owner.swing(InteractionHand.MAIN_HAND, true)
@@ -813,8 +814,17 @@ open class Pokemon : ShowdownIdentifiable {
                     it.phasingTargetId = -1
                 }
 
-                it.after(seconds = SEND_OUT_DURATION) {
+                val removalSubscription = it.removalObservable.subscribe { reason ->
+                   if (!future.isDone) {
+                       Cobblemon.LOGGER.warn("Pokemon entity ${it.uuid} was removed ($reason) before send-out animation completed. Forcing future completion.")
+                       future.complete(it)
+                   }
+                }
 
+                it.after(seconds = SEND_OUT_DURATION) {
+                    // Unsubscribe to avoid memory leaks or double completion (though future handles double completion safely)
+                    removalSubscription.unsubscribe()
+                    
                     // Allow recall animation to override sendout animation
                     if(it.beamMode == 3) {
                         future.complete(it)
@@ -837,6 +847,16 @@ open class Pokemon : ShowdownIdentifiable {
                 }
 
                 mutation(it)
+            }
+
+            // [FIX] If sendOut returned null (e.g. event cancelled), the above callback never runs.
+            // We MUST complete the future to prevent logic hangs (like in SwitchInstruction).
+            if (sentEntity == null) {
+                Cobblemon.LOGGER.warn("Pokemon.sendOut returned null (Event cancelled?). Forcing future completion exceptionally.")
+                // We complete exceptionally so the caller knows it failed, or we could complete with null if the signature allowed.
+                // Since the signature is CompletableFuture<PokemonEntity>, we cannot return null easily without changing signature.
+                // Exceptional completion is safest to ensure 'thenAccept' blocks might be skipped or handled.
+                future.completeExceptionally(IllegalStateException("Pokemon sendOut failed or was cancelled."))
             }
         }
 

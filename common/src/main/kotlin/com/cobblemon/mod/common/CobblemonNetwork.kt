@@ -25,6 +25,7 @@ import com.cobblemon.mod.common.client.net.data.RideSettingsSyncHandler
 import com.cobblemon.mod.common.client.net.debug.OpenRidingStatsDebugGUIHandler
 import com.cobblemon.mod.common.client.net.dialogue.DialogueClosedHandler
 import com.cobblemon.mod.common.client.net.dialogue.DialogueOpenedHandler
+import com.cobblemon.mod.common.client.net.tower.OpenTowerSelectionHandler
 import com.cobblemon.mod.common.client.net.effect.PokeSnackBlockParticlesHandler
 import com.cobblemon.mod.common.client.net.effect.RunPosableMoLangHandler
 import com.cobblemon.mod.common.client.net.effect.SaccharineLogBlockParticlesHandler
@@ -128,6 +129,7 @@ import com.cobblemon.mod.common.net.messages.client.storage.pc.wallpaper.Request
 import com.cobblemon.mod.common.net.messages.client.storage.pc.wallpaper.SetPCBoxWallpapersPacket
 import com.cobblemon.mod.common.net.messages.client.storage.pc.wallpaper.UnlockPCBoxWallpaperPacket
 import com.cobblemon.mod.common.net.messages.client.toast.ToastPacket
+import com.cobblemon.mod.common.net.messages.client.tower.OpenTowerSelectionPacket
 import com.cobblemon.mod.common.net.messages.client.trade.TradeAcceptanceChangedPacket
 import com.cobblemon.mod.common.net.messages.client.trade.TradeCancelledPacket
 import com.cobblemon.mod.common.net.messages.client.trade.TradeCompletedPacket
@@ -170,8 +172,9 @@ import com.cobblemon.mod.common.net.messages.server.debug.ServerboundUpdateRidin
 import com.cobblemon.mod.common.net.messages.server.debug.ServerboundUpdateRidingStatsPacket
 import com.cobblemon.mod.common.net.messages.server.dialogue.EscapeDialoguePacket
 import com.cobblemon.mod.common.net.messages.server.dialogue.InputToDialoguePacket
-import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SMegaEvolvePacket
-import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SRemoveMegaEvolutionPacket
+// DISABLED: Mega Evolution integration (conflicts with Mega Showdown mod)
+// import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SMegaEvolvePacket
+// import com.cobblemon.mod.common.net.messages.server.megaevolution.C2SRemoveMegaEvolutionPacket
 import com.cobblemon.mod.common.net.messages.server.npc.SaveNPCPacket
 import com.cobblemon.mod.common.net.messages.server.orientation.ServerboundUpdateOrientationPacket
 import com.cobblemon.mod.common.net.messages.server.pasture.PasturePokemonPacket
@@ -198,6 +201,7 @@ import com.cobblemon.mod.common.net.messages.server.storage.party.ReleasePartyPo
 import com.cobblemon.mod.common.net.messages.server.storage.party.SwapPartyPokemonPacket
 import com.cobblemon.mod.common.net.messages.server.storage.pc.*
 import com.cobblemon.mod.common.net.messages.server.trade.AcceptTradeRequestPacket
+import com.cobblemon.mod.common.net.messages.server.tower.TowerPokemonSelectionPacket
 import com.cobblemon.mod.common.net.messages.server.trade.CancelTradePacket
 import com.cobblemon.mod.common.net.messages.server.trade.ChangeTradeAcceptancePacket
 import com.cobblemon.mod.common.net.messages.server.trade.OfferTradePacket
@@ -230,8 +234,9 @@ import com.cobblemon.mod.common.net.serverhandling.debug.ServerboundUpdateRiding
 import com.cobblemon.mod.common.net.serverhandling.dialogue.EscapeDialogueHandler
 import com.cobblemon.mod.common.net.serverhandling.dialogue.InputToDialogueHandler
 import com.cobblemon.mod.common.net.serverhandling.evolution.AcceptEvolutionHandler
-import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SMegaEvolveHandler
-import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SRemoveMegaEvolutionHandler
+// DISABLED: Mega Evolution integration (conflicts with Mega Showdown mod)
+// import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SMegaEvolveHandler
+// import com.cobblemon.mod.common.net.serverhandling.megaevolution.C2SRemoveMegaEvolutionHandler
 import com.cobblemon.mod.common.net.serverhandling.npc.SaveNPCHandler
 import com.cobblemon.mod.common.net.serverhandling.orientation.ServerboundUpdateOrientationHandler
 import com.cobblemon.mod.common.net.serverhandling.pasture.PasturePokemonHandler
@@ -260,6 +265,7 @@ import com.cobblemon.mod.common.net.serverhandling.storage.party.MovePartyPokemo
 import com.cobblemon.mod.common.net.serverhandling.storage.party.ReleasePCPokemonHandler
 import com.cobblemon.mod.common.net.serverhandling.storage.party.SwapPartyPokemonHandler
 import com.cobblemon.mod.common.net.serverhandling.storage.pc.*
+import com.cobblemon.mod.common.net.serverhandling.tower.TowerPokemonSelectionHandler
 import com.cobblemon.mod.common.net.serverhandling.trade.AcceptTradeRequestHandler
 import com.cobblemon.mod.common.net.serverhandling.trade.CancelTradeHandler
 import com.cobblemon.mod.common.net.serverhandling.trade.ChangeTradeAcceptanceHandler
@@ -510,6 +516,9 @@ object CobblemonNetwork {
         // Debug
         list.add(PacketRegisterInfo(OpenRidingStatsDebugGUIPacket.ID, OpenRidingStatsDebugGUIPacket::decode, OpenRidingStatsDebugGUIHandler))
 
+        // Tower
+        list.add(PacketRegisterInfo(OpenTowerSelectionPacket.ID, OpenTowerSelectionPacket::decode, OpenTowerSelectionHandler))
+
         return list
     }
 
@@ -632,12 +641,16 @@ object CobblemonNetwork {
 
         list.add(PacketRegisterInfo(SpectateNearestBattlePacket.ID, SpectateNearestBattlePacket::decode, SpectateNearestBattleHandler))
 
-        // Mega Evolution
-        list.add(PacketRegisterInfo(C2SMegaEvolvePacket.ID, C2SMegaEvolvePacket::decode, C2SMegaEvolveHandler))
-        list.add(PacketRegisterInfo(C2SRemoveMegaEvolutionPacket.ID, C2SRemoveMegaEvolutionPacket::decode, C2SRemoveMegaEvolutionHandler))
+        // DISABLED: Mega Evolution integration (conflicts with Mega Showdown mod)
+        // list.add(PacketRegisterInfo(C2SMegaEvolvePacket.ID, C2SMegaEvolvePacket::decode, C2SMegaEvolveHandler))
+        // list.add(PacketRegisterInfo(C2SRemoveMegaEvolutionPacket.ID, C2SRemoveMegaEvolutionPacket::decode, C2SRemoveMegaEvolutionHandler))
 
         // Poke Bags
         list.add(PacketRegisterInfo(C2SOpenPokeBagPacket.ID, C2SOpenPokeBagPacket::decode, C2SOpenPokeBagHandler))
+
+        // Tower
+        list.add(PacketRegisterInfo(TowerPokemonSelectionPacket.ID, TowerPokemonSelectionPacket::decode, TowerPokemonSelectionHandler))
+
         return list
     }
 

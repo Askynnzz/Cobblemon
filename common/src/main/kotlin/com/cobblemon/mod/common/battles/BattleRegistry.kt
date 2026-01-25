@@ -46,6 +46,10 @@ object BattleRegistry {
         return battleMap.values.flatMap { it.players }
     }
 
+    fun getBattles(): Collection<PokemonBattle> {
+        return battleMap.values
+    }
+
     /**
      * Packs a team into the showdown format
      *
@@ -223,6 +227,18 @@ object BattleRegistry {
             return SuccessfulBattleStart(battle)
         }
         return ErroredBattleStart(mutableSetOf(BattleStartError.canceledByEvent(preBattleEvent.reason)))
+    }
+
+    // Wrapper for compatibility with radgyms in java
+    @JvmStatic
+    fun startBattle(
+        battleFormat: BattleFormat,
+        side1: BattleSide,
+        side2: BattleSide,
+        canPreempt: Boolean
+    ): BattleStartResult {
+        // call the known kotlin method with defaults parameter
+        return startBattle(battleFormat, side1, side2, canPreempt) { _, _ -> null }
     }
 
     @JvmStatic

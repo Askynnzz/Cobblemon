@@ -1,0 +1,49 @@
+{
+    "cobblemon:tower_lobby_attendant": {
+        "pages": [
+            {
+                "text": "§6§lWelcome to the Battle Tower!§r\n\n§7Test your skills against 7 consecutive battles.\n§7Choose your challenge level:",
+                "input": {
+                    "inputType": "optionset",
+                    "options": [
+                        {
+                            "text": "§a§lRookie Challenge§r\n§ | Moderate Rewards",
+                            "value": "easy"
+                        },
+                        {
+                            "text": "§e§lAdvanced Trial§r\n§ | Great Rewards",
+                            "value": "normal"
+                        },
+                        {
+                            "text": "§c§lMaster Challenge§r\n§ | Legendary Rewards",
+                            "value": "hard"
+                        },
+                        {
+                            "text": "§7Leave",
+                            "value": "exit"
+                        }
+                    ]
+                },
+                "action": {
+                    "type": "tower_start"
+                }
+            }
+        ]
+    },
+    "cobblemon:tower_victory": {
+        "pages": [
+            {
+                "text": "§a§l★ VICTORY! ★§r\n\n§7Arena cleared! Proceeding to next challenge...",
+                "timeout": 3
+            }
+        ]
+    },
+    "cobblemon:tower_defeat": {
+        "pages": [
+            {
+                "text": "§c§lDEFEAT§r\n\n§7Your tower run has ended.\n§7Better luck next time!",
+                "timeout": 3
+            }
+        ]
+    }
+}

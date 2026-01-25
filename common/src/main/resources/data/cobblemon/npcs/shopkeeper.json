@@ -1,0 +1,16 @@
+{
+    "id": "shopkeeper",
+    "behaviour": "cobblemon:standard",
+    "aspects": [
+        "shopkeeper-custom"
+    ],
+    "hitbox": "player",
+    "names": [
+        "§aShopkeeper"
+    ],
+    "interaction": {
+        "type": "dialogue",
+        "dialogue": "cobblemon:shop_welcome"
+    },
+    "canDespawn": false
+}

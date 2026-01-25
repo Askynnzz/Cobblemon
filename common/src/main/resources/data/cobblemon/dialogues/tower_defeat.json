@@ -1,0 +1,14 @@
+{
+    "pages": [
+        {
+            "id": "defeat",
+            "speaker": "npc",
+            "lines": [
+                "§c§lDEFEAT§r",
+                "§7Your tower run has ended.",
+                "§7Better luck next time!"
+            ],
+            "input": "q.dialogue.close();"
+        }
+    ]
+}

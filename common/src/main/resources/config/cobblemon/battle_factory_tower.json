@@ -1,0 +1,203 @@
+{
+    "tower_name": "§6§lDelta Battle Tower",
+    "difficulties": [
+        {
+            "id": "easy",
+            "display_name": "§a§lRookie Challenge",
+            "pokemon_level_range": [
+                50,
+                55
+            ],
+            "trainer_ai_difficulty": "easy",
+            "reward_multiplier": 1.0,
+            "completion_reward": {
+                "items": [
+                    "cobblemon:rare_candy:3",
+                    "cobblemon:exp_share:1"
+                ]
+            }
+        },
+        {
+            "id": "normal",
+            "display_name": "§e§lAdvanced Trial",
+            "pokemon_level_range": [
+                60,
+                70
+            ],
+            "trainer_ai_difficulty": "normal",
+            "reward_multiplier": 2.0,
+            "completion_reward": {
+                "items": [
+                    "cobblemon:master_ball:1",
+                    "cobblemon:ability_capsule:1",
+                    "cobblemon:rare_candy:5"
+                ]
+            }
+        },
+        {
+            "id": "hard",
+            "display_name": "§c§lMaster Challenge",
+            "pokemon_level_range": [
+                75,
+                100
+            ],
+            "trainer_ai_difficulty": "hard",
+            "reward_multiplier": 3.0,
+            "completion_reward": {
+                "items": [
+                    "cobblemon:master_ball:3",
+                    "cobblemon:ability_patch:1",
+                    "cobblemon:rare_candy:10"
+                ]
+            }
+        }
+    ],
+    "arenas": [
+        {
+            "id": "arena_1",
+            "name": "§bStage 1",
+            "coordinates": {
+                "x": -248,
+                "y": 34,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 35,
+                "z": 16
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 35,
+                "z": 31
+            }
+        },
+        {
+            "id": "arena_2",
+            "name": "§6Stage 2",
+            "coordinates": {
+                "x": -248,
+                "y": 48,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 48,
+                "z": 29
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 48,
+                "z": 17
+            }
+        },
+        {
+            "id": "arena_3",
+            "name": "§4Stage 3",
+            "coordinates": {
+                "x": -248,
+                "y": 59,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 58,
+                "z": 30
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 58,
+                "z": 16
+            }
+        },
+        {
+            "id": "arena_4",
+            "name": "§3Stage 4",
+            "coordinates": {
+                "x": -248,
+                "y": 78,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": 405,
+                "y": 76,
+                "z": 205
+            },
+            "player_spawn": {
+                "x": 395,
+                "y": 76,
+                "z": 195
+            }
+        },
+        {
+            "id": "arena_5",
+            "name": "§2Stage 5",
+            "coordinates": {
+                "x": -248,
+                "y": 90,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 90,
+                "z": 32
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 90,
+                "z": 16
+            }
+        },
+        {
+            "id": "arena_6",
+            "name": "§5Stage 6",
+            "coordinates": {
+                "x": -248,
+                "y": 105,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 105,
+                "z": 32
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 105,
+                "z": 16
+            }
+        },
+        {
+            "id": "arena_7",
+            "name": "§c§lLAST STAGE",
+            "coordinates": {
+                "x": -248,
+                "y": 115,
+                "z": 23,
+                "world": "monserveur:spawn"
+            },
+            "trainer_spawn": {
+                "x": -248,
+                "y": 115,
+                "z": 32
+            },
+            "player_spawn": {
+                "x": -248,
+                "y": 115,
+                "z": 14
+            }
+        }
+    ],
+    "lobby_npc_spawn": {
+        "x": -248,
+        "y": 26,
+        "z": 31,
+        "world": "monserveur:spawn"
+    }
+}
