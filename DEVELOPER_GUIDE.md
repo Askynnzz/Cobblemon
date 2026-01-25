@@ -8,7 +8,7 @@ This fork includes several custom systems designed for the Cobblemon Academy ser
 - **Battle Factory / Tower**: A PvE challenge mode with generated teams.
 - **Economy & Shop**: A custom NPC shop system selling items for currency.
 - **Custom NPCs**: Unique trainers and utility NPCs with custom textures and dialogues.
-- **Mega Evolution & Battle Fixes**: Re-enabled Mega Evolution and fixes for battle UI logic.
+- **Mega Evolution & Battle Fixes**: Re-enabled Mega Evolution managed by Mega Showdown and fixes for battle UI logic and ragdgym/raid dens.
 
 ---
 
@@ -55,19 +55,6 @@ A simple shop system where players can buy items.
 - **NPC:** `data/cobblemon/npcs/shopkeeper.json`.
 - **Dialogue:** `data/cobblemon/dialogues/shop_welcome.json`.
 
-### C. Custom Textures
-We use custom textures for specific NPCs without replacing the default player skin.
-
-**Texture Locations:**
-- Images: `common/src/main/resources/assets/cobblemon/textures/npcs/standard/`
-  - `trainertower.png`
-  - `shopkeeper.png`
-
-**Definition Logic:**
-- **Texture Mapping:** [`assets/cobblemon/bedrock/npcs/variations/standard/99_custom_npcs.json`](common/src/main/resources/assets/cobblemon/bedrock/npcs/variations/standard/99_custom_npcs.json).
-  - Maps aspects (`tower-trainer-custom`, `shopkeeper-custom`) to the PNG files.
-- **Applying to NPCs:**
-  - In the NPC JSON (e.g., `shopkeeper.json`), add `"aspects": ["shopkeeper-custom"]`.
 
 ---
 
@@ -91,5 +78,5 @@ We use custom textures for specific NPCs without replacing the default player sk
 ---
 
 ## 4. Troubleshooting
-- **Textures not showing?** Check `99_custom_npcs.json` to ensure the aspect name matches exactly what is in the NPC file, and that the path to the PNG is correct relative to `assets/`.
 - **NPC interactions broken?** Validate the JSON syntax in `dialogues/`. A missing comma can prevent the dialogue from loading.
+- **Pokemon GUI not refreshing after a battle/after battle factory?** Disconnect and reconnect to your server should be enough to fix this for the moment.
