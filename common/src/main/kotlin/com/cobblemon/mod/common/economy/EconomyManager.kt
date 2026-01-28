@@ -31,16 +31,18 @@ object EconomyManager {
     )
 
     fun load() {
+        // Register Dialogue Action (Needed even if economy is disabled to prevent JSON errors)
+        com.cobblemon.mod.common.api.dialogue.DialogueAction.types["economy_shop"] = com.cobblemon.mod.common.economy.shop.EconomyShopDialogueAction::class.java
+
+        if (!Cobblemon.config.enableEconomy) return
         PlayerInstancedDataStoreTypes.register(ECONOMY_DATA_TYPE)
 
         // Register Event Handler
         EconomyEventHandler.register()
-
-        // Register Dialogue Action
-        com.cobblemon.mod.common.api.dialogue.DialogueAction.types["economy_shop"] = com.cobblemon.mod.common.economy.shop.EconomyShopDialogueAction::class.java
     }
 
     fun setup(server: net.minecraft.server.MinecraftServer) {
+        if (!Cobblemon.config.enableEconomy) return
         val backend = object : JsonBackedPlayerDataStoreBackend<PlayerEconomyData>("economy", ECONOMY_DATA_TYPE) {
             override val gson = GsonBuilder().setPrettyPrinting().create()
             override val classToken = object : TypeToken<PlayerEconomyData>() {}

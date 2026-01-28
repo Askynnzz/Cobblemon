@@ -368,6 +368,10 @@ class NPCEntity(world: Level) : AgeableMob(CobblemonEntities.NPC, world), Posabl
         return brain
     }
 
+
+
+
+
     override fun doHurtTarget(target: Entity): Boolean {
         val source = this.damageSources().mobAttack(this)
         val hurt = target.hurt(source, attributes.getValue(Attributes.ATTACK_DAMAGE).toFloat() * 5F)
@@ -624,6 +628,16 @@ class NPCEntity(world: Level) : AgeableMob(CobblemonEntities.NPC, world), Posabl
 
     override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
         if (player is ServerPlayer) {
+            // Tower Isolation Logic
+            val challengerTag = this.tags.find { it.startsWith("challenger:") }
+            if (challengerTag != null) {
+                val authorizedUUID = challengerTag.substringAfter("challenger:")
+                if (player.uuid.toString() != authorizedUUID) {
+                     player.sendSystemMessage(net.minecraft.network.chat.Component.literal("This Trainer is challenging someone else!").withStyle(net.minecraft.ChatFormatting.RED))
+                    return InteractionResult.FAIL
+                }
+            }
+
             if (player.isCreative && player.getItemInHand(hand).item.toString() == CobblemonItems.NPC_EDITOR.toString()) {
                 edit(player)
             } else if (hand == InteractionHand.MAIN_HAND) {

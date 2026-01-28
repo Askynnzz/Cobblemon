@@ -53,7 +53,8 @@ object TowerTrainerSpawner {
         world: ServerLevel,
         arena: ArenaLocation,
         difficulty: TowerDifficulty,
-        arenaNumber: Int
+        arenaNumber: Int,
+        challengerUUID: java.util.UUID
     ): NPCEntity? {
         try {
             // Generate strategic trainer team
@@ -63,6 +64,13 @@ object TowerTrainerSpawner {
             
             // Create NPC entity
             val npc = NPCEntity(world)
+            
+            // Apply Tower Tags for Logic Handling
+            npc.addTag("tower_npc")
+            npc.addTag("challenger:${challengerUUID}")
+            
+            // Set Native Invulnerability
+            npc.isInvulnerable = true
             
             // Position NPC at trainer spawn location
             val spawnPos = arena.trainerSpawn

@@ -21,4 +21,5 @@ enum class Category(val lang: String) {
     Interface("interface"),
     Riding("riding"),
     Debug("debug"),
+    Economy("economy"),
 }

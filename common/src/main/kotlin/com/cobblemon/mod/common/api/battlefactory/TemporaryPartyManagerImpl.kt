@@ -131,33 +131,7 @@ object TemporaryPartyManagerImpl : TemporaryPartyManager {
             }
             
             // HARD REFRESH: Complete party store reinitialization (same as restore)
-            // This fixes UI not refreshing on second start
-            
-            // Step 1: Send SetPartyReferencePacket
-            com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                player,
-                com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyReferencePacket(party.uuid)
-            )
-            
-            // Step 2: Initialize party
-            com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                player,
-                com.cobblemon.mod.common.net.messages.client.storage.party.InitializePartyPacket(false, party.uuid, 6)
-            )
-            
-            // Step 3: Send each Pokemon
-            for (i in 0 until 6) {
-                val pokemon = party.get(i)
-                if (pokemon != null) {
-                    com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                        player,
-                        com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyPokemonPacket(
-                            party.uuid,
-                            com.cobblemon.mod.common.api.storage.party.PartyPosition(i)
-                        ) { pokemon }
-                    )
-                }
-            }
+            refreshUI(player)
             
             Cobblemon.LOGGER.info("Applied rental team of ${rentalTeam.size} Pokémon to ${player.name.string}")
             return true
@@ -217,33 +191,7 @@ object TemporaryPartyManagerImpl : TemporaryPartyManager {
             player.removeTag(TAG_HAS_TEMP_PARTY)
             
             // ULTIMATE FIX: Complete party store reinitialization
-            // This mimics what happens on player login to force complete UI refresh
-            
-            // Step 1: Send SetPartyReferencePacket to tell client which party to watch
-            com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                player,
-                com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyReferencePacket(party.uuid)
-            )
-            
-            // Step 2: Initialize party with size
-            com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                player,
-                com.cobblemon.mod.common.net.messages.client.storage.party.InitializePartyPacket(false, party.uuid, 6)
-            )
-            
-            // Step 3: Send each Pokemon individually with its position
-            for (i in 0 until 6) {
-                val pokemon = party.get(i)
-                if (pokemon != null) {
-                    com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
-                        player,
-                        com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyPokemonPacket(
-                            party.uuid,
-                            com.cobblemon.mod.common.api.storage.party.PartyPosition(i)
-                        ) { pokemon }
-                    )
-                }
-            }
+            refreshUI(player)            
             
             Cobblemon.LOGGER.info("Successfully restored original party for ${player.name.string} (${backupData.originalParty.size} Pokémon)")
             return true
@@ -381,5 +329,38 @@ fun onPlayerLogin(player: ServerPlayer) {
             Cobblemon.LOGGER.warn("Player ${player.name.string} died with temporary party - forcing restore")
             restore(player, force = true)
         }
+    }
+
+    override fun refreshUI(player: ServerPlayer) {
+        val party = player.party()
+        
+        // Force sync entire data first (if method exists, but we'll stick to packets we know)
+        // SetPartyReferencePacket: Tells client "Use this UUID for your party sidebar"
+        com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
+            player,
+            com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyReferencePacket(party.uuid)
+        )
+        
+        // InitializePartyPacket: "Here is your party data, clear old data first (true)"
+        com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
+            player,
+            com.cobblemon.mod.common.net.messages.client.storage.party.InitializePartyPacket(true, party.uuid, 6)
+        )
+        
+        // Send individual slots just to be absolutely sure
+        for (i in 0 until 6) {
+            val pokemon = party.get(i)
+            if (pokemon != null) {
+                com.cobblemon.mod.common.CobblemonNetwork.sendPacketToPlayer(
+                    player,
+                    com.cobblemon.mod.common.net.messages.client.storage.party.SetPartyPokemonPacket(
+                        party.uuid,
+                        com.cobblemon.mod.common.api.storage.party.PartyPosition(i)
+                    ) { pokemon }
+                )
+            }
+        }
+        
+        Cobblemon.LOGGER.info("Forced UI refresh for ${player.name.string}")
     }
 }

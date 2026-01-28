@@ -22,6 +22,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 class EconomyShopDialogueAction : DialogueAction {
     
     override fun invoke(dialogue: ActiveDialogue, input: String?) {
+        if (!com.cobblemon.mod.common.Cobblemon.config.enableEconomy) {
+             dialogue.playerEntity.sendSystemMessage(Component.literal("§cThe economy system is currently disabled."))
+             return
+        }
+
         com.cobblemon.mod.common.Cobblemon.LOGGER.info("EconomyShopDialogueAction invoked with input: $input")
         val player = dialogue.playerEntity
         val option = input ?: return

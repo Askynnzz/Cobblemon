@@ -101,5 +101,6 @@
   "despawnerNearDistance": 32.0,
   "despawnerFarDistance": 96.0,
   "despawnerMinAgeTicks": 600,
-  "despawnerMaxAgeTicks": 3600
+  "despawnerMaxAgeTicks": 3600,
+  "enableEconomy": true
 }

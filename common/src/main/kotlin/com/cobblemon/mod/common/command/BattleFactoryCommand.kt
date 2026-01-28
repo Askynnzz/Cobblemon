@@ -59,6 +59,11 @@ object BattleFactoryCommand {
                         .executes(::status)
                 )
                 .then(
+                    Commands.literal("refresh")
+                        .requires { it.hasPermission(0) }
+                        .executes(::refresh)
+                )
+                .then(
                     Commands.literal("test")
                         .requires { it.hasPermission(2) }
                         .executes(::test)
@@ -171,6 +176,19 @@ object BattleFactoryCommand {
         // Show backup status
         val hasBackup = TemporaryPartyManagerImpl.hasTemporaryParty(player)
         player.sendSystemMessage(Component.literal("§7Party Backup: ${if (hasBackup) "§aActive" else "§cNone"}"))
+        
+        return 1
+    }
+
+    /**
+     * Manuall refreshes the player's UI.
+     */
+    private fun refresh(context: CommandContext<CommandSourceStack>): Int {
+        val player = context.source.playerOrException
+        
+        player.sendSystemMessage(Component.literal("§eRefreshing Battle Factory UI..."))
+        TemporaryPartyManagerImpl.refreshUI(player)
+        player.sendSystemMessage(Component.literal("§aUI Refresh signal sent!"))
         
         return 1
     }

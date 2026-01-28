@@ -83,6 +83,10 @@ object BattleFactoryEventHandler {
         
         // Hook 1: Player logout → force restore
         PlatformEvents.SERVER_PLAYER_LOGOUT.subscribe { event ->
+            // If player disconnects during a Tower run, it counts as a defeat (anti-cheat)
+            if (BattleFactoryTowerManager.hasActiveSession(event.player)) {
+                BattleFactoryTowerManager.onArenaDefeat(event.player)
+            }
             TemporaryPartyManagerImpl.onPlayerLogout(event.player)
         }
         
@@ -99,20 +103,50 @@ object BattleFactoryEventHandler {
         // Hook 4: Battle victory → session.onWin() OR tower.onArenaVictory()
         CobblemonEvents.BATTLE_VICTORY.subscribe { event ->
             val winners = event.winners
+            val battle = event.battle
+            
+            // Handle Winners (Player Won)
             winners.forEach { battleActor ->
                 if (battleActor is com.cobblemon.mod.common.battles.actor.PlayerBattleActor) {
                     val player = battleActor.entity as? net.minecraft.server.level.ServerPlayer ?: return@forEach
                     
                     // Check for Tower session first
-                    if (BattleFactoryTowerManager.hasActiveSession(player)) {
-                        BattleFactoryTowerManager.onArenaVictory(player)
+                    val session = BattleFactoryTowerManager.getActiveSession(player)
+                    if (session != null) {
+                        // VICTORY SCOPE CHECK: Verify this battle was against the current Tower NPC
+                        // If the battle didn't include the specific NPC we spawned, it's just a random wild battle
+                        val isCorrectOpponent = session.currentTrainerNPC != null && 
+                                              battle.actors.any { it.uuid == session.currentTrainerNPC }
+                        
+                        if (isCorrectOpponent) {
+                            BattleFactoryTowerManager.onArenaVictory(player)
+                        } else {
+                            Cobblemon.LOGGER.info("Player ${player.name.string} won a battle, but not against the Tower Trainer. Ignoring.")
+                        }
                         return@forEach
                     }
                     
                     // Otherwise check for regular Battle Factory session
-                    val session = FacilitySessionManager.getSession(player)
-                    if (session is BattleFactorySession && session.isActive()) {
-                        session.onWin()
+                    val factorySession = FacilitySessionManager.getSession(player)
+                    if (factorySession is BattleFactorySession && factorySession.isActive()) {
+                        factorySession.onWin()
+                    }
+                }
+            }
+            
+            // Handle Losers/Forfeit (Player Lost)
+            // Forfeit counts as a loss, so the opponent wins and player ends up in losers list
+            battle.losers.forEach { battleActor ->
+                if (battleActor is com.cobblemon.mod.common.battles.actor.PlayerBattleActor) {
+                    val player = battleActor.entity as? net.minecraft.server.level.ServerPlayer ?: return@forEach
+                    
+                    if (BattleFactoryTowerManager.hasActiveSession(player)) {
+                        BattleFactoryTowerManager.onArenaDefeat(player)
+                    } else {
+                         val factorySession = FacilitySessionManager.getSession(player)
+                         if (factorySession is BattleFactorySession && factorySession.isActive()) {
+                             factorySession.onLose()
+                         }
                     }
                 }
             }

@@ -208,7 +208,7 @@ object BattleFactoryTowerManager {
             return
         }
         
-        val npc = TowerTrainerSpawner.spawnTrainer(player.serverLevel(), arena, session.difficulty, 1)
+        val npc = TowerTrainerSpawner.spawnTrainer(player.serverLevel(), arena, session.difficulty, 1, player.uuid)
         session.currentTrainerNPC = npc?.uuid // Store UUID for cleanup
         
         player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§a§lTower session started! ${difficulty.displayName}"))
@@ -248,7 +248,7 @@ object BattleFactoryTowerManager {
                  return
             }
             
-            val npc = TowerTrainerSpawner.spawnTrainer(player.serverLevel(), arena, session.difficulty, session.currentArena + 1)
+            val npc = TowerTrainerSpawner.spawnTrainer(player.serverLevel(), arena, session.difficulty, session.currentArena + 1, player.uuid)
             session.currentTrainerNPC = npc?.uuid
             
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§a§lVictory! Party Healed."))

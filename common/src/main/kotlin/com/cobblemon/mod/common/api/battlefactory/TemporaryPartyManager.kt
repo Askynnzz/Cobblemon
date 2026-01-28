@@ -83,4 +83,10 @@ interface TemporaryPartyManager {
      * @param wins The new win count
      */
     fun updateWins(player: ServerPlayer, wins: Int)
+
+    /**
+     * Forces a complete UI refresh of the player's party.
+     * Useful if client-side desync occurs after swapping parties.
+     */
+    fun refreshUI(player: ServerPlayer)
 }
