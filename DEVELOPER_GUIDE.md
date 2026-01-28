@@ -6,8 +6,8 @@ This document outlines the custom features, file structures, and modifications p
 
 This fork includes several custom systems designed for the Cobblemon Academy server, including:
 - **Battle Factory / Tower**: A PvE challenge mode with generated teams.
-- **Economy & Shop**: A custom NPC shop system selling items for currency.
-- **Custom NPCs**: Unique trainers and utility NPCs with custom textures and dialogues.
+- **Economy & Shop**: A custom NPC shop system selling items for currency. (Can be disabled through main config from cobblemon to use an other economy mod)
+- **Custom NPCs**: Trainers and utility NPCs dialogues. 
 - **Mega Evolution & Battle Fixes**: Re-enabled Mega Evolution managed by Mega Showdown and fixes for battle UI logic and ragdgym/raid dens.
 
 ---
@@ -35,6 +35,10 @@ The Battle Tower allows players to challenge AI trainers with progressively hard
 - Package: `com.cobblemon.mod.common.api.battlefactory`
 - Key Class: `TowerBattleActor` (Handles AI logic for tower trainers).
 
+**Commands:**
+- /towersimulate [difficulty] [complete/fail] to force the end of a trial
+- /battlefactory refresh to hard refresh the UI if there is any issues with it after a trial.
+
 ### B. Economy & Shop
 A simple shop system where players can buy items.
 
@@ -50,7 +54,7 @@ A simple shop system where players can buy items.
       "amount": 1
     }
     ```
-
+  - You can disable it through config/cobblemon/main.json by turning enableEconomy to false
 **Data Files:**
 - **NPC:** `data/cobblemon/npcs/shopkeeper.json`.
 - **Dialogue:** `data/cobblemon/dialogues/shop_welcome.json`.
@@ -79,4 +83,4 @@ A simple shop system where players can buy items.
 
 ## 4. Troubleshooting
 - **NPC interactions broken?** Validate the JSON syntax in `dialogues/`. A missing comma can prevent the dialogue from loading.
-- **Pokemon GUI not refreshing after a battle/after battle factory?** Disconnect and reconnect to your server should be enough to fix this for the moment.
+- **Pokemon GUI not refreshing after a battle/after battle factory?** Disconnect and reconnect to your server should be enough to fix this for the moment , or try /battlefactory refresh.
